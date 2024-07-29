@@ -5,8 +5,8 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  Tooltip,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -17,12 +17,13 @@ import {
 } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
 
-const produk = () => {
+const sales = () => {
   const theme = useTheme();
   const [data, setData] = useState([
-    ["1", "Joe James", "Test Corp", "Yonkers", "NY"],
-    ["2", "John Walsh", "Test Corp", "Hartford", "CT"],
-    ["3", "Bob Herm", "Test Corp", "Tampa", "FL"],
+    ["1", "Reza", "100000", "5", "1"],
+    ["2", "Hasbullah", "200000", "4", "2"],
+    ["3", "Farras", "50000", "3", "3"],
+    ["4", "Putri", "300000", "2", "4"],
   ]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -111,10 +112,10 @@ const produk = () => {
 
   const columns = [
     { name: "No", label: "No" },
-    { name: "Name", label: "Name" },
-    { name: "Company", label: "Company" },
-    { name: "City", label: "City" },
-    { name: "State", label: "State" },
+    { name: "Nama", label: "Nama" },
+    { name: "Harga", label: "Harga" },
+    { name: "Rating", label: "Rating" },
+    { name: "Terjual", label: "Terjual" },
     {
       name: "Actions",
       label: "Actions",
@@ -166,7 +167,11 @@ const produk = () => {
   return (
     <div>
       <MUIDataTable
-        title={<Typography variant="h3">Daftar Produk</Typography>}
+        title={
+          <Typography variant="h3" sx={{ fontWeight: 500 }}>
+            Daftar Produk
+          </Typography>
+        }
         data={data}
         columns={columns}
         options={{
@@ -230,4 +235,4 @@ const produk = () => {
   );
 };
 
-export default produk;
+export default sales;
