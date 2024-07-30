@@ -130,7 +130,7 @@ const sales = () => {
                 <Button
                   onClick={() => handleCreate()}
                   sx={{
-                    color: theme.palette.secondary.dark,
+                    color: theme.palette.success.dark,
                   }}
                 >
                   <IconTablePlus />

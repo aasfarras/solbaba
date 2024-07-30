@@ -5,19 +5,15 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogTitle,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
-import {
-  IconTablePlus,
-  IconEye,
-  IconPencil,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconEye, IconCalculator } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
 
-const laporan = () => {
+const Laporan = () => {
   const theme = useTheme();
   const [data, setData] = useState([
     ["1", "Reza", "100000", "5", "1"],
@@ -35,6 +31,9 @@ const laporan = () => {
     city: "",
     state: "",
   });
+
+  const [incomeDialogOpen, setIncomeDialogOpen] = useState(false);
+  const [totalIncome, setTotalIncome] = useState(0);
 
   const handleCreate = () => {
     setDialogMode("Create");
@@ -73,6 +72,7 @@ const laporan = () => {
 
   const handleDialogClose = () => {
     setDialogOpen(false);
+    setIncomeDialogOpen(false);
   };
 
   const handleSave = () => {
@@ -110,6 +110,15 @@ const laporan = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const calculateTotalIncome = () => {
+    return data.reduce((total, row) => total + parseFloat(row[2] || 0), 0);
+  };
+
+  const handleCalculateIncome = () => {
+    setTotalIncome(calculateTotalIncome());
+    setIncomeDialogOpen(true);
+  };
+
   const columns = [
     { name: "No", label: "No" },
     { name: "Nama", label: "Nama" },
@@ -126,35 +135,14 @@ const laporan = () => {
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <>
-              <Tooltip title="create">
-                <Button
-                  onClick={() => handleCreate()}
-                  sx={{
-                    color: theme.palette.secondary.dark,
-                  }}
-                >
-                  <IconTablePlus />
-                </Button>
-              </Tooltip>
-              <Tooltip title="read">
+              <Tooltip title="Read">
                 <Button onClick={() => handleRead(tableMeta.rowIndex)}>
                   <IconEye />
                 </Button>
               </Tooltip>
-              <Tooltip title="edit">
-                <Button
-                  onClick={() => handleUpdate(tableMeta.rowIndex)}
-                  sx={{ color: theme.palette.warning.main }}
-                >
-                  <IconPencil />
-                </Button>
-              </Tooltip>
-              <Tooltip title="delete">
-                <Button
-                  onClick={() => handleDelete(tableMeta.rowIndex)}
-                  sx={{ color: theme.palette.error.main }}
-                >
-                  <IconTrash />
+              <Tooltip title="Calculate Income">
+                <Button onClick={handleCalculateIncome}>
+                  <IconCalculator />
                 </Button>
               </Tooltip>
             </>
@@ -167,7 +155,11 @@ const laporan = () => {
   return (
     <div>
       <MUIDataTable
-        title={<Typography>Daftar Produk</Typography>}
+        title={
+          <Typography variant="h3" sx={{ fontWeight: 500 }}>
+            Daftar Produk
+          </Typography>
+        }
         data={data}
         columns={columns}
         options={{
@@ -227,8 +219,26 @@ const laporan = () => {
           )}
         </DialogActions>
       </Dialog>
+
+      <Dialog open={incomeDialogOpen} onClose={handleDialogClose}>
+        <DialogTitle>Total Pendapatan</DialogTitle>
+        <DialogContent>
+          <Typography variant="h6">
+            Total Pendapatan:{" "}
+            {totalIncome.toLocaleString("id-ID", {
+              style: "currency",
+              currency: "IDR",
+            })}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
 
-export default laporan;
+export default Laporan;

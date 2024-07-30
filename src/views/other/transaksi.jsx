@@ -17,7 +17,7 @@ import {
 } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
 
-const transaksi = () => {
+const Transaksi = () => {
   const theme = useTheme();
   const [data, setData] = useState([
     ["1", "Reza", "100000", "5", "1"],
@@ -126,35 +126,9 @@ const transaksi = () => {
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <>
-              <Tooltip title="create">
-                <Button
-                  onClick={() => handleCreate()}
-                  sx={{
-                    color: theme.palette.secondary.dark,
-                  }}
-                >
-                  <IconTablePlus />
-                </Button>
-              </Tooltip>
               <Tooltip title="read">
                 <Button onClick={() => handleRead(tableMeta.rowIndex)}>
                   <IconEye />
-                </Button>
-              </Tooltip>
-              <Tooltip title="edit">
-                <Button
-                  onClick={() => handleUpdate(tableMeta.rowIndex)}
-                  sx={{ color: theme.palette.warning.main }}
-                >
-                  <IconPencil />
-                </Button>
-              </Tooltip>
-              <Tooltip title="delete">
-                <Button
-                  onClick={() => handleDelete(tableMeta.rowIndex)}
-                  sx={{ color: theme.palette.error.main }}
-                >
-                  <IconTrash />
                 </Button>
               </Tooltip>
             </>
@@ -167,7 +141,11 @@ const transaksi = () => {
   return (
     <div>
       <MUIDataTable
-        title={<Typography>Daftar Produk</Typography>}
+        title={
+          <Typography variant="h3" sx={{ fontWeight: 500 }}>
+            Daftar Produk
+          </Typography>
+        }
         data={data}
         columns={columns}
         options={{
@@ -231,4 +209,4 @@ const transaksi = () => {
   );
 };
 
-export default transaksi;
+export default Transaksi;
