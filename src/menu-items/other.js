@@ -15,18 +15,18 @@ const other = {
       id: "transaksi",
       title: "Transaksi",
       type: "item",
-      url: "/other/transaksi",
+      url: "/super-admin/other/transaksi",
       icon: icons.IconCash,
       breadcrumbs: false,
     },
-    {
-      id: "laporan",
-      title: "Laporan",
-      type: "item",
-      url: "/other/laporan",
-      icon: icons.IconFileAnalytics,
-      breadcrumbs: false,
-    },
+    // {
+    //   id: "laporan",
+    //   title: "Laporan",
+    //   type: "item",
+    //   url: "/super-admin/other/laporan",
+    //   icon: icons.IconFileAnalytics,
+    //   breadcrumbs: false,
+    // },
   ],
 };
 

@@ -8,27 +8,36 @@ import {
   TextField,
   Tooltip,
   Typography,
+  Box,
 } from "@mui/material";
-import {
-  IconTablePlus,
-  IconEye,
-  IconPencil,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconEye, IconPencil, IconTrash } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
 
 const Transaksi = () => {
   const theme = useTheme();
   const [data, setData] = useState([
-    ["1", "Reza", "100000", "5", "1"],
-    ["2", "Hasbullah", "200000", "4", "2"],
-    ["3", "Farras", "50000", "3", "3"],
-    ["4", "Putri", "300000", "2", "4"],
+    {
+      kode: "1",
+      namaProduk: "Produk A",
+      namaCustomer: "Budi",
+      jumlahBeli: "2",
+      transaksi: "200000",
+      images: ["https://via.placeholder.com/150"],
+    },
+    {
+      kode: "2",
+      namaProduk: "Produk B",
+      namaCustomer: "Andi",
+      jumlahBeli: "1",
+      transaksi: "150000",
+      images: ["https://via.placeholder.com/150"],
+    },
+    // Produk lainnya
   ]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState(""); // "Create", "Read", "Update"
-  const [currentRow, setCurrentRow] = useState(null);
+  const [currentRowIndex, setCurrentRowIndex] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     company: "",
@@ -36,39 +45,17 @@ const Transaksi = () => {
     state: "",
   });
 
-  const handleCreate = () => {
-    setDialogMode("Create");
-    setFormData({ name: "", company: "", city: "", state: "" });
-    setDialogOpen(true);
-  };
-
   const handleRead = (rowIndex) => {
     setDialogMode("Read");
-    setCurrentRow(data[rowIndex]);
+    setCurrentRowIndex(rowIndex);
+    const rowData = data[rowIndex];
     setFormData({
-      name: data[rowIndex][1],
-      company: data[rowIndex][2],
-      city: data[rowIndex][3],
-      state: data[rowIndex][4],
+      name: rowData.namaProduk,
+      company: rowData.namaCustomer,
+      city: rowData.jumlahBeli,
+      state: rowData.transaksi,
     });
     setDialogOpen(true);
-  };
-
-  const handleUpdate = (rowIndex) => {
-    setDialogMode("Update");
-    setCurrentRow(data[rowIndex]);
-    setFormData({
-      name: data[rowIndex][1],
-      company: data[rowIndex][2],
-      city: data[rowIndex][3],
-      state: data[rowIndex][4],
-    });
-    setDialogOpen(true);
-  };
-
-  const handleDelete = (rowIndex) => {
-    const newData = data.filter((_, index) => index !== rowIndex);
-    setData(newData);
   };
 
   const handleDialogClose = () => {
@@ -76,46 +63,52 @@ const Transaksi = () => {
   };
 
   const handleSave = () => {
+    const updatedData = [...data];
     if (dialogMode === "Create") {
-      const newData = [
-        ...data,
-        [
-          (data.length + 1).toString(),
-          formData.name,
-          formData.company,
-          formData.city,
-          formData.state,
-        ],
-      ];
-      setData(newData);
+      updatedData.push({
+        kode: (data.length + 1).toString(),
+        namaProduk: formData.name,
+        namaCustomer: formData.company,
+        jumlahBeli: formData.city,
+        transaksi: formData.state,
+        images: [], // Gambar tidak diubah di mode Create
+      });
     } else if (dialogMode === "Update") {
-      const newData = data.map((row, index) =>
-        index === data.indexOf(currentRow)
-          ? [
-              currentRow[0],
-              formData.name,
-              formData.company,
-              formData.city,
-              formData.state,
-            ]
-          : row
-      );
-      setData(newData);
+      updatedData[currentRowIndex] = {
+        ...updatedData[currentRowIndex],
+        namaProduk: formData.name,
+        namaCustomer: formData.company,
+        jumlahBeli: formData.city,
+        transaksi: formData.state,
+      };
     }
+    setData(updatedData);
     setDialogOpen(false);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   const columns = [
-    { name: "No", label: "No" },
-    { name: "Nama", label: "Nama" },
-    { name: "Harga", label: "Harga" },
-    { name: "Rating", label: "Rating" },
-    { name: "Terjual", label: "Terjual" },
+    {
+      name: "images",
+      label: "Foto Produk",
+      options: {
+        customBodyRender: (value, tableMeta) => (
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            {data[tableMeta.rowIndex].images.length > 0 && (
+              <img
+                src={data[tableMeta.rowIndex].images[0]}
+                alt="Foto Produk"
+                style={{ width: 100, height: 100, objectFit: "cover" }}
+              />
+            )}
+          </Box>
+        ),
+      },
+    },
+    { name: "kode", label: "Kode Produk" },
+    { name: "namaProduk", label: "Nama Produk" },
+    { name: "namaCustomer", label: "Nama Customer" },
+    { name: "jumlahBeli", label: "Jumlah beli" },
+    { name: "transaksi", label: "Transaksi" },
     {
       name: "Actions",
       label: "Actions",
@@ -123,17 +116,18 @@ const Transaksi = () => {
         filter: false,
         sort: false,
         empty: true,
-        customBodyRender: (value, tableMeta, updateValue) => {
-          return (
-            <>
-              <Tooltip title="read">
-                <Button onClick={() => handleRead(tableMeta.rowIndex)}>
-                  <IconEye />
-                </Button>
-              </Tooltip>
-            </>
-          );
-        },
+        customBodyRender: (value, tableMeta) => (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Tooltip title="Read">
+              <Button
+                onClick={() => handleRead(tableMeta.rowIndex)}
+                sx={{ color: theme.palette.success.dark }}
+              >
+                <IconEye />
+              </Button>
+            </Tooltip>
+          </div>
+        ),
       },
     },
   ];
@@ -143,7 +137,7 @@ const Transaksi = () => {
       <MUIDataTable
         title={
           <Typography variant="h3" sx={{ fontWeight: 500 }}>
-            Daftar Produk
+            Transaksi
           </Typography>
         }
         data={data}
@@ -159,40 +153,54 @@ const Transaksi = () => {
         <DialogContent>
           <TextField
             margin="dense"
-            label="Name"
+            label="Nama Produk"
             name="name"
             fullWidth
             value={formData.name}
-            onChange={handleInputChange}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             disabled={dialogMode === "Read"}
           />
           <TextField
             margin="dense"
-            label="Harga"
-            name="Harga"
+            label="Nama Customer"
+            name="company"
             fullWidth
             value={formData.company}
-            onChange={handleInputChange}
+            onChange={(e) =>
+              setFormData({ ...formData, company: e.target.value })
+            }
             disabled={dialogMode === "Read"}
           />
           <TextField
             margin="dense"
-            label="Rating"
-            name="Rating"
+            label="Jumlah Beli"
+            name="city"
             fullWidth
             value={formData.city}
-            onChange={handleInputChange}
+            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
             disabled={dialogMode === "Read"}
           />
           <TextField
             margin="dense"
-            label="Terjual"
-            name="Terjual"
+            label="Transaksi"
+            name="state"
             fullWidth
             value={formData.state}
-            onChange={handleInputChange}
+            onChange={(e) =>
+              setFormData({ ...formData, state: e.target.value })
+            }
             disabled={dialogMode === "Read"}
           />
+          {/* Menampilkan gambar jika dalam mode Read */}
+          {dialogMode === "Read" && data[currentRowIndex].images.length > 0 && (
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+              <img
+                src={data[currentRowIndex].images[0]}
+                alt="Detail"
+                style={{ width: 100, height: 100, objectFit: "cover" }}
+              />
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">

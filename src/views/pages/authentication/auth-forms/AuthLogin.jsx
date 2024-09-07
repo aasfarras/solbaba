@@ -22,7 +22,6 @@ import Stack from "@mui/material/Stack";
 // third party
 import * as Yup from "yup";
 import { Formik } from "formik";
-import { useNavigate } from "react-router-dom";
 
 // project imports
 import AnimateButton from "../../../../ui-component/extended/AnimateButton";
@@ -31,8 +30,6 @@ import AnimateButton from "../../../../ui-component/extended/AnimateButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
-import Google from "../../../../assets/images/icons/social-google.svg";
-
 // ============================|| FIREBASE - LOGIN ||============================ //
 
 const AuthLogin = ({ ...others }) => {
@@ -40,11 +37,6 @@ const AuthLogin = ({ ...others }) => {
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const customization = useSelector((state) => state.customization);
   const [checked, setChecked] = useState(true);
-  const navigate = useNavigate();
-
-  const googleHandler = async () => {
-    console.error("Login");
-  };
 
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {
@@ -58,33 +50,6 @@ const AuthLogin = ({ ...others }) => {
   return (
     <>
       <Grid container direction="column" justifyContent="center" spacing={2}>
-        <Grid item xs={12}>
-          <AnimateButton>
-            <Button
-              disableElevation
-              fullWidth
-              onClick={googleHandler}
-              size="large"
-              variant="outlined"
-              sx={{
-                color: "grey.700",
-                backgroundColor: theme.palette.grey[50],
-                borderColor: theme.palette.grey[100],
-              }}
-            >
-              <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
-                <img
-                  src={Google}
-                  alt="google"
-                  width={16}
-                  height={16}
-                  style={{ marginRight: matchDownSM ? 8 : 16 }}
-                />
-              </Box>
-              Sign in with Google
-            </Button>
-          </AnimateButton>
-        </Grid>
         <Grid item xs={12}>
           <Box
             sx={{
@@ -257,9 +222,7 @@ const AuthLogin = ({ ...others }) => {
               <AnimateButton>
                 <Button
                   disableElevation
-                  // disabled={isSubmitting}
-                  onClick={() => navigate("/")}
-                  navi
+                  disabled={isSubmitting}
                   fullWidth
                   size="large"
                   type="submit"

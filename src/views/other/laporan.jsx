@@ -157,7 +157,7 @@ const Laporan = () => {
       <MUIDataTable
         title={
           <Typography variant="h3" sx={{ fontWeight: 500 }}>
-            Daftar Produk
+            Laporan
           </Typography>
         }
         data={data}

@@ -98,11 +98,11 @@ const ProfileSection = () => {
           alignItems: "center",
           borderRadius: "27px",
           transition: "all .2s ease-in-out",
-          borderColor: theme.palette.secondary.light,
-          backgroundColor: theme.palette.secondary.light,
+          borderColor: theme.palette.primary.light,
+          backgroundColor: theme.palette.primary.light,
           '&[aria-controls="menu-list-grow"], &:hover': {
-            borderColor: theme.palette.secondary.main,
-            background: `${theme.palette.secondary.main}!important`,
+            borderColor: theme.palette.primary.main,
+            background: `${theme.palette.primary.main}!important`,
             color: theme.palette.primary.light,
             "& svg": {
               stroke: theme.palette.primary.light,

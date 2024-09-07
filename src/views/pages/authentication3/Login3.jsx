@@ -11,7 +11,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import AuthWrapper1 from "../AuthWrapper1";
 import AuthCardWrapper from "../AuthCardWrapper";
 import AuthLogin from "../authentication/auth-forms/AuthLogin";
-import Logo from "../../../ui-component/Logo";
+// import Logo from "../../../ui-component/Logo";
 import AuthFooter from "../../../ui-component/cards/AuthFooter";
 
 // ================================|| AUTH3 - LOGIN ||================================ //
@@ -42,11 +42,6 @@ const Login = () => {
                   alignItems="center"
                   justifyContent="center"
                 >
-                  <Grid item sx={{ mb: 3 }}>
-                    <Link to="#" aria-label="logo">
-                      <Logo />
-                    </Link>
-                  </Grid>
                   <Grid item xs={12}>
                     <Grid
                       container

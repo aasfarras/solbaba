@@ -5,21 +5,55 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
+  Grid,
   TextField,
   Tooltip,
   Typography,
+  Avatar,
+  Card,
+  CardContent,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
-import { IconEye, IconLock, IconCheck, IconTrash } from "@tabler/icons-react";
+import {
+  IconEye,
+  IconPencil,
+  IconTrash,
+  IconKey,
+  IconEyeOff,
+} from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
 
 const Pelanggan = () => {
   const theme = useTheme();
   const [data, setData] = useState([
-    ["1", "Reza", "100000", "Not Verified", "Password123"],
-    ["2", "Hasbullah", "200000", "Verified", "Password456"],
-    ["3", "Farras", "50000", "Not Verified", "Password789"],
-    ["4", "Putri", "300000", "Verified", "Password000"],
+    [
+      "1",
+      "Agus",
+      "agus@gmail.com",
+      "08123456789",
+      "Laki-laki",
+      "https://via.placeholder.com/100",
+      "2000-01-01",
+      "1234567890123456",
+      "Provinsi A, Kabupaten A, Kecamatan A, Desa A, Jalan A",
+      "Referal A",
+      "password123",
+    ],
+    [
+      "2",
+      "Budi",
+      "budi@gmail.com",
+      "08129876543",
+      "Laki-laki",
+      "https://via.placeholder.com/100",
+      "2001-02-02",
+      "2345678901234567",
+      "Provinsi B, Kabupaten B, Kecamatan B, Desa B, Jalan B",
+      "Referal B",
+      "password456",
+    ],
+    // Tambahkan data pelanggan lainnya di sini
   ]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -27,18 +61,32 @@ const Pelanggan = () => {
   const [currentRow, setCurrentRow] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
-    company: "",
-    city: "",
-    state: "",
+    email: "",
+    phone: "",
+    gender: "",
+    photo: "",
+    dob: "",
+    nik: "",
+    address: "",
+    referral: "",
+    password: "",
   });
-
-  const [resetDialogOpen, setResetDialogOpen] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+  const [showPassword, setShowPassword] = useState(false); // State untuk visibilitas password
 
   const handleCreate = () => {
     setDialogMode("Create");
-    setFormData({ name: "", company: "", city: "", state: "" });
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      gender: "",
+      photo: "",
+      dob: "",
+      nik: "",
+      address: "",
+      referral: "",
+      password: "",
+    });
     setDialogOpen(true);
   };
 
@@ -47,9 +95,15 @@ const Pelanggan = () => {
     setCurrentRow(data[rowIndex]);
     setFormData({
       name: data[rowIndex][1],
-      company: data[rowIndex][2],
-      city: data[rowIndex][3],
-      state: data[rowIndex][4],
+      email: data[rowIndex][2],
+      phone: data[rowIndex][3],
+      gender: data[rowIndex][4],
+      photo: data[rowIndex][5],
+      dob: data[rowIndex][6],
+      nik: data[rowIndex][7],
+      address: data[rowIndex][8],
+      referral: data[rowIndex][9],
+      password: data[rowIndex][10],
     });
     setDialogOpen(true);
   };
@@ -59,9 +113,15 @@ const Pelanggan = () => {
     setCurrentRow(data[rowIndex]);
     setFormData({
       name: data[rowIndex][1],
-      company: data[rowIndex][2],
-      city: data[rowIndex][3],
-      state: data[rowIndex][4],
+      email: data[rowIndex][2],
+      phone: data[rowIndex][3],
+      gender: data[rowIndex][4],
+      photo: data[rowIndex][5],
+      dob: data[rowIndex][6],
+      nik: data[rowIndex][7],
+      address: data[rowIndex][8],
+      referral: data[rowIndex][9],
+      password: data[rowIndex][10],
     });
     setDialogOpen(true);
   };
@@ -71,10 +131,15 @@ const Pelanggan = () => {
     setData(newData);
   };
 
+  const handleResetPassword = (rowIndex) => {
+    const customerName = data[rowIndex][1];
+    // Logika untuk reset kata sandi dapat ditambahkan di sini, misalnya menghubungi API reset password
+    alert(`Reset kata sandi untuk ${customerName}`);
+  };
+
   const handleDialogClose = () => {
     setDialogOpen(false);
-    setResetDialogOpen(false);
-    setNewPassword("");
+    setShowPassword(false); // Reset visibility state on close
   };
 
   const handleSave = () => {
@@ -84,9 +149,15 @@ const Pelanggan = () => {
         [
           (data.length + 1).toString(),
           formData.name,
-          formData.company,
-          "Not Verified", // Default status
-          data[0][4], // Placeholder for Password
+          formData.email,
+          formData.phone,
+          formData.gender,
+          formData.photo,
+          formData.dob,
+          formData.nik,
+          formData.address,
+          formData.referral,
+          formData.password,
         ],
       ];
       setData(newData);
@@ -96,9 +167,15 @@ const Pelanggan = () => {
           ? [
               currentRow[0],
               formData.name,
-              formData.company,
-              row[3], // Preserve existing Status
-              row[4], // Preserve existing Password
+              formData.email,
+              formData.phone,
+              formData.gender,
+              formData.photo,
+              formData.dob,
+              formData.nik,
+              currentRow[8],
+              currentRow[9],
+              formData.password,
             ]
           : row
       );
@@ -112,43 +189,19 @@ const Pelanggan = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleVerify = (rowIndex) => {
-    const newData = data.map((row, index) =>
-      index === rowIndex
-        ? [
-            row[0],
-            row[1],
-            row[2],
-            row[3] === "Verified" ? "Not Verified" : "Verified", // Toggle status
-            row[4], // Preserve existing Password
-          ]
-        : row
-    );
-    setData(newData);
-  };
-
-  const handleResetPassword = () => {
-    if (selectedRowIndex !== null) {
-      const newData = data.map((row, index) =>
-        index === selectedRowIndex
-          ? [row[0], row[1], row[2], row[3], newPassword] // Update Password
-          : row
-      );
-      setData(newData);
-      setNewPassword("");
-      setResetDialogOpen(false);
-    }
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const columns = [
     { name: "No", label: "No" },
-    { name: "Nama", label: "Nama" },
-    { name: "Harga", label: "Harga" },
-    { name: "Status", label: "Status" },
-    { name: "Password", label: "Password" },
+    { name: "Nama Pelanggan", label: "Nama Pelanggan" },
+    { name: "email", label: "email" },
+    { name: "No.Telp", label: "No.Telp" },
+    { name: "Jenis Kelamin", label: "Jenis Kelamin" },
     {
-      name: "Actions",
-      label: "Actions",
+      name: "Aksi",
+      label: "Aksi",
       options: {
         filter: false,
         sort: false,
@@ -156,28 +209,20 @@ const Pelanggan = () => {
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <>
-              <Tooltip title="Read">
-                <Button onClick={() => handleRead(tableMeta.rowIndex)}>
+              <Tooltip title="Detail">
+                <Button
+                  onClick={() => handleRead(tableMeta.rowIndex)}
+                  sx={{ color: theme.palette.success.dark }}
+                >
                   <IconEye />
                 </Button>
               </Tooltip>
-              <Tooltip title="Verify">
+              <Tooltip title="Edit">
                 <Button
-                  onClick={() => handleVerify(tableMeta.rowIndex)}
-                  sx={{ color: theme.palette.success.main }}
-                >
-                  <IconCheck />
-                </Button>
-              </Tooltip>
-              <Tooltip title="Reset Password">
-                <Button
-                  onClick={() => {
-                    setSelectedRowIndex(tableMeta.rowIndex);
-                    setResetDialogOpen(true);
-                  }}
+                  onClick={() => handleUpdate(tableMeta.rowIndex)}
                   sx={{ color: theme.palette.warning.main }}
                 >
-                  <IconLock />
+                  <IconPencil />
                 </Button>
               </Tooltip>
               <Tooltip title="Delete">
@@ -188,6 +233,14 @@ const Pelanggan = () => {
                   <IconTrash />
                 </Button>
               </Tooltip>
+              <Tooltip title="Reset Password">
+                <Button
+                  onClick={() => handleResetPassword(tableMeta.rowIndex)}
+                  sx={{ color: theme.palette.info.main }}
+                >
+                  <IconKey />
+                </Button>
+              </Tooltip>
             </>
           );
         },
@@ -196,13 +249,10 @@ const Pelanggan = () => {
   ];
 
   return (
-    <div>
+    <>
       <MUIDataTable
-        title={
-          <Typography variant="h3" sx={{ fontWeight: 500 }}>
-            Daftar Produk
-          </Typography>
-        }
+        title={<Typography variant="h4">Manajemen Pelanggan</Typography>}
+        search={false}
         data={data}
         columns={columns}
         options={{
@@ -212,82 +262,173 @@ const Pelanggan = () => {
           rowsPerPageOptions: [5, 10, 20, 50, 100],
         }}
       />
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleDialogClose}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogContent>
-          <TextField
-            margin="dense"
-            label="Name"
-            name="name"
-            fullWidth
-            value={formData.name}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Read"}
-          />
-          <TextField
-            margin="dense"
-            label="Harga"
-            name="company"
-            fullWidth
-            value={formData.company}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Read"}
-          />
-          <TextField
-            margin="dense"
-            label="Rating"
-            name="city"
-            fullWidth
-            value={formData.city}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Read"}
-          />
-          <TextField
-            margin="dense"
-            label="Password"
-            name="state"
-            fullWidth
-            value={formData.state}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Read"}
-          />
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={4}>
+              {dialogMode === "Read" && (
+                <Card>
+                  <CardContent>
+                    <Avatar
+                      alt="Profile Picture"
+                      src={formData.photo}
+                      sx={{ width: 100, height: 100, mb: 2 }}
+                    />
+                    <Typography variant="h6">Nama: {formData.name}</Typography>
+                    <Typography variant="body1">
+                      Email: {formData.email}
+                    </Typography>
+                    <Typography variant="body1">
+                      No Telp: {formData.phone}
+                    </Typography>
+                    <Typography variant="body1">
+                      Jenis Kelamin: {formData.gender}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              )}
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <form noValidate autoComplete="off">
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      margin="dense"
+                      label="Nama"
+                      name="name"
+                      fullWidth
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      disabled={dialogMode === "Read"}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      margin="dense"
+                      label="Email"
+                      name="email"
+                      type="email"
+                      fullWidth
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      disabled={dialogMode === "Read"}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      margin="dense"
+                      label="No Telp"
+                      name="phone"
+                      fullWidth
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      disabled={dialogMode === "Read"}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      margin="dense"
+                      label="Jenis Kelamin"
+                      name="gender"
+                      fullWidth
+                      value={formData.gender}
+                      onChange={handleInputChange}
+                      disabled={dialogMode === "Read"}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      margin="dense"
+                      label="Tanggal Lahir"
+                      name="dob"
+                      type="date"
+                      fullWidth
+                      value={formData.dob}
+                      onChange={handleInputChange}
+                      disabled={dialogMode === "Read"}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      margin="dense"
+                      label="NIK"
+                      name="nik"
+                      fullWidth
+                      value={formData.nik}
+                      onChange={handleInputChange}
+                      disabled={dialogMode === "Read"}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      margin="dense"
+                      label="Alamat"
+                      name="address"
+                      fullWidth
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      disabled={dialogMode === "Read"}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      margin="dense"
+                      label="Referal"
+                      name="referral"
+                      fullWidth
+                      value={formData.referral}
+                      onChange={handleInputChange}
+                      disabled={dialogMode === "Read"}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      margin="dense"
+                      label="Password"
+                      name="password"
+                      fullWidth
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      type={showPassword ? "text" : "password"}
+                      disabled={dialogMode === "Read"}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={handleTogglePasswordVisibility}
+                            >
+                              {showPassword ? <IconEyeOff /> : <IconEye />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </form>
+            </Grid>
+          </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            Cancel
-          </Button>
           {dialogMode !== "Read" && (
             <Button onClick={handleSave} color="primary">
               Save
             </Button>
           )}
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={resetDialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>Reset Password</DialogTitle>
-        <DialogContent>
-          <TextField
-            margin="dense"
-            label="New Password"
-            type="password"
-            fullWidth
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-          <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-            Enter the new password for the selected user.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
+          <Button onClick={handleDialogClose} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleResetPassword} color="primary">
-            Reset Password
-          </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 

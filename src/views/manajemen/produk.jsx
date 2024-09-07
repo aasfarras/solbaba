@@ -3,119 +3,123 @@ import MUIDataTable from "mui-datatables";
 import {
   Button,
   Dialog,
-  DialogActions,
   DialogContent,
+  DialogActions,
   TextField,
   Tooltip,
+  Box,
   Typography,
 } from "@mui/material";
-import {
-  IconTablePlus,
-  IconEye,
-  IconPencil,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconEye, IconPencil, IconTrash } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
+import MainCard from "../../ui-component/cards/MainCard";
 
-const produk = () => {
+// Gaya gambar secara horizontal
+const imageStyle = {
+  display: "flex",
+  overflowX: "auto",
+  gap: "10px",
+  padding: "10px 0",
+};
+
+const Produk = () => {
   const theme = useTheme();
   const [data, setData] = useState([
-    ["1", "Reza", "100000", "5", "1"],
-    ["2", "Hasbullah", "200000", "4", "2"],
-    ["3", "Farras", "50000", "3", "3"],
-    ["4", "Putri", "300000", "2", "4"],
+    {
+      images: [
+        "https://via.placeholder.com/150",
+        "https://via.placeholder.com/150",
+        "https://via.placeholder.com/150",
+      ],
+      name: "Produk A",
+      kategori: "Elektronik",
+      subKategori: "Smartphone",
+      harga: "Rp. 5.000.000",
+      terjual: "50",
+      rating: "4.5",
+    },
+    // Produk lainnya
   ]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState(""); // "Create", "Read", "Update"
-  const [currentRow, setCurrentRow] = useState(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    company: "",
-    city: "",
-    state: "",
-  });
+  const [dialogMode, setDialogMode] = useState(""); // "Detail", "Create", "Update"
+  const [currentRowIndex, setCurrentRowIndex] = useState(null); // Menyimpan index baris yang sedang diedit
+  const [currentRow, setCurrentRow] = useState({});
+  const [imagePreviews, setImagePreviews] = useState([]);
 
-  const handleCreate = () => {
-    setDialogMode("Create");
-    setFormData({ name: "", company: "", city: "", state: "" });
-    setDialogOpen(true);
-  };
-
-  const handleRead = (rowIndex) => {
-    setDialogMode("Read");
+  // Fungsi untuk menangani klik tombol "Detail"
+  const handleDetail = (rowIndex) => {
+    setDialogMode("Detail");
+    setCurrentRowIndex(rowIndex);
     setCurrentRow(data[rowIndex]);
-    setFormData({
-      name: data[rowIndex][1],
-      company: data[rowIndex][2],
-      city: data[rowIndex][3],
-      state: data[rowIndex][4],
-    });
+    setImagePreviews(data[rowIndex].images);
     setDialogOpen(true);
   };
 
-  const handleUpdate = (rowIndex) => {
+  // Fungsi untuk menangani klik tombol "Edit"
+  const handleEdit = (rowIndex) => {
     setDialogMode("Update");
-    setCurrentRow(data[rowIndex]);
-    setFormData({
-      name: data[rowIndex][1],
-      company: data[rowIndex][2],
-      city: data[rowIndex][3],
-      state: data[rowIndex][4],
-    });
+    setCurrentRowIndex(rowIndex);
+    setCurrentRow({ ...data[rowIndex] }); // Copy data untuk diedit
+    setImagePreviews(data[rowIndex].images); // Menetapkan URL gambar sebagai preview
     setDialogOpen(true);
   };
 
+  // Fungsi untuk menangani klik tombol "Delete"
   const handleDelete = (rowIndex) => {
-    const newData = data.filter((_, index) => index !== rowIndex);
-    setData(newData);
+    const updatedData = data.filter((_, index) => index !== rowIndex);
+    setData(updatedData);
   };
 
+  // Fungsi untuk menutup dialog
   const handleDialogClose = () => {
     setDialogOpen(false);
+    setImagePreviews([]);
   };
 
+  // Fungsi untuk menyimpan perubahan produk baru atau produk yang diedit
   const handleSave = () => {
+    const updatedData = [...data];
     if (dialogMode === "Create") {
-      const newData = [
-        ...data,
-        [
-          (data.length + 1).toString(),
-          formData.name,
-          formData.company,
-          formData.city,
-          formData.state,
-        ],
-      ];
-      setData(newData);
+      updatedData.push({ ...currentRow, images: imagePreviews });
     } else if (dialogMode === "Update") {
-      const newData = data.map((row, index) =>
-        index === data.indexOf(currentRow)
-          ? [
-              currentRow[0],
-              formData.name,
-              formData.company,
-              formData.city,
-              formData.state,
-            ]
-          : row
-      );
-      setData(newData);
+      updatedData[currentRowIndex] = { ...currentRow, images: imagePreviews };
     }
-    setDialogOpen(false);
+    setData(updatedData);
+    handleDialogClose();
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  // Fungsi untuk menangani perubahan gambar yang diunggah
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    const previews = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews(previews);
+    setCurrentRow((prevRow) => ({
+      ...prevRow,
+      images: files,
+    }));
   };
 
+  // Kolom untuk tabel
   const columns = [
-    { name: "No", label: "No" },
-    { name: "Nama", label: "Nama" },
-    { name: "Harga", label: "Harga" },
-    { name: "Rating", label: "Rating" },
-    { name: "Terjual", label: "Terjual" },
+    {
+      name: "images",
+      label: "Foto Produk",
+      options: {
+        customBodyRender: (value, tableMeta) => (
+          <img
+            src={data[tableMeta.rowIndex].images[0]} // Thumbnail gambar pertama
+            alt="Foto Produk"
+            style={{ width: 100, height: 100, objectFit: "cover" }}
+          />
+        ),
+      },
+    },
+    { name: "name", label: "Nama Produk" },
+    { name: "kategori", label: "Kategori Produk" },
+    { name: "subKategori", label: "Sub Kategori Produk" },
+    { name: "harga", label: "Harga" },
+    { name: "terjual", label: "Jumlah Terjual" },
     {
       name: "Actions",
       label: "Actions",
@@ -123,54 +127,61 @@ const produk = () => {
         filter: false,
         sort: false,
         empty: true,
-        customBodyRender: (value, tableMeta, updateValue) => {
-          return (
-            <>
-              <Tooltip title="create">
-                <Button
-                  onClick={() => handleCreate()}
-                  sx={{
-                    color: theme.palette.success.dark,
-                  }}
-                >
-                  <IconTablePlus />
-                </Button>
-              </Tooltip>
-              <Tooltip title="read">
-                <Button onClick={() => handleRead(tableMeta.rowIndex)}>
-                  <IconEye />
-                </Button>
-              </Tooltip>
-              <Tooltip title="edit">
-                <Button
-                  onClick={() => handleUpdate(tableMeta.rowIndex)}
-                  sx={{ color: theme.palette.warning.main }}
-                >
-                  <IconPencil />
-                </Button>
-              </Tooltip>
-              <Tooltip title="delete">
-                <Button
-                  onClick={() => handleDelete(tableMeta.rowIndex)}
-                  sx={{ color: theme.palette.error.main }}
-                >
-                  <IconTrash />
-                </Button>
-              </Tooltip>
-            </>
-          );
-        },
+        customBodyRender: (value, tableMeta) => (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Tooltip title="Detail">
+              <Button
+                onClick={() => handleDetail(tableMeta.rowIndex)}
+                sx={{ color: theme.palette.success.dark }}
+              >
+                <IconEye />
+              </Button>
+            </Tooltip>
+            <Tooltip title="Edit">
+              <Button
+                onClick={() => handleEdit(tableMeta.rowIndex)}
+                sx={{ color: theme.palette.primary.main }}
+              >
+                <IconPencil />
+              </Button>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <Button
+                onClick={() => handleDelete(tableMeta.rowIndex)}
+                sx={{ color: theme.palette.error.main }}
+              >
+                <IconTrash />
+              </Button>
+            </Tooltip>
+          </div>
+        ),
       },
     },
   ];
 
   return (
-    <div>
+    <MainCard title="Manajemen Produk">
       <MUIDataTable
         title={
-          <Typography variant="h3" sx={{ fontWeight: 500 }}>
-            Daftar Produk
-          </Typography>
+          <Button
+            onClick={() => {
+              setDialogMode("Create");
+              setCurrentRow({
+                images: [],
+                name: "",
+                kategori: "",
+                subKategori: "",
+                harga: "",
+                terjual: "",
+                rating: "",
+              });
+              setImagePreviews([]);
+              setDialogOpen(true);
+            }}
+            variant="contained"
+          >
+            Tambah Produk
+          </Button>
         }
         data={data}
         columns={columns}
@@ -183,56 +194,135 @@ const produk = () => {
       />
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogContent>
-          <TextField
-            margin="dense"
-            label="Name"
-            name="name"
-            fullWidth
-            value={formData.name}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Read"}
-          />
-          <TextField
-            margin="dense"
-            label="Harga"
-            name="Harga"
-            fullWidth
-            value={formData.company}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Read"}
-          />
-          <TextField
-            margin="dense"
-            label="Rating"
-            name="Rating"
-            fullWidth
-            value={formData.city}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Read"}
-          />
-          <TextField
-            margin="dense"
-            label="Terjual"
-            name="Terjual"
-            fullWidth
-            value={formData.state}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Read"}
-          />
+          <Box>
+            <Typography variant="h6">
+              {dialogMode === "Detail" ? "Detail Produk" : "Form Produk"}
+            </Typography>
+            <TextField
+              margin="dense"
+              label="Nama Produk"
+              name="name"
+              fullWidth
+              value={currentRow?.name || ""}
+              InputProps={{
+                readOnly: dialogMode === "Detail",
+              }}
+              onChange={(e) =>
+                setCurrentRow({ ...currentRow, name: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Kategori Produk"
+              name="kategori"
+              fullWidth
+              value={currentRow?.kategori || ""}
+              InputProps={{
+                readOnly: dialogMode === "Detail",
+              }}
+              onChange={(e) =>
+                setCurrentRow({ ...currentRow, kategori: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Sub Kategori Produk"
+              name="subKategori"
+              fullWidth
+              value={currentRow?.subKategori || ""}
+              InputProps={{
+                readOnly: dialogMode === "Detail",
+              }}
+              onChange={(e) =>
+                setCurrentRow({ ...currentRow, subKategori: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Harga"
+              name="harga"
+              fullWidth
+              value={currentRow?.harga || ""}
+              InputProps={{
+                readOnly: dialogMode === "Detail",
+              }}
+              onChange={(e) =>
+                setCurrentRow({ ...currentRow, harga: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Jumlah Terjual"
+              name="terjual"
+              fullWidth
+              value={currentRow?.terjual || ""}
+              InputProps={{
+                readOnly: dialogMode === "Detail",
+              }}
+              onChange={(e) =>
+                setCurrentRow({ ...currentRow, terjual: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Rating"
+              name="rating"
+              fullWidth
+              value={currentRow?.rating || ""}
+              InputProps={{
+                readOnly: dialogMode === "Detail",
+              }}
+              onChange={(e) =>
+                setCurrentRow({ ...currentRow, rating: e.target.value })
+              }
+            />
+            {/* Menampilkan gambar jika dalam mode detail */}
+            {dialogMode === "Detail" && currentRow.images && (
+              <Box sx={imageStyle}>
+                {currentRow.images.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`Detail ${index}`}
+                    style={{ width: 100, height: 100, objectFit: "cover" }}
+                  />
+                ))}
+              </Box>
+            )}
+            {/* Menambahkan opsi upload gambar */}
+            {dialogMode !== "Detail" && (
+              <>
+                <Typography variant="body1" sx={{ mt: 2 }}>
+                  Upload Gambar Produk:
+                </Typography>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{ marginTop: "10px" }}
+                />
+                <Box sx={imageStyle}>
+                  {imagePreviews.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`Preview ${index}`}
+                      style={{ width: 100, height: 100, objectFit: "cover" }}
+                    />
+                  ))}
+                </Box>
+              </>
+            )}
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            Cancel
-          </Button>
-          {dialogMode !== "Read" && (
-            <Button onClick={handleSave} color="primary">
-              Save
-            </Button>
-          )}
+          <Button onClick={handleDialogClose}>Cancel</Button>
+          <Button onClick={handleSave}>Save</Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </MainCard>
   );
 };
 
-export default produk;
+export default Produk;
