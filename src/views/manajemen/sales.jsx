@@ -237,7 +237,7 @@ const Sales = () => {
               <Tooltip title="Reset Password">
                 <Button
                   onClick={() => handleResetPassword(tableMeta.rowIndex)}
-                  sx={{ color: theme.palette.info.main }}
+                  sx={{ color: theme.palette.success.main }}
                 >
                   <IconKey />
                 </Button>

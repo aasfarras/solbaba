@@ -180,7 +180,7 @@ const Pesanan = () => {
                 <Tooltip title="Hubungi via WhatsApp">
                   <Button
                     onClick={handleWhatsAppClick}
-                    sx={{ color: theme.palette.success.dark }}
+                    sx={{ color: theme.palette.success.main }}
                   >
                     <IconBrandWhatsapp />
                   </Button>

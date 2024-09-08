@@ -140,7 +140,7 @@ const Produk = () => {
             <Tooltip title="Edit">
               <Button
                 onClick={() => handleEdit(tableMeta.rowIndex)}
-                sx={{ color: theme.palette.primary.main }}
+                sx={{ color: theme.palette.warning.main }}
               >
                 <IconPencil />
               </Button>

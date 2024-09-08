@@ -14,11 +14,11 @@ import { useTheme } from "@mui/material/styles";
 const SubKategori = () => {
   const theme = useTheme();
   const [data, setData] = useState([
-    ["PVC", "5"], // Nama Sub Kategori, Jumlah Produk
-    ["PVCC", "3"],
-    ["PVCCC", "10"],
-    ["Metal", "5"],
-    ["Kaca", "7"],
+    ["PVC", "5", "Pipa"], // Nama Sub Kategori, Jumlah Produk
+    ["PVCC", "3", "Pipa"],
+    ["PVCCC", "10", "Pipa"],
+    ["Metal", "5", "Genteng"],
+    ["Kaca", "7", "Genteng"],
   ]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -27,6 +27,7 @@ const SubKategori = () => {
   const [formData, setFormData] = useState({
     subKategoriName: "",
     jumlahProduk: "",
+    Kategori: "",
   });
 
   const handleCreate = () => {
@@ -41,6 +42,7 @@ const SubKategori = () => {
     setFormData({
       subKategoriName: data[rowIndex][0],
       jumlahProduk: data[rowIndex][1],
+      jumlahProduk: data[rowIndex][2],
     });
     setDialogOpen(true);
   };
@@ -51,6 +53,7 @@ const SubKategori = () => {
     setFormData({
       subKategoriName: data[rowIndex][0],
       jumlahProduk: data[rowIndex][1],
+      jumlahProduk: data[rowIndex][2],
     });
     setDialogOpen(true);
   };
@@ -68,13 +71,13 @@ const SubKategori = () => {
     if (dialogMode === "Create") {
       const newData = [
         ...data,
-        [formData.subKategoriName, formData.jumlahProduk],
+        [formData.subKategoriName, formData.jumlahProduk, formData.Kategori],
       ];
       setData(newData);
     } else if (dialogMode === "Update") {
       const newData = data.map((row, index) =>
         index === data.indexOf(currentRow)
-          ? [formData.subKategoriName, formData.jumlahProduk]
+          ? [formData.subKategoriName, formData.jumlahProduk, formData.Kategori]
           : row
       );
       setData(newData);
@@ -90,6 +93,7 @@ const SubKategori = () => {
   const columns = [
     { name: "Nama sub Kategori", label: "Nama sub Kategori" },
     { name: "Jumlah Produk", label: "Jumlah Produk" },
+    { name: "Kategori", label: "Kategori" },
     {
       name: "Actions",
       label: "Actions",
@@ -158,6 +162,15 @@ const SubKategori = () => {
             name="jumlahProduk"
             fullWidth
             value={formData.jumlahProduk}
+            onChange={handleInputChange}
+            disabled={dialogMode === "Read"}
+          />
+          <TextField
+            margin="dense"
+            label="Kategori"
+            name="Kategori"
+            fullWidth
+            value={formData.Kategori}
             onChange={handleInputChange}
             disabled={dialogMode === "Read"}
           />
