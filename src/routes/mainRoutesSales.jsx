@@ -8,6 +8,8 @@ import Loadable from "../ui-component/Loadable";
 const DashboardDefault = Loadable(lazy(() => import("../views/dashboard")));
 const Produk = Loadable(lazy(() => import("../views/manajemen/produk")));
 const Pesanan = Loadable(lazy(() => import("../views/menu/pesanan")));
+const Pelanggan = Loadable(lazy(() => import("../views/menu/pelanggan")));
+const Transaksi = Loadable(lazy(() => import("../views/menu/transaksi")));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -37,7 +39,7 @@ const MainRoutesSales = {
       children: [
         {
           path: "customer",
-          element: <Produk />,
+          element: <Pelanggan />,
         },
       ],
     },
@@ -46,7 +48,7 @@ const MainRoutesSales = {
       children: [
         {
           path: "transaksi",
-          element: <Produk />,
+          element: <Transaksi />,
         },
       ],
     },

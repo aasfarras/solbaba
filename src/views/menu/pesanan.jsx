@@ -160,30 +160,32 @@ const Pesanan = () => {
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <>
-              <Tooltip title="Detail">
-                <Button
-                  onClick={() => handleRead(tableMeta.rowIndex)}
-                  sx={{ color: theme.palette.primary.main }}
-                >
-                  <IconEye />
-                </Button>
-              </Tooltip>
-              <Tooltip title="Edit">
-                <Button
-                  onClick={() => handleUpdate(tableMeta.rowIndex)}
-                  sx={{ color: theme.palette.warning.main }}
-                >
-                  <IconPencil />
-                </Button>
-              </Tooltip>
-              <Tooltip title="Hubungi via WhatsApp">
-                <Button
-                  onClick={handleWhatsAppClick}
-                  sx={{ color: theme.palette.success.dark }}
-                >
-                  <IconBrandWhatsapp />
-                </Button>
-              </Tooltip>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <Tooltip title="Detail">
+                  <Button
+                    onClick={() => handleRead(tableMeta.rowIndex)}
+                    sx={{ color: theme.palette.primary.main }}
+                  >
+                    <IconEye />
+                  </Button>
+                </Tooltip>
+                <Tooltip title="Edit">
+                  <Button
+                    onClick={() => handleUpdate(tableMeta.rowIndex)}
+                    sx={{ color: theme.palette.warning.main }}
+                  >
+                    <IconPencil />
+                  </Button>
+                </Tooltip>
+                <Tooltip title="Hubungi via WhatsApp">
+                  <Button
+                    onClick={handleWhatsAppClick}
+                    sx={{ color: theme.palette.success.dark }}
+                  >
+                    <IconBrandWhatsapp />
+                  </Button>
+                </Tooltip>
+              </div>
             </>
           );
         },

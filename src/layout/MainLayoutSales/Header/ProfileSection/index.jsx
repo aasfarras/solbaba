@@ -1,65 +1,54 @@
-import { useState, useRef, useEffect } from "react";
-
-import { useNavigate } from "react-router-dom";
+import { useState, useRef } from "react";
 import { useSelector } from "react-redux";
-
-// material-ui
+import { useNavigate } from "react-router-dom";
+import {
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  ClickAwayListener,
+  Divider,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+  Popper,
+  Stack,
+  TextField,
+  Typography,
+  Modal,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Chip from "@mui/material/Chip";
-import ClickAwayListener from "@mui/material/ClickAwayListener";
-import Divider from "@mui/material/Divider";
-import Grid from "@mui/material/Grid";
-import InputAdornment from "@mui/material/InputAdornment";
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import Paper from "@mui/material/Paper";
-import Popper from "@mui/material/Popper";
-import Stack from "@mui/material/Stack";
-import Switch from "@mui/material/Switch";
-import Typography from "@mui/material/Typography";
-
-// third-party
+import { IconLogout, IconSettings } from "@tabler/icons-react";
 import PerfectScrollbar from "react-perfect-scrollbar";
-
-// project imports
 import MainCard from "../../../../ui-component/cards/MainCard";
 import Transitions from "../../../../ui-component/extended/Transitions";
-import UpgradePlanCard from "./UpgradePlanCard";
-import User1 from "../../../../assets/images/users/user-round.svg";
-
-// assets
-import {
-  IconLogout,
-  IconSearch,
-  IconSettings,
-  IconUser,
-} from "@tabler/icons-react";
-
-// ==============================|| PROFILE MENU ||============================== //
+import User1 from "../../../../assets/images/users/user-round.svg"; // Placeholder gambar
 
 const ProfileSection = () => {
   const theme = useTheme();
   const customization = useSelector((state) => state.customization);
-  const navigate = useNavigate();
-
-  const [sdm, setSdm] = useState(true);
-  const [value, setValue] = useState("");
-  const [notification, setNotification] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
-  /**
-   * anchorRef is used on different componets and specifying one type leads to other components throwing an error
-   * */
+  const [openModal, setOpenModal] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const navigate = useNavigate();
+
+  // State untuk menyimpan data pengguna dan gambar profil
+  const [userData, setUserData] = useState({
+    name: "Johne Doe",
+    email: "johndoe@example.com",
+    gender: "laki-laki",
+    address: "Minasa Upa",
+    referralCode: "hq6dqy",
+    profileImage: User1, // Gambar profil default
+  });
+
   const anchorRef = useRef(null);
-  const handleLogout = async () => {
-    console.log("Logout");
+
+  const handleLogout = () => {
+    navigate("/");
   };
 
   const handleClose = (event) => {
@@ -69,26 +58,52 @@ const ProfileSection = () => {
     setOpen(false);
   };
 
-  const handleListItemClick = (event, index, route = "") => {
+  const handleListItemClick = (event, index) => {
     setSelectedIndex(index);
     handleClose(event);
 
-    if (route && route !== "") {
-      navigate(route);
+    if (index === 0) {
+      setOpenModal(true); // Membuka modal ketika Account Settings ditekan
     }
   };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setIsEditMode(false);
+  };
+
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
 
-  const prevOpen = useRef(open);
-  useEffect(() => {
-    if (prevOpen.current === true && open === false) {
-      anchorRef.current.focus();
-    }
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUserData({
+      ...userData,
+      [name]: value,
+    });
+  };
 
-    prevOpen.current = open;
-  }, [open]);
+  // Mengubah gambar profil
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setUserData({ ...userData, profileImage: reader.result });
+      };
+      reader.readAsDataURL(file); // Mengubah file gambar menjadi data URL
+    }
+  };
+
+  const handleSave = () => {
+    console.log("Data berhasil disimpan:", userData);
+    setIsEditMode(false);
+  };
+
+  const toggleEditMode = () => {
+    setIsEditMode(true);
+  };
 
   return (
     <>
@@ -98,11 +113,11 @@ const ProfileSection = () => {
           alignItems: "center",
           borderRadius: "27px",
           transition: "all .2s ease-in-out",
-          borderColor: theme.palette.primary.light,
-          backgroundColor: theme.palette.primary.light,
+          borderColor: theme.palette.secondary.light,
+          backgroundColor: theme.palette.secondary.light,
           '&[aria-controls="menu-list-grow"], &:hover': {
-            borderColor: theme.palette.primary.main,
-            background: `${theme.palette.primary.main}!important`,
+            borderColor: theme.palette.secondary.main,
+            background: `${theme.palette.secondary.main}!important`,
             color: theme.palette.primary.light,
             "& svg": {
               stroke: theme.palette.primary.light,
@@ -114,7 +129,7 @@ const ProfileSection = () => {
         }}
         icon={
           <Avatar
-            src={User1}
+            src={userData.profileImage} // Gambar profil yang bisa berubah
             sx={{
               ...theme.typography.mediumAvatar,
               margin: "8px 0 8px 8px !important",
@@ -178,7 +193,7 @@ const ProfileSection = () => {
                           variant="h4"
                           sx={{ fontWeight: 400 }}
                         >
-                          Johne Doe
+                          {userData.name}
                         </Typography>
                       </Stack>
                       <Typography variant="subtitle2">Project Admin</Typography>
@@ -211,13 +226,8 @@ const ProfileSection = () => {
                         }}
                       >
                         <ListItemButton
-                          sx={{
-                            borderRadius: `${customization.borderRadius}px`,
-                          }}
                           selected={selectedIndex === 0}
-                          onClick={(event) =>
-                            handleListItemClick(event, 0, "#")
-                          }
+                          onClick={(event) => handleListItemClick(event, 0)}
                         >
                           <ListItemIcon>
                             <IconSettings stroke={1.5} size="1.3rem" />
@@ -230,13 +240,7 @@ const ProfileSection = () => {
                             }
                           />
                         </ListItemButton>
-                        <ListItemButton
-                          sx={{
-                            borderRadius: `${customization.borderRadius}px`,
-                          }}
-                          selected={selectedIndex === 4}
-                          onClick={handleLogout}
-                        >
+                        <ListItemButton onClick={handleLogout}>
                           <ListItemIcon>
                             <IconLogout stroke={1.5} size="1.3rem" />
                           </ListItemIcon>
@@ -255,6 +259,162 @@ const ProfileSection = () => {
           </Transitions>
         )}
       </Popper>
+
+      {/* Modal untuk Account Settings */}
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="account-settings-modal"
+        aria-describedby="account-settings-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <Avatar
+              src={userData.profileImage}
+              sx={{ width: 100, height: 100 }}
+            />
+          </div>
+          {isEditMode ? (
+            <Box component="form" sx={{ mt: 2 }}>
+              <Button
+                variant="contained"
+                component="label"
+                fullWidth
+                sx={{ mb: 2 }}
+              >
+                Ubah Foto Profil
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={handleImageChange}
+                />
+              </Button>
+              <TextField
+                fullWidth
+                label="Nama"
+                name="name"
+                value={userData.name}
+                onChange={handleInputChange}
+                margin="normal"
+              />
+              <TextField
+                fullWidth
+                label="Email"
+                name="email"
+                value={userData.email}
+                onChange={handleInputChange}
+                margin="normal"
+              />
+              <TextField
+                fullWidth
+                label="Jenis Kelamin"
+                name="gender"
+                value={userData.gender}
+                onChange={handleInputChange}
+                margin="normal"
+              />
+              <TextField
+                fullWidth
+                label="Alamat"
+                name="address"
+                value={userData.address}
+                onChange={handleInputChange}
+                margin="normal"
+              />
+              <TextField
+                fullWidth
+                label="Kode Referral"
+                name="referralCode"
+                value={userData.referralCode}
+                onChange={handleInputChange}
+                margin="normal"
+              />
+              <Stack
+                direction="row"
+                justifyContent="flex-end"
+                spacing={2}
+                mt={2}
+              >
+                <Button variant="contained" onClick={handleCloseModal}>
+                  Close
+                </Button>
+                <Button variant="contained" onClick={handleSave}>
+                  Save
+                </Button>
+              </Stack>
+            </Box>
+          ) : (
+            <Box>
+              <TextField
+                fullWidth
+                label="Nama"
+                name="name"
+                value={userData.name}
+                margin="normal"
+                disabled
+              />
+              <TextField
+                fullWidth
+                label="Email"
+                name="email"
+                value={userData.email}
+                margin="normal"
+                disabled
+              />
+              <TextField
+                fullWidth
+                label="Gender"
+                name="gender"
+                value={userData.gender}
+                margin="normal"
+                disabled
+              />
+              <TextField
+                fullWidth
+                label="Address"
+                name="address"
+                value={userData.address}
+                margin="normal"
+                disabled
+              />
+              <TextField
+                fullWidth
+                label="Referral Code"
+                name="referralCode"
+                value={userData.referralCode}
+                margin="normal"
+                disabled
+              />
+              <Stack
+                direction="row"
+                justifyContent="flex-end"
+                spacing={2}
+                mt={2}
+              >
+                <Button variant="outlined" onClick={handleCloseModal}>
+                  Close
+                </Button>
+                <Button variant="outlined" onClick={toggleEditMode}>
+                  Edit
+                </Button>
+              </Stack>
+            </Box>
+          )}
+        </Box>
+      </Modal>
     </>
   );
 };

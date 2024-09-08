@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
@@ -30,15 +31,15 @@ import AnimateButton from "../../../../ui-component/extended/AnimateButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
-// ============================|| FIREBASE - LOGIN ||============================ //
-
 const AuthLogin = ({ ...others }) => {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const customization = useSelector((state) => state.customization);
-  const [checked, setChecked] = useState(true);
+  const navigate = useNavigate(); // Declare useNavigate
 
+  const [checked, setChecked] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -108,6 +109,23 @@ const AuthLogin = ({ ...others }) => {
             .required("Email is required"),
           password: Yup.string().max(255).required("Password is required"),
         })}
+        onSubmit={(values, { setSubmitting, setErrors }) => {
+          // Logika untuk menentukan rute berdasarkan username dan password
+          if (
+            values.email === "sales@gmail.com" &&
+            values.password === "password"
+          ) {
+            navigate("/sales");
+          } else if (
+            values.email === "super-admin@gmail.com" &&
+            values.password === "password"
+          ) {
+            navigate("/super-admin");
+          } else {
+            setErrors({ submit: "Invalid username or password" });
+          }
+          setSubmitting(false);
+        }}
       >
         {({
           errors,
