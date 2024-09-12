@@ -52,7 +52,7 @@ const PopularCard = ({ isLoading }) => {
                   justifyContent="space-between"
                 >
                   <Grid item>
-                    <Typography variant="h4">Popular Stocks</Typography>
+                    <Typography variant="h4">Populer</Typography>
                   </Grid>
                   <Grid item>
                     <MoreHorizOutlinedIcon

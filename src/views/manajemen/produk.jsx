@@ -122,7 +122,7 @@ const Produk = () => {
     { name: "terjual", label: "Jumlah Terjual" },
     {
       name: "Actions",
-      label: "Actions",
+      label: "Aksi",
       options: {
         filter: false,
         sort: false,

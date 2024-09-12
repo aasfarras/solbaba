@@ -141,9 +141,9 @@ const Customization = () => {
                     name="row-radio-buttons-group"
                   >
                     <FormControlLabel
-                      value="Roboto"
+                      value="Inter"
                       control={<Radio />}
-                      label="Roboto"
+                      label="Inter"
                       sx={{
                         "& .MuiSvgIcon-root": { fontSize: 28 },
                         "& .MuiFormControlLabel-label": {
@@ -163,9 +163,9 @@ const Customization = () => {
                       }}
                     />
                     <FormControlLabel
-                      value="Inter"
+                      value="Roboto"
                       control={<Radio />}
-                      label="Inter"
+                      label="Roboto"
                       sx={{
                         "& .MuiSvgIcon-root": { fontSize: 28 },
                         "& .MuiFormControlLabel-label": {

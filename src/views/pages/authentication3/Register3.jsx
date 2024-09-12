@@ -44,11 +44,6 @@ const Register = () => {
                   alignItems="center"
                   justifyContent="center"
                 >
-                  <Grid item sx={{ mb: 3 }}>
-                    <Link to="#" aria-label="theme logo">
-                      <Logo />
-                    </Link>
-                  </Grid>
                   <Grid item xs={12}>
                     <Grid
                       container
@@ -67,14 +62,7 @@ const Register = () => {
                             gutterBottom
                             variant={downMD ? "h3" : "h2"}
                           >
-                            Sign up
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            fontSize="16px"
-                            textAlign={{ xs: "center", md: "inherit" }}
-                          >
-                            Enter your credentials to continue
+                            Masuk
                           </Typography>
                         </Stack>
                       </Grid>
@@ -100,7 +88,7 @@ const Register = () => {
                         variant="subtitle1"
                         sx={{ textDecoration: "none" }}
                       >
-                        Already have an account?
+                        Sudah Punya Akun?
                       </Typography>
                     </Grid>
                   </Grid>

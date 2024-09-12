@@ -127,7 +127,7 @@ const Laporan = () => {
     { name: "Terjual", label: "Terjual" },
     {
       name: "Actions",
-      label: "Actions",
+      label: "Aksi",
       options: {
         filter: false,
         sort: false,

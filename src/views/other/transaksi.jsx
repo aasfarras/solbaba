@@ -111,7 +111,7 @@ const Transaksi = () => {
     { name: "transaksi", label: "Transaksi" },
     {
       name: "Actions",
-      label: "Actions",
+      label: "Aksi",
       options: {
         filter: false,
         sort: false,

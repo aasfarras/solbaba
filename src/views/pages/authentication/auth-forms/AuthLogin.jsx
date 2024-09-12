@@ -57,29 +57,7 @@ const AuthLogin = ({ ...others }) => {
               alignItems: "center",
               display: "flex",
             }}
-          >
-            <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
-
-            <Button
-              variant="outlined"
-              sx={{
-                cursor: "unset",
-                m: 2,
-                py: 0.5,
-                px: 7,
-                borderColor: `${theme.palette.grey[100]} !important`,
-                color: `${theme.palette.grey[900]}!important`,
-                fontWeight: 500,
-                borderRadius: `${customization.borderRadius}px`,
-              }}
-              disableRipple
-              disabled
-            >
-              OR
-            </Button>
-
-            <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
-          </Box>
+          ></Box>
         </Grid>
         <Grid
           item
@@ -89,9 +67,7 @@ const AuthLogin = ({ ...others }) => {
           justifyContent="center"
         >
           <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1">
-              Sign in with Email address
-            </Typography>
+            <Typography variant="subtitle1">Masuk Dengan Email</Typography>
           </Box>
         </Grid>
       </Grid>
@@ -104,10 +80,10 @@ const AuthLogin = ({ ...others }) => {
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string()
-            .email("Must be a valid email")
+            .email("Harus Berupa Email Yang Benar")
             .max(255)
-            .required("Email is required"),
-          password: Yup.string().max(255).required("Password is required"),
+            .required("Email Di Butuhkan"),
+          password: Yup.string().max(255).required("Kata Sandi Di Perlukan"),
         })}
         onSubmit={(values, { setSubmitting, setErrors }) => {
           // Logika untuk menentukan rute berdasarkan username dan password
@@ -143,7 +119,7 @@ const AuthLogin = ({ ...others }) => {
               sx={{ ...theme.typography.customInput }}
             >
               <InputLabel htmlFor="outlined-adornment-email-login">
-                Email Address / Username
+                Masukkan Email
               </InputLabel>
               <OutlinedInput
                 id="outlined-adornment-email-login"
@@ -171,7 +147,7 @@ const AuthLogin = ({ ...others }) => {
               sx={{ ...theme.typography.customInput }}
             >
               <InputLabel htmlFor="outlined-adornment-password-login">
-                Password
+                Masukkan Kata Sandi
               </InputLabel>
               <OutlinedInput
                 id="outlined-adornment-password-login"
@@ -220,14 +196,14 @@ const AuthLogin = ({ ...others }) => {
                     color="primary"
                   />
                 }
-                label="Remember me"
+                label="Ingatkan Saya"
               />
               <Typography
                 variant="subtitle1"
-                color="secondary"
+                color="primary.main"
                 sx={{ textDecoration: "none", cursor: "pointer" }}
               >
-                Forgot Password?
+                Lupa Password?
               </Typography>
             </Stack>
             {errors.submit && (
@@ -245,9 +221,9 @@ const AuthLogin = ({ ...others }) => {
                   size="large"
                   type="submit"
                   variant="contained"
-                  color="secondary"
+                  color="primary"
                 >
-                  Sign in
+                  Masuk
                 </Button>
               </AnimateButton>
             </Box>

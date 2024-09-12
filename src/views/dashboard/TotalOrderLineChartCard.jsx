@@ -99,7 +99,7 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                       sx={{ color: "inherit" }}
                       onClick={(e) => handleChangeTime(e, true)}
                     >
-                      Month
+                      Bulan
                     </Button>
                     <Button
                       disableElevation
@@ -108,7 +108,7 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                       sx={{ color: "inherit" }}
                       onClick={(e) => handleChangeTime(e, false)}
                     >
-                      Year
+                      Tahun
                     </Button>
                   </Grid>
                 </Grid>
@@ -167,7 +167,7 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                             color: "primary.200",
                           }}
                         >
-                          Total Order
+                          Jumlah Penghasilan
                         </Typography>
                       </Grid>
                     </Grid>

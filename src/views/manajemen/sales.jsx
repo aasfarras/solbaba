@@ -202,7 +202,7 @@ const Sales = () => {
     { name: "Jenis Kelamin", label: "Jenis Kelamin" },
     {
       name: "Actions",
-      label: "Actions",
+      label: "Aksi",
       options: {
         filter: false,
         sort: false,

@@ -84,7 +84,7 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                       variant="subtitle2"
                       sx={{ color: "primary.light", mt: 0.25 }}
                     >
-                      Total Income
+                      Jumlah Pemasukan
                     </Typography>
                   }
                 />

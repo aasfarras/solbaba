@@ -96,7 +96,7 @@ const Kategori = () => {
     { name: "Jumlah Produk", label: "Jumlah Produk" },
     {
       name: "Actions",
-      label: "Actions",
+      label: "Aksi",
       options: {
         filter: false,
         sort: false,

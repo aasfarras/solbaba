@@ -47,7 +47,7 @@ const EarningCard = ({ isLoading }) => {
           border={false}
           content={false}
           sx={{
-            bgcolor: "secondary.dark",
+            bgcolor: "orange.main",
             color: "#fff",
             overflow: "hidden",
             position: "relative",
@@ -179,7 +179,7 @@ const EarningCard = ({ isLoading }) => {
                     color: "secondary.200",
                   }}
                 >
-                  Total Earning
+                  Jumlah Penghasilan
                 </Typography>
               </Grid>
             </Grid>

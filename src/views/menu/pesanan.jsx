@@ -152,7 +152,7 @@ const Pesanan = () => {
     { name: "Status Pesanan", label: "Status Pesanan" },
     {
       name: "Actions",
-      label: "Actions",
+      label: "Aksi",
       options: {
         filter: false,
         sort: false,

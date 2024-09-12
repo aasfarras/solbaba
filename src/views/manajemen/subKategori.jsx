@@ -96,7 +96,7 @@ const SubKategori = () => {
     { name: "Kategori", label: "Kategori" },
     {
       name: "Actions",
-      label: "Actions",
+      label: "Aksi",
       options: {
         filter: false,
         sort: false,
