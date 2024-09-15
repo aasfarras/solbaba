@@ -9,7 +9,7 @@ import { Card } from "@mui/material";
 // ==============================|| AUTHENTICATION CARD WRAPPER ||============================== //
 
 const AuthCardWrapper = ({ children, ...other }) => (
-  <Card sx={{ width: { xs: 2, md: 473 } }}>
+  <Card sx={{ width: { xs: 350, md: 473 } }}>
     <Box sx={{ p: { xs: 2, sm: 3, xl: 5 } }}>{children}</Box>
   </Card>
 );
