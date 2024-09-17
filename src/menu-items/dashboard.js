@@ -1,8 +1,8 @@
 // assets
-import { IconDashboard } from "@tabler/icons-react";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 
 // constant
-const icons = { IconDashboard };
+const icons = { DashboardOutlinedIcon };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
@@ -16,7 +16,7 @@ const dashboard = {
       title: "Dashboard",
       type: "item",
       url: "/super-admin",
-      icon: icons.IconDashboard,
+      icon: icons.DashboardOutlinedIcon, // gunakan icons.DashboardIcon
       breadcrumbs: false,
     },
   ],

@@ -90,53 +90,20 @@ const ProfileSection = () => {
 
   return (
     <>
-      <Chip
+      <Avatar
+        src={User1}
         sx={{
-          height: "48px",
-          alignItems: "center",
-          borderRadius: "27px",
-          transition: "all .2s ease-in-out",
-          borderColor: theme.palette.secondary.light,
-          backgroundColor: theme.palette.secondary.light,
-          '&[aria-controls="menu-list-grow"], &:hover': {
-            borderColor: theme.palette.secondary.main,
-            background: `${theme.palette.secondary.main}!important`,
-            color: theme.palette.primary.light,
-            "& svg": {
-              stroke: theme.palette.primary.light,
-            },
-          },
-          "& .MuiChip-label": {
-            lineHeight: 0,
-          },
+          ...theme.typography.mediumAvatar,
+          margin: "8px 0 8px 8px !important",
+          cursor: "pointer",
+          width: "40px",
+          height: "40px",
         }}
-        icon={
-          <Avatar
-            src={User1}
-            sx={{
-              ...theme.typography.mediumAvatar,
-              margin: "8px 0 8px 8px !important",
-              cursor: "pointer",
-            }}
-            ref={anchorRef}
-            aria-controls={open ? "menu-list-grow" : undefined}
-            aria-haspopup="true"
-            color="inherit"
-          />
-        }
-        label={
-          <IconSettings
-            stroke={1.5}
-            size="1.5rem"
-            color={theme.palette.primary.main}
-          />
-        }
-        variant="outlined"
         ref={anchorRef}
         aria-controls={open ? "menu-list-grow" : undefined}
         aria-haspopup="true"
+        color="inherit"
         onClick={handleToggle}
-        color="primary"
       />
       <Popper
         placement="bottom-end"
@@ -170,7 +137,7 @@ const ProfileSection = () => {
                   <Box sx={{ p: 2, pb: 0 }}>
                     <Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">Good Morning,</Typography>
+                        <Typography variant="h4">Selamat Pagi,</Typography>
                         <Typography
                           component="span"
                           variant="h4"
@@ -179,7 +146,7 @@ const ProfileSection = () => {
                           Johne Doe
                         </Typography>
                       </Stack>
-                      <Typography variant="subtitle2">Project Admin</Typography>
+                      <Typography variant="subtitle2">Admin</Typography>
                     </Stack>
                     <Divider />
                   </Box>
@@ -212,26 +179,6 @@ const ProfileSection = () => {
                           sx={{
                             borderRadius: `${customization.borderRadius}px`,
                           }}
-                          selected={selectedIndex === 0}
-                          onClick={(event) =>
-                            handleListItemClick(event, 0, "#")
-                          }
-                        >
-                          <ListItemIcon>
-                            <IconSettings stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Typography variant="body2">
-                                Account Settings
-                              </Typography>
-                            }
-                          />
-                        </ListItemButton>
-                        <ListItemButton
-                          sx={{
-                            borderRadius: `${customization.borderRadius}px`,
-                          }}
                           selected={selectedIndex === 4}
                           onClick={handleLogout}
                         >
@@ -240,7 +187,7 @@ const ProfileSection = () => {
                           </ListItemIcon>
                           <ListItemText
                             primary={
-                              <Typography variant="body2">Logout</Typography>
+                              <Typography variant="body2">Keluar</Typography>
                             }
                           />
                         </ListItemButton>

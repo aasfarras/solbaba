@@ -107,53 +107,20 @@ const ProfileSection = () => {
 
   return (
     <>
-      <Chip
+      <Avatar
+        src={userData.profileImage} // Gambar profil yang bisa berubah
         sx={{
-          height: "48px",
-          alignItems: "center",
-          borderRadius: "27px",
-          transition: "all .2s ease-in-out",
-          borderColor: theme.palette.secondary.light,
-          backgroundColor: theme.palette.secondary.light,
-          '&[aria-controls="menu-list-grow"], &:hover': {
-            borderColor: theme.palette.secondary.main,
-            background: `${theme.palette.secondary.main}!important`,
-            color: theme.palette.primary.light,
-            "& svg": {
-              stroke: theme.palette.primary.light,
-            },
-          },
-          "& .MuiChip-label": {
-            lineHeight: 0,
-          },
+          ...theme.typography.mediumAvatar,
+          margin: "8px 0 8px 8px !important",
+          cursor: "pointer",
+          width: "40px",
+          height: "40px",
         }}
-        icon={
-          <Avatar
-            src={userData.profileImage} // Gambar profil yang bisa berubah
-            sx={{
-              ...theme.typography.mediumAvatar,
-              margin: "8px 0 8px 8px !important",
-              cursor: "pointer",
-            }}
-            ref={anchorRef}
-            aria-controls={open ? "menu-list-grow" : undefined}
-            aria-haspopup="true"
-            color="inherit"
-          />
-        }
-        label={
-          <IconSettings
-            stroke={1.5}
-            size="1.5rem"
-            color={theme.palette.primary.main}
-          />
-        }
-        variant="outlined"
         ref={anchorRef}
         aria-controls={open ? "menu-list-grow" : undefined}
         aria-haspopup="true"
+        color="inherit"
         onClick={handleToggle}
-        color="primary"
       />
       <Popper
         placement="bottom-end"
@@ -187,7 +154,7 @@ const ProfileSection = () => {
                   <Box sx={{ p: 2, pb: 0 }}>
                     <Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">Good Morning,</Typography>
+                        <Typography variant="h4">Selamat Pagi,</Typography>
                         <Typography
                           component="span"
                           variant="h4"
@@ -196,7 +163,7 @@ const ProfileSection = () => {
                           {userData.name}
                         </Typography>
                       </Stack>
-                      <Typography variant="subtitle2">Project Admin</Typography>
+                      <Typography variant="subtitle2">Sales</Typography>
                     </Stack>
                     <Divider />
                   </Box>
@@ -235,7 +202,7 @@ const ProfileSection = () => {
                           <ListItemText
                             primary={
                               <Typography variant="body2">
-                                Account Settings
+                                Pengaturan Akun
                               </Typography>
                             }
                           />
@@ -246,7 +213,7 @@ const ProfileSection = () => {
                           </ListItemIcon>
                           <ListItemText
                             primary={
-                              <Typography variant="body2">Logout</Typography>
+                              <Typography variant="body2">Keluar</Typography>
                             }
                           />
                         </ListItemButton>

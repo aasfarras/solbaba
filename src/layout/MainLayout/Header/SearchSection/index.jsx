@@ -70,9 +70,9 @@ const MobileSearch = ({ value, setValue, popupState }) => {
       }
       endAdornment={
         <InputAdornment position="end">
-          <HeaderAvatar>
+          {/* <HeaderAvatar>
             <IconAdjustmentsHorizontal stroke={1.5} size="20px" />
-          </HeaderAvatar>
+          </HeaderAvatar> */}
           <Box sx={{ ml: 2 }}>
             <Avatar
               variant="rounded"
@@ -186,9 +186,9 @@ const SearchSection = () => {
           }
           endAdornment={
             <InputAdornment position="end">
-              <HeaderAvatar>
+              {/* <HeaderAvatar>
                 <IconAdjustmentsHorizontal stroke={1.5} size="20px" />
-              </HeaderAvatar>
+              </HeaderAvatar> */}
             </InputAdornment>
           }
           aria-describedby="search-helper-text"

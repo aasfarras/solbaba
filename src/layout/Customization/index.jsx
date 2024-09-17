@@ -91,7 +91,7 @@ const Customization = () => {
   return (
     <>
       {/* toggle button */}
-      <Tooltip title="Live Customize">
+      {/* <Tooltip title="Live Customize">
         <Fab
           component="div"
           onClick={handleToggle}
@@ -116,9 +116,9 @@ const Customization = () => {
             </IconButton>
           </AnimateButton>
         </Fab>
-      </Tooltip>
+      </Tooltip> */}
 
-      <Drawer
+      {/* <Drawer
         anchor="right"
         onClose={handleToggle}
         open={open}
@@ -131,7 +131,6 @@ const Customization = () => {
         <PerfectScrollbar component="div">
           <Grid container spacing={gridSpacing} sx={{ p: 3 }}>
             <Grid item xs={12}>
-              {/* font family */}
               <SubCard title="Font Family">
                 <FormControl>
                   <RadioGroup
@@ -178,7 +177,6 @@ const Customization = () => {
               </SubCard>
             </Grid>
             <Grid item xs={12}>
-              {/* border radius */}
               <SubCard title="Border Radius">
                 <Grid
                   item
@@ -223,7 +221,7 @@ const Customization = () => {
             </Grid>
           </Grid>
         </PerfectScrollbar>
-      </Drawer>
+      </Drawer> */}
     </>
   );
 };
