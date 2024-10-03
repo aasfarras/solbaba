@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   Avatar,
   Box,
@@ -47,8 +48,33 @@ const ProfileSection = () => {
 
   const anchorRef = useRef(null);
 
-  const handleLogout = () => {
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_APP_API}logout`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.code === 200) {
+        sessionStorage.removeItem("token");
+
+        navigate("/");
+      } else {
+        console.error("Logout failed:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const handleClose = (event) => {
@@ -160,10 +186,9 @@ const ProfileSection = () => {
                           variant="h4"
                           sx={{ fontWeight: 400 }}
                         >
-                          {userData.name}
+                          Sales
                         </Typography>
                       </Stack>
-                      <Typography variant="subtitle2">Sales</Typography>
                     </Stack>
                     <Divider />
                   </Box>

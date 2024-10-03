@@ -50,7 +50,6 @@ const manajemen = {
       type: "item",
       url: "/super-admin/manajemen/produk", // Update URL
       icon: icons.IconHammer,
-      breadcrumbs: false,
     },
     {
       id: "pelanggan",

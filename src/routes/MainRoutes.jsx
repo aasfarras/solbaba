@@ -3,6 +3,7 @@ import { lazy } from "react";
 // project imports
 import MainLayout from "../layout/MainLayout";
 import Loadable from "../ui-component/Loadable";
+import AuthGuard from "../utils/AuthGuard"; // Import AuthGuard
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import("../views/dashboard")));
@@ -24,34 +25,62 @@ const MainRoutes = {
   children: [
     {
       path: "",
-      element: <DashboardDefault />,
+      element: (
+        <AuthGuard>
+          <DashboardDefault />,
+        </AuthGuard>
+      ),
     },
     {
       path: "dashboard",
-      element: <DashboardDefault />,
+      element: (
+        <AuthGuard>
+          <DashboardDefault />,
+        </AuthGuard>
+      ),
     },
     {
       path: "manajemen",
       children: [
         {
           path: "produk",
-          element: <Produk />,
+          element: (
+            <AuthGuard>
+              <Produk />,
+            </AuthGuard>
+          ),
         },
         {
           path: "kategori",
-          element: <Kategori />,
+          element: (
+            <AuthGuard>
+              <Kategori />,
+            </AuthGuard>
+          ),
         },
         {
           path: "subKategori",
-          element: <SubKategori />,
+          element: (
+            <AuthGuard>
+              <SubKategori />,
+            </AuthGuard>
+          ),
         },
         {
           path: "sales",
-          element: <Sales />,
+          element: (
+            <AuthGuard>
+              <Sales />,
+            </AuthGuard>
+          ),
         },
         {
           path: "pelanggan",
-          element: <Pelanggan />,
+          element: (
+            <AuthGuard>
+              <Pelanggan />,
+            </AuthGuard>
+          ),
         },
       ],
     },
@@ -60,7 +89,11 @@ const MainRoutes = {
       children: [
         {
           path: "transaksi",
-          element: <Transaksi />,
+          element: (
+            <AuthGuard>
+              <Transaksi />,
+            </AuthGuard>
+          ),
         },
         // {
         //   path: "laporan",

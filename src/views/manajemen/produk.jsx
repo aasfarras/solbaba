@@ -1,125 +1,202 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
 import {
   Button,
   Dialog,
-  DialogContent,
   DialogActions,
+  DialogContent,
   TextField,
   Tooltip,
-  Box,
+  DialogTitle,
+  Input,
   Typography,
+  Box,
 } from "@mui/material";
-import { IconEye, IconPencil, IconTrash } from "@tabler/icons-react";
+import {
+  IconPencil,
+  IconTrash,
+  IconUpload,
+  IconEye,
+} from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
-import MainCard from "../../ui-component/cards/MainCard";
+import { getProduct } from "../../service/product/product.get.service";
+import { postProduct } from "../../service/product/product.post.service";
+import { updateProduct } from "../../service/product/product.update.service";
+import { deleteProduct } from "../../service/product/product.delete.service";
+import { postProductImage } from "../../service/product/productgambar.post.service";
 
-// Gaya gambar secara horizontal
-const imageStyle = {
-  display: "flex",
-  overflowX: "auto",
-  gap: "10px",
-  padding: "10px 0",
-};
-
-const Produk = () => {
+const Product = () => {
   const theme = useTheme();
-  const [data, setData] = useState([
-    {
-      images: [
-        "https://via.placeholder.com/150",
-        "https://via.placeholder.com/150",
-        "https://via.placeholder.com/150",
-      ],
-      name: "Produk A",
-      kategori: "Elektronik",
-      subKategori: "Smartphone",
-      harga: "Rp. 5.000.000",
-      terjual: "50",
-      rating: "4.5",
-    },
-    // Produk lainnya
-  ]);
-
+  const [data, setData] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState(""); // "Detail", "Create", "Update"
-  const [currentRowIndex, setCurrentRowIndex] = useState(null); // Menyimpan index baris yang sedang diedit
-  const [currentRow, setCurrentRow] = useState({});
-  const [imagePreviews, setImagePreviews] = useState([]);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState(""); // "Create" or "Update"
+  const [currentRowIndex, setCurrentRowIndex] = useState(null);
+  const [formData, setFormData] = useState({
+    product_name: "",
+    product_images: [],
+    category_name: "",
+    price: "",
+    description: "",
+  });
+  const [currentProductId, setCurrentProductId] = useState(null);
+  const [imageFile, setImageFile] = useState(null); // Menyimpan file gambar yang diunggah
 
-  // Fungsi untuk menangani klik tombol "Detail"
-  const handleDetail = (rowIndex) => {
-    setDialogMode("Detail");
-    setCurrentRowIndex(rowIndex);
-    setCurrentRow(data[rowIndex]);
-    setImagePreviews(data[rowIndex].images);
+  // Fetch data produk dari API
+  const fetchData = async () => {
+    try {
+      const result = await getProduct();
+      const formattedData = result.data.data.map((item) => [
+        item.product_images[0], // Ambil hanya gambar pertama untuk ditampilkan di tabel
+        item.product_name,
+        item.category_name,
+        item.price,
+        item.description, // Tambahkan deskripsi ke dalam data yang diformat
+        item.id, // ID produk
+        item.product_images, // Menyimpan semua gambar untuk detail
+      ]);
+      setData(formattedData);
+    } catch (error) {
+      console.error("Failed to fetch product data", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(); // Panggil data produk setiap kali halaman di-load
+  }, []);
+
+  const handleCreate = () => {
+    setDialogMode("Create");
+    setFormData({
+      product_name: "",
+      product_images: [],
+      category_name: "",
+      price: "",
+      description: "",
+    }); // Reset data
+    setImageFile(null); // Reset file gambar
     setDialogOpen(true);
   };
 
-  // Fungsi untuk menangani klik tombol "Edit"
-  const handleEdit = (rowIndex) => {
+  const handleUpdate = (rowIndex) => {
     setDialogMode("Update");
     setCurrentRowIndex(rowIndex);
-    setCurrentRow({ ...data[rowIndex] }); // Copy data untuk diedit
-    setImagePreviews(data[rowIndex].images); // Menetapkan URL gambar sebagai preview
-    setDialogOpen(true);
+    const rowData = data[rowIndex];
+    setFormData({
+      product_name: rowData[1], // Ambil nama produk
+      product_images: rowData[6], // Ambil URL gambar
+      category_name: rowData[2],
+      price: rowData[3],
+      description: rowData[4], // Ambil deskripsi dari data yang diformat
+    });
+    setCurrentProductId(rowData[5]); // Ambil ID produk
+    setDialogOpen(true); // Buka dialog untuk edit
   };
 
-  // Fungsi untuk menangani klik tombol "Delete"
-  const handleDelete = (rowIndex) => {
-    const updatedData = data.filter((_, index) => index !== rowIndex);
-    setData(updatedData);
+  const handleDetail = (rowIndex) => {
+    const rowData = data[rowIndex];
+    setFormData({
+      product_name: rowData[1],
+      product_images: rowData[6], // Ambil semua gambar dari data yang diformat
+      category_name: rowData[2],
+      price: rowData[3],
+      description: rowData[4], // Ambil deskripsi dari data yang diformat
+    });
+    setCurrentProductId(rowData[5]); // Ambil ID produk
+    setDetailDialogOpen(true);
   };
 
-  // Fungsi untuk menutup dialog
   const handleDialogClose = () => {
     setDialogOpen(false);
-    setImagePreviews([]);
+    setDetailDialogOpen(false);
   };
 
-  // Fungsi untuk menyimpan perubahan produk baru atau produk yang diedit
-  const handleSave = () => {
-    const updatedData = [...data];
-    if (dialogMode === "Create") {
-      updatedData.push({ ...currentRow, images: imagePreviews });
-    } else if (dialogMode === "Update") {
-      updatedData[currentRowIndex] = { ...currentRow, images: imagePreviews };
+  const handleSave = async () => {
+    try {
+      let imageUrl = formData.product_images;
+
+      // Jika ada file gambar yang diunggah, upload terlebih dahulu
+      if (imageFile) {
+        const uploadResult = await postProductImage(
+          currentProductId,
+          imageFile
+        );
+        imageUrl = uploadResult.image_url; // Dapatkan URL gambar dari hasil unggahan
+      }
+
+      if (dialogMode === "Create") {
+        await postProduct({
+          product_name: formData.product_name,
+          product_images: imageUrl,
+          category_name: formData.category_name,
+          price: formData.price,
+          description: formData.description,
+        });
+        fetchData(); // Refresh data setelah create
+      } else if (dialogMode === "Update") {
+        await updateProduct(currentProductId, {
+          product_name: formData.product_name,
+          product_images: imageUrl,
+          category_name: formData.category_name,
+          price: formData.price,
+          description: formData.description,
+        });
+        fetchData(); // Refresh data setelah update
+      }
+      setDialogOpen(false);
+    } catch (error) {
+      console.error("Error saving product:", error);
     }
-    setData(updatedData);
-    handleDialogClose();
   };
 
-  // Fungsi untuk menangani perubahan gambar yang diunggah
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Menyimpan file gambar yang dipilih
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    const previews = files.map((file) => URL.createObjectURL(file));
-    setImagePreviews(previews);
-    setCurrentRow((prevRow) => ({
-      ...prevRow,
-      images: files,
-    }));
+    setImageFile(e.target.files[0]);
   };
 
-  // Kolom untuk tabel
+  // Fungsi untuk membuka dialog konfirmasi delete
+  const handleDeleteClick = (rowIndex) => {
+    setCurrentRowIndex(rowIndex);
+    const rowData = data[rowIndex];
+    setCurrentProductId(rowData[5]);
+    setDeleteDialogOpen(true);
+  };
+
+  // Fungsi untuk menghapus produk
+  const handleDelete = async () => {
+    try {
+      await deleteProduct(currentProductId);
+      const updatedData = data.filter((_, index) => index !== currentRowIndex);
+      setData(updatedData);
+      setDeleteDialogOpen(false);
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
+  const handleDeleteDialogClose = () => {
+    setDeleteDialogOpen(false);
+  };
+
   const columns = [
     {
-      name: "images",
-      label: "Foto Produk",
+      name: "product_images",
+      label: "Gambar Produk",
       options: {
-        customBodyRender: (value, tableMeta) => (
-          <img
-            src={data[tableMeta.rowIndex].images[0]} // Thumbnail gambar pertama
-            alt="Foto Produk"
-            style={{ width: 100, height: 100, objectFit: "cover" }}
-          />
+        customBodyRender: (value) => (
+          <img src={value} alt="product" style={{ width: 50, height: 50 }} />
         ),
       },
     },
-    { name: "name", label: "Nama Produk" },
-    { name: "kategori", label: "Kategori Produk" },
-    { name: "subKategori", label: "Sub Kategori Produk" },
-    { name: "harga", label: "Harga" },
-    { name: "terjual", label: "Jumlah Terjual" },
+    { name: "product_name", label: "Nama Produk" },
+    { name: "category_name", label: "Nama Kategori" },
+    { name: "price", label: "Harga" },
     {
       name: "Actions",
       label: "Aksi",
@@ -128,57 +205,50 @@ const Produk = () => {
         sort: false,
         empty: true,
         customBodyRender: (value, tableMeta) => (
-          <div style={{ display: "flex", gap: "10px" }}>
-            <Tooltip title="Detail">
-              <Button
-                onClick={() => handleDetail(tableMeta.rowIndex)}
-                sx={{ color: theme.palette.success.dark }}
-              >
-                <IconEye />
-              </Button>
-            </Tooltip>
+          <>
             <Tooltip title="Edit">
               <Button
-                onClick={() => handleEdit(tableMeta.rowIndex)}
+                onClick={() => handleUpdate(tableMeta.rowIndex)}
                 sx={{ color: theme.palette.warning.main }}
               >
                 <IconPencil />
               </Button>
             </Tooltip>
+            <Tooltip title="Detail">
+              <Button
+                onClick={() => handleDetail(tableMeta.rowIndex)}
+                sx={{ color: theme.palette.info.main }}
+              >
+                <IconEye />
+              </Button>
+            </Tooltip>
             <Tooltip title="Delete">
               <Button
-                onClick={() => handleDelete(tableMeta.rowIndex)}
+                onClick={() => handleDeleteClick(tableMeta.rowIndex)}
                 sx={{ color: theme.palette.error.main }}
               >
                 <IconTrash />
               </Button>
             </Tooltip>
-          </div>
+          </>
         ),
       },
     },
   ];
 
   return (
-    <MainCard title="Manajemen Produk">
+    <>
       <MUIDataTable
         title={
           <Button
-            onClick={() => {
-              setDialogMode("Create");
-              setCurrentRow({
-                images: [],
-                name: "",
-                kategori: "",
-                subKategori: "",
-                harga: "",
-                terjual: "",
-                rating: "",
-              });
-              setImagePreviews([]);
-              setDialogOpen(true);
-            }}
+            onClick={handleCreate}
             variant="contained"
+            sx={{
+              backgroundColor: theme.palette.secondary.main,
+              "&:hover": {
+                background: theme.palette.error.light,
+              },
+            }}
           >
             Tambah Produk
           </Button>
@@ -190,139 +260,131 @@ const Produk = () => {
           elevation: 0,
           rowsPerPage: 10,
           rowsPerPageOptions: [5, 10, 20, 50, 100],
+          textLabels: {
+            pagination: {
+              rowsPerPage: "Baris per Halaman",
+            },
+          },
         }}
       />
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogContent>
-          <Box>
-            <Typography variant="h6">
-              {dialogMode === "Detail" ? "Detail Produk" : "Form Produk"}
-            </Typography>
-            <TextField
-              margin="dense"
-              label="Nama Produk"
-              name="name"
-              fullWidth
-              value={currentRow?.name || ""}
-              InputProps={{
-                readOnly: dialogMode === "Detail",
-              }}
-              onChange={(e) =>
-                setCurrentRow({ ...currentRow, name: e.target.value })
-              }
+          <TextField
+            margin="dense"
+            label="Nama Produk"
+            name="product_name"
+            fullWidth
+            value={formData.product_name}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            label="Nama Kategori"
+            name="category_name"
+            fullWidth
+            value={formData.category_name}
+            onChange={handleInputChange}
+            sx={{ marginTop: 2 }}
+          />
+          <TextField
+            margin="dense"
+            label="Harga"
+            name="price"
+            fullWidth
+            value={formData.price}
+            onChange={handleInputChange}
+            sx={{ marginTop: 2 }}
+          />
+          <TextField
+            margin="dense"
+            label="Deskripsi"
+            name="description"
+            fullWidth
+            value={formData.description}
+            onChange={handleInputChange}
+            multiline
+            rows={4}
+            sx={{ marginTop: 2 }}
+          />
+          <Button
+            variant="outlined"
+            component="label"
+            sx={{
+              borderColor: theme.palette.grey[400],
+            }}
+          >
+            <IconUpload
+              height="16px"
+              width="16"
+              style={{ marginRight: "10px" }}
             />
-            <TextField
-              margin="dense"
-              label="Kategori Produk"
-              name="kategori"
-              fullWidth
-              value={currentRow?.kategori || ""}
-              InputProps={{
-                readOnly: dialogMode === "Detail",
-              }}
-              onChange={(e) =>
-                setCurrentRow({ ...currentRow, kategori: e.target.value })
-              }
+            Tambahkan Gambar
+            <Input
+              type="file"
+              onChange={handleImageChange} // Menangani perubahan file gambar
+              inputProps={{ accept: "image/*" }}
+              sx={{ display: "none" }} // Sembunyikan input asli
             />
-            <TextField
-              margin="dense"
-              label="Sub Kategori Produk"
-              name="subKategori"
-              fullWidth
-              value={currentRow?.subKategori || ""}
-              InputProps={{
-                readOnly: dialogMode === "Detail",
-              }}
-              onChange={(e) =>
-                setCurrentRow({ ...currentRow, subKategori: e.target.value })
-              }
-            />
-            <TextField
-              margin="dense"
-              label="Harga"
-              name="harga"
-              fullWidth
-              value={currentRow?.harga || ""}
-              InputProps={{
-                readOnly: dialogMode === "Detail",
-              }}
-              onChange={(e) =>
-                setCurrentRow({ ...currentRow, harga: e.target.value })
-              }
-            />
-            <TextField
-              margin="dense"
-              label="Jumlah Terjual"
-              name="terjual"
-              fullWidth
-              value={currentRow?.terjual || ""}
-              InputProps={{
-                readOnly: dialogMode === "Detail",
-              }}
-              onChange={(e) =>
-                setCurrentRow({ ...currentRow, terjual: e.target.value })
-              }
-            />
-            <TextField
-              margin="dense"
-              label="Rating"
-              name="rating"
-              fullWidth
-              value={currentRow?.rating || ""}
-              InputProps={{
-                readOnly: dialogMode === "Detail",
-              }}
-              onChange={(e) =>
-                setCurrentRow({ ...currentRow, rating: e.target.value })
-              }
-            />
-            {/* Menampilkan gambar jika dalam mode detail */}
-            {dialogMode === "Detail" && currentRow.images && (
-              <Box sx={imageStyle}>
-                {currentRow.images.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={`Detail ${index}`}
-                    style={{ width: 100, height: 100, objectFit: "cover" }}
-                  />
-                ))}
-              </Box>
-            )}
-            {/* Menambahkan opsi upload gambar */}
-            {dialogMode !== "Detail" && (
-              <>
-                <Typography variant="body1" sx={{ mt: 2 }}>
-                  Upload Gambar Produk:
-                </Typography>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  style={{ marginTop: "10px" }}
-                />
-                <Box sx={imageStyle}>
-                  {imagePreviews.map((image, index) => (
-                    <img
-                      key={index}
-                      src={image}
-                      alt={`Preview ${index}`}
-                      style={{ width: 100, height: 100, objectFit: "cover" }}
-                    />
-                  ))}
-                </Box>
-              </>
-            )}
+          </Button>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Batal
+          </Button>
+          <Button onClick={handleSave} color="primary">
+            {dialogMode === "Create" ? "Simpan" : "Perbarui"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
+        <DialogTitle>Hapus Produk</DialogTitle>
+        <DialogContent>
+          <Typography>Apakah Anda yakin ingin menghapus produk ini?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteDialogClose} color="primary">
+            Batal
+          </Button>
+          <Button onClick={handleDelete} color="primary">
+            Hapus
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={detailDialogOpen} onClose={handleDialogClose}>
+        <DialogTitle>Detail Produk</DialogTitle>
+        <DialogContent>
+          <Typography variant="h6">
+            Nama Produk: {formData.product_name}
+          </Typography>
+          <Typography variant="body1">
+            Kategori: {formData.category_name}
+          </Typography>
+          <Typography variant="body1">Harga: {formData.price}</Typography>
+          <Typography variant="body1">
+            Deskripsi: {formData.description}
+          </Typography>
+          <Typography variant="body1">Gambar:</Typography>
+          <Box display="flex" flexWrap="wrap">
+            {formData.product_images.map((image, index) => (
+              <img
+                key={index}
+                src={image}
+                alt={`product-image-${index}`}
+                style={{ width: 100, height: 100, margin: 5 }}
+              />
+            ))}
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleDialogClose} color="primary">
+            Tutup
+          </Button>
         </DialogActions>
       </Dialog>
-    </MainCard>
+    </>
   );
 };
 
-export default Produk;
+export default Product;

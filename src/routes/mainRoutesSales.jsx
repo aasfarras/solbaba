@@ -3,6 +3,7 @@ import { lazy } from "react";
 // project imports
 import MainLayoutSales from "../layout/MainLayoutSales";
 import Loadable from "../ui-component/Loadable";
+import AuthGuard from "../utils/AuthGuard"; // Import AuthGuard
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import("../views/dashboard")));
@@ -19,18 +20,30 @@ const MainRoutesSales = {
   children: [
     {
       path: "",
-      element: <DashboardDefault />,
+      element: (
+        <AuthGuard>
+          <DashboardDefault />,
+        </AuthGuard>
+      ),
     },
     {
       path: "dashboard",
-      element: <DashboardDefault />,
+      element: (
+        <AuthGuard>
+          <DashboardDefault />,
+        </AuthGuard>
+      ),
     },
     {
       path: "menu",
       children: [
         {
           path: "pesanan",
-          element: <Pesanan />,
+          element: (
+            <AuthGuard>
+              <Pesanan />,
+            </AuthGuard>
+          ),
         },
       ],
     },
@@ -39,7 +52,11 @@ const MainRoutesSales = {
       children: [
         {
           path: "customer",
-          element: <Pelanggan />,
+          element: (
+            <AuthGuard>
+              <Pelanggan />,
+            </AuthGuard>
+          ),
         },
       ],
     },
@@ -48,7 +65,11 @@ const MainRoutesSales = {
       children: [
         {
           path: "transaksi",
-          element: <Transaksi />,
+          element: (
+            <AuthGuard>
+              <Transaksi />,
+            </AuthGuard>
+          ),
         },
       ],
     },

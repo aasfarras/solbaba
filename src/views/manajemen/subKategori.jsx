@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
 import {
   Button,
@@ -7,80 +7,73 @@ import {
   DialogContent,
   TextField,
   Tooltip,
+  MenuItem,
 } from "@mui/material";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
+import { getSubKategori } from "../../service/subKategori/subKategori.get.service";
+import { getKategori } from "../../service/kategori/kategori.get.service"; // Service untuk mengambil kategori
+import { postSubKategori } from "../../service/subKategori/subKategori.post.service"; // Service untuk post subkategori
 
 const SubKategori = () => {
   const theme = useTheme();
-  const [data, setData] = useState([
-    ["PVC", "5", "Pipa"], // Nama Sub Kategori, Jumlah Produk
-    ["PVCC", "3", "Pipa"],
-    ["PVCCC", "10", "Pipa"],
-    ["Metal", "5", "Genteng"],
-    ["Kaca", "7", "Genteng"],
-  ]);
-
+  const [data, setData] = useState([]);
+  const [categories, setCategories] = useState([]); // Untuk menyimpan kategori
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState(""); // "Create", "Read", "Update"
-  const [currentRow, setCurrentRow] = useState(null);
+  const [dialogMode, setDialogMode] = useState("");
   const [formData, setFormData] = useState({
     subKategoriName: "",
-    jumlahProduk: "",
-    Kategori: "",
+    categoryId: "", // Menggunakan category_id
   });
+
+  const fetchData = async () => {
+    try {
+      const response = await getSubKategori();
+      const formattedData = response.data.map((subcat) => ({
+        id: subcat.id,
+        subcategory_name: subcat.subcategory_name,
+        category_name: subcat.category_name,
+        category_id: subcat.category_id,
+      }));
+      setData(formattedData);
+    } catch (error) {
+      console.error("Error fetching subkategori:", error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await getKategori(); // Ambil daftar kategori dari API
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    fetchCategories(); // Ambil kategori saat komponen dimuat
+  }, []);
 
   const handleCreate = () => {
     setDialogMode("Create");
-    setFormData({ subKategoriName: "", jumlahProduk: "" });
+    setFormData({ subKategoriName: "", categoryId: "" });
     setDialogOpen(true);
   };
 
-  const handleRead = (rowIndex) => {
-    setDialogMode("Read");
-    setCurrentRow(data[rowIndex]);
-    setFormData({
-      subKategoriName: data[rowIndex][0],
-      jumlahProduk: data[rowIndex][1],
-      jumlahProduk: data[rowIndex][2],
-    });
-    setDialogOpen(true);
-  };
-
-  const handleUpdate = (rowIndex) => {
-    setDialogMode("Update");
-    setCurrentRow(data[rowIndex]);
-    setFormData({
-      subKategoriName: data[rowIndex][0],
-      jumlahProduk: data[rowIndex][1],
-      jumlahProduk: data[rowIndex][2],
-    });
-    setDialogOpen(true);
-  };
-
-  const handleDelete = (rowIndex) => {
-    const newData = data.filter((_, index) => index !== rowIndex);
-    setData(newData);
-  };
-
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-  };
-
-  const handleSave = () => {
+  const handleSave = async () => {
     if (dialogMode === "Create") {
-      const newData = [
-        ...data,
-        [formData.subKategoriName, formData.jumlahProduk, formData.Kategori],
-      ];
-      setData(newData);
-    } else if (dialogMode === "Update") {
-      const newData = data.map((row, index) =>
-        index === data.indexOf(currentRow)
-          ? [formData.subKategoriName, formData.jumlahProduk, formData.Kategori]
-          : row
-      );
-      setData(newData);
+      try {
+        // Lakukan POST ke API
+        const newSubCategory = {
+          subcategory_name: formData.subKategoriName,
+          category_id: formData.categoryId,
+        };
+        await postSubKategori(newSubCategory); // Fungsi POST
+        fetchData(); // Refresh data setelah berhasil menambah
+      } catch (error) {
+        console.error("Error creating subkategori:", error);
+      }
     }
     setDialogOpen(false);
   };
@@ -91,38 +84,34 @@ const SubKategori = () => {
   };
 
   const columns = [
-    { name: "Nama sub Kategori", label: "Nama sub Kategori" },
-    { name: "Jumlah Produk", label: "Jumlah Produk" },
-    { name: "Kategori", label: "Kategori" },
+    { name: "subcategory_name", label: "Nama Sub Kategori" },
+    { name: "category_name", label: "Kategori" },
     {
       name: "Actions",
       label: "Aksi",
       options: {
         filter: false,
         sort: false,
-        empty: true,
-        customBodyRender: (value, tableMeta) => {
-          return (
-            <>
-              <Tooltip title="Edit">
-                <Button
-                  onClick={() => handleUpdate(tableMeta.rowIndex)}
-                  sx={{ color: theme.palette.warning.main }}
-                >
-                  <IconPencil />
-                </Button>
-              </Tooltip>
-              <Tooltip title="Delete">
-                <Button
-                  onClick={() => handleDelete(tableMeta.rowIndex)}
-                  sx={{ color: theme.palette.error.main }}
-                >
-                  <IconTrash />
-                </Button>
-              </Tooltip>
-            </>
-          );
-        },
+        customBodyRender: (value, tableMeta) => (
+          <>
+            <Tooltip title="Edit">
+              <Button
+                onClick={() => handleUpdate(tableMeta.rowIndex)}
+                sx={{ color: theme.palette.warning.main }}
+              >
+                <IconPencil />
+              </Button>
+            </Tooltip>
+            <Tooltip title="Hapus">
+              <Button
+                onClick={() => handleDelete(tableMeta.rowIndex)}
+                sx={{ color: theme.palette.error.main }}
+              >
+                <IconTrash />
+              </Button>
+            </Tooltip>
+          </>
+        ),
       },
     },
   ];
@@ -131,11 +120,19 @@ const SubKategori = () => {
     <>
       <MUIDataTable
         title={
-          <Button onClick={handleCreate} variant="contained">
-            Tambah Produk
+          <Button
+            onClick={handleCreate}
+            variant="contained"
+            sx={{
+              backgroundColor: theme.palette.secondary.main,
+              "&:hover": {
+                background: theme.palette.error.light,
+              },
+            }}
+          >
+            Tambah Sub Kategori
           </Button>
         }
-        search={false}
         data={data}
         columns={columns}
         options={{
@@ -143,47 +140,41 @@ const SubKategori = () => {
           elevation: 0,
           rowsPerPage: 10,
           rowsPerPageOptions: [5, 10, 20, 50, 100],
+          textLabels: {
+            pagination: {
+              rowsPerPage: "Baris per Halaman",
+            },
+          },
         }}
       />
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
-        <DialogContent>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <DialogContent sx={{ minWidth: "400px" }}>
           <TextField
-            margin="dense"
-            label="Nama sub Kategori"
+            label="Nama Sub Kategori"
             name="subKategoriName"
-            fullWidth
             value={formData.subKategoriName}
             onChange={handleInputChange}
-            disabled={dialogMode === "Read"}
-          />
-          <TextField
-            margin="dense"
-            label="Jumlah Produk"
-            name="jumlahProduk"
+            sx={{ mb: "10px" }}
             fullWidth
-            value={formData.jumlahProduk}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Read"}
           />
           <TextField
-            margin="dense"
+            select
             label="Kategori"
-            name="Kategori"
-            fullWidth
-            value={formData.Kategori}
+            name="categoryId"
+            value={formData.categoryId}
             onChange={handleInputChange}
-            disabled={dialogMode === "Read"}
-          />
+            fullWidth
+          >
+            {categories.map((category) => (
+              <MenuItem key={category.id} value={category.id}>
+                {category.category_name}
+              </MenuItem>
+            ))}
+          </TextField>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            Cancel
-          </Button>
-          {dialogMode !== "Read" && (
-            <Button onClick={handleSave} color="primary">
-              Save
-            </Button>
-          )}
+          <Button onClick={() => setDialogOpen(false)}>Batal</Button>
+          <Button onClick={handleSave}>Simpan</Button>
         </DialogActions>
       </Dialog>
     </>

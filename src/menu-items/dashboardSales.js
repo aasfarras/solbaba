@@ -1,8 +1,8 @@
 // assets
-import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import { IconLayoutDashboard } from "@tabler/icons-react";
 
 // constant
-const icons = { DashboardOutlinedIcon };
+const icons = { IconLayoutDashboard };
 
 const dashboardSales = {
   id: "dashboardSales",
@@ -14,7 +14,7 @@ const dashboardSales = {
       title: "Dashboard",
       type: "item",
       url: "/sales",
-      icon: icons.DashboardOutlinedIcon,
+      icon: icons.IconLayoutDashboard,
       breadcrumbs: false,
     },
   ],

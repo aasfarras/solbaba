@@ -14,6 +14,7 @@ import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import InputAdornment from "@mui/material/InputAdornment";
+import { Button } from "@mui/material";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -24,6 +25,7 @@ import Popper from "@mui/material/Popper";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
+import axios from "axios";
 
 // third-party
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -56,15 +58,41 @@ const ProfileSection = () => {
   const [open, setOpen] = useState(false);
 
   const anchorRef = useRef(null);
-  const handleLogout = () => {
-    navigate("/");
-  };
 
   const handleClose = (event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;
     }
     setOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_APP_API}logout`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.code === 200) {
+        sessionStorage.removeItem("token");
+
+        navigate("/");
+      } else {
+        console.error("Logout failed:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const handleListItemClick = (event, index, route = "") => {
@@ -137,16 +165,17 @@ const ProfileSection = () => {
                   <Box sx={{ p: 2, pb: 0 }}>
                     <Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">Selamat Pagi,</Typography>
+                        <Typography variant="h4" sx={{ fontWeight: 500 }}>
+                          Selamat Pagi,
+                        </Typography>
                         <Typography
                           component="span"
                           variant="h4"
                           sx={{ fontWeight: 400 }}
                         >
-                          Johne Doe
+                          Super Admin
                         </Typography>
                       </Stack>
-                      <Typography variant="subtitle2">Admin</Typography>
                     </Stack>
                     <Divider />
                   </Box>
@@ -158,7 +187,7 @@ const ProfileSection = () => {
                     }}
                   >
                     <Box sx={{ p: 2, pt: 0 }}>
-                      <Divider />
+                      {/* <Divider /> */}
                       <List
                         component="nav"
                         sx={{
@@ -175,22 +204,24 @@ const ProfileSection = () => {
                           },
                         }}
                       >
-                        <ListItemButton
+                        <Button
+                          onClick={handleLogout}
+                          startIcon={<IconLogout stroke={1.5} size="1.3rem" />}
+                          variant="text"
+                          color="inherit"
                           sx={{
                             borderRadius: `${customization.borderRadius}px`,
+                            textAlign: "left",
+                            padding: "12px 16px",
+                            justifyContent: "flex-start",
+                            width: "100%",
+                            "&:hover": {
+                              backgroundColor: theme.palette.action.hover,
+                            },
                           }}
-                          selected={selectedIndex === 4}
-                          onClick={handleLogout}
                         >
-                          <ListItemIcon>
-                            <IconLogout stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Typography variant="body2">Keluar</Typography>
-                            }
-                          />
-                        </ListItemButton>
+                          <Typography variant="body2">Keluar</Typography>
+                        </Button>
                       </List>
                     </Box>
                   </PerfectScrollbar>

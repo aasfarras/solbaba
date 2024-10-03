@@ -5,6 +5,7 @@ import GuestGuard from "../utils/route-guard/GuestGuard";
 import MinimalLayout from "../layout/MinimalLayout";
 import NavMotion from "../layout/NavMotion";
 import Loadable from "../ui-component/Loadable";
+import AuthGuard from "../utils/AuthGuard";
 
 // login routing
 const AuthLogin = Loadable(

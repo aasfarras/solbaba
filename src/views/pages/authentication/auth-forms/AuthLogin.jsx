@@ -1,16 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import Divider from "@mui/material/Divider";
 import FormControl from "@mui/material/FormControl";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
@@ -18,7 +15,6 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
 
 // third party
 import * as Yup from "yup";
@@ -31,15 +27,16 @@ import AnimateButton from "../../../../ui-component/extended/AnimateButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
+// ============================|| AUTH - LOGIN ||============================ //
+
 const AuthLogin = ({ ...others }) => {
   const theme = useTheme();
-  const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const customization = useSelector((state) => state.customization);
-  const navigate = useNavigate(); // Declare useNavigate
-
-  const [checked, setChecked] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState(""); // State untuk error login
+  const navigate = useNavigate();
 
+  // Menangani toggle visibilitas password
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -48,51 +45,68 @@ const AuthLogin = ({ ...others }) => {
     event.preventDefault();
   };
 
+  // Fungsi login menggunakan API yang diambil dari .env
+  const handleLogin = async (values, setSubmitting) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_APP_API}login`, // Mengambil URL dari .env
+        {
+          username: values.username,
+          password: values.password,
+        }
+      );
+
+      if (response.data.code === 200) {
+        // Simpan token di localStorage atau context
+        sessionStorage.setItem("token", response.data.data.access_token);
+
+        // Cek role dari respons API
+        const userRole = response.data.data.user.role;
+
+        // Redirect berdasarkan role
+        if (userRole === "superadmin") {
+          navigate("/super-admin");
+        } else if (userRole === "salesman") {
+          navigate("/sales");
+        } else {
+          setLoginError("Role tidak dikenal");
+        }
+      } else {
+        // Menampilkan pesan error jika login gagal
+        setLoginError("Nama Pengguna atau Kata Sandi salah");
+      }
+    } catch (error) {
+      console.error("Gagal Masuk:", error);
+      setLoginError("Gagal Masuk. Silakan coba lagi.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <>
       <Grid container direction="column" justifyContent="center" spacing={2}>
-        <Grid
-          item
-          xs={12}
-          container
-          alignItems="center"
-          justifyContent="center"
-        >
+        <Grid item container alignItems="center" justifyContent="center">
           <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1">Masuk Dengan Email</Typography>
+            <Typography variant="subtitle1">
+              Masuk dengan Nama Pengguna
+            </Typography>
           </Box>
         </Grid>
       </Grid>
 
       <Formik
         initialValues={{
-          email: "",
+          username: "",
           password: "",
           submit: null,
         }}
         validationSchema={Yup.object().shape({
-          email: Yup.string()
-            .email("Harus Berupa Email Yang Benar")
-            .max(255)
-            .required("Email Di Butuhkan"),
+          username: Yup.string().max(255).required("Nama Pengguna Di Perlukan"),
           password: Yup.string().max(255).required("Kata Sandi Di Perlukan"),
         })}
-        onSubmit={(values, { setSubmitting, setErrors }) => {
-          // Logika untuk menentukan rute berdasarkan username dan password
-          if (
-            values.email === "sales@gmail.com" &&
-            values.password === "password"
-          ) {
-            navigate("/sales");
-          } else if (
-            values.email === "super-admin@gmail.com" &&
-            values.password === "password"
-          ) {
-            navigate("/super-admin");
-          } else {
-            setErrors({ submit: "Invalid username or password" });
-          }
-          setSubmitting(false);
+        onSubmit={(values, { setSubmitting }) => {
+          handleLogin(values, setSubmitting);
         }}
       >
         {({
@@ -107,28 +121,27 @@ const AuthLogin = ({ ...others }) => {
           <form noValidate onSubmit={handleSubmit} {...others}>
             <FormControl
               fullWidth
-              error={Boolean(touched.email && errors.email)}
+              error={Boolean(touched.username && errors.username)}
               sx={{ ...theme.typography.customInput }}
             >
-              <InputLabel htmlFor="outlined-adornment-email-login">
-                Masukkan Email
+              <InputLabel htmlFor="outlined-adornment-username-login">
+                Nama Pengguna
               </InputLabel>
               <OutlinedInput
-                id="outlined-adornment-email-login"
-                type="email"
-                value={values.email}
-                name="email"
+                id="outlined-adornment-username-login"
+                type="text"
+                value={values.username}
+                name="username"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                label="Email Address / Username"
-                inputProps={{}}
+                label="Username"
               />
-              {touched.email && errors.email && (
+              {touched.username && errors.username && (
                 <FormHelperText
                   error
-                  id="standard-weight-helper-text-email-login"
+                  id="standard-weight-helper-text-username-login"
                 >
-                  {errors.email}
+                  {errors.username}
                 </FormHelperText>
               )}
             </FormControl>
@@ -139,7 +152,7 @@ const AuthLogin = ({ ...others }) => {
               sx={{ ...theme.typography.customInput }}
             >
               <InputLabel htmlFor="outlined-adornment-password-login">
-                Masukkan Kata Sandi
+                Kata Sandi
               </InputLabel>
               <OutlinedInput
                 id="outlined-adornment-password-login"
@@ -162,7 +175,6 @@ const AuthLogin = ({ ...others }) => {
                   </InputAdornment>
                 }
                 label="Password"
-                inputProps={{}}
               />
               {touched.password && errors.password && (
                 <FormHelperText
@@ -173,31 +185,11 @@ const AuthLogin = ({ ...others }) => {
                 </FormHelperText>
               )}
             </FormControl>
-            <Stack
-              direction="row"
-              alignItems="center"
-              justifyContent="space-between"
-              spacing={1}
-            >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={checked}
-                    onChange={(event) => setChecked(event.target.checked)}
-                    name="checked"
-                    color="primary"
-                  />
-                }
-                label="Ingatkan Saya"
-              />
-              <Typography
-                variant="subtitle1"
-                color="primary.main"
-                sx={{ textDecoration: "none", cursor: "pointer" }}
-              >
-                Lupa Password?
-              </Typography>
-            </Stack>
+            {loginError && (
+              <Box sx={{ mt: 2 }}>
+                <FormHelperText error>{loginError}</FormHelperText>
+              </Box>
+            )}
             {errors.submit && (
               <Box sx={{ mt: 3 }}>
                 <FormHelperText error>{errors.submit}</FormHelperText>
@@ -213,7 +205,7 @@ const AuthLogin = ({ ...others }) => {
                   size="large"
                   type="submit"
                   variant="contained"
-                  color="primary"
+                  color="secondary"
                 >
                   Masuk
                 </Button>
