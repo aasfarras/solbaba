@@ -1,165 +1,71 @@
-import PropTypes from "prop-types";
 import React from "react";
+import { Bar } from "react-chartjs-2";
+import { Card, CardContent, Typography, Box } from "@mui/material";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
-// material-ui
-import { useTheme } from "@mui/material/styles";
-import Grid from "@mui/material/Grid";
-import MenuItem from "@mui/material/MenuItem";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-
-// third-party
-import ApexCharts from "apexcharts";
-import Chart from "react-apexcharts";
-
-// project imports
-import SkeletonTotalGrowthBarChart from "../../ui-component/cards/Skeleton/TotalGrowthBarChart";
-import MainCard from "../../ui-component/cards/MainCard";
-import { gridSpacing } from "../../store/constant";
-
-// chart data
-import chartData from "./chart-data/total-growth-bar-chart";
-
-const status = [
-  {
-    value: "today",
-    label: "Today",
-  },
-  {
-    value: "month",
-    label: "This Month",
-  },
-  {
-    value: "year",
-    label: "This Year",
-  },
-];
-
-// ==============================|| DASHBOARD DEFAULT - TOTAL GROWTH BAR CHART ||============================== //
+// Register chart components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const TotalGrowthBarChart = ({ isLoading }) => {
-  const [value, setValue] = React.useState("today");
-  const theme = useTheme();
-
-  const { primary } = theme.palette.text;
-  const divider = theme.palette.divider;
-  const grey500 = theme.palette.grey[500];
-
-  const primary200 = theme.palette.primary[200];
-  const primaryDark = theme.palette.primary.dark;
-  const secondaryMain = theme.palette.secondary.main;
-  const secondaryLight = theme.palette.secondary.light;
-
-  React.useEffect(() => {
-    const newChartData = {
-      ...chartData.options,
-      colors: [primary200, primaryDark, secondaryMain, secondaryLight],
-      xaxis: {
-        labels: {
-          style: {
-            colors: [
-              primary,
-              primary,
-              primary,
-              primary,
-              primary,
-              primary,
-              primary,
-              primary,
-              primary,
-              primary,
-              primary,
-              primary,
-            ],
-          },
-        },
+  // Data untuk bar chart
+  const data = {
+    labels: ["January", "February", "March", "April", "May", "June", "July"],
+    datasets: [
+      {
+        label: "Pertumbuhan",
+        data: [65, 59, 80, 81, 56, 55, 40], // Data pertumbuhan
+        backgroundColor: "#52b1ff",
+        borderColor: "#52b1ff",
+        borderWidth: 1,
       },
-      yaxis: {
-        labels: {
-          style: {
-            colors: [primary],
-          },
-        },
-      },
-      grid: { borderColor: divider },
-      tooltip: { theme: "light" },
-      legend: { labels: { colors: grey500 } },
-    };
+    ],
+  };
 
-    // do not load chart when loading
-    if (!isLoading) {
-      ApexCharts.exec(`bar-chart`, "updateOptions", newChartData);
-    }
-  }, [
-    primary200,
-    primaryDark,
-    secondaryMain,
-    secondaryLight,
-    primary,
-    divider,
-    isLoading,
-    grey500,
-  ]);
+  // Opsi konfigurasi chart
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Arus Pemasukan",
+      },
+    },
+  };
 
   return (
-    <>
-      {isLoading ? (
-        <SkeletonTotalGrowthBarChart />
-      ) : (
-        <MainCard>
-          <Grid container spacing={gridSpacing}>
-            <Grid item xs={12}>
-              <Grid
-                container
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Grid item>
-                  <Grid container direction="column" spacing={1}>
-                    <Grid item>
-                      <Typography variant="subtitle2">Total Growth</Typography>
-                    </Grid>
-                    <Grid item>
-                      <Typography variant="h3">$2,324.00</Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item>
-                  <TextField
-                    id="standard-select-currency"
-                    select
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
-                  >
-                    {status.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              sx={{
-                "& .apexcharts-menu.apexcharts-menu-open": {
-                  bgcolor: "background.paper",
-                },
-              }}
-            >
-              <Chart {...chartData} />
-            </Grid>
-          </Grid>
-        </MainCard>
-      )}
-    </>
+    <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
+      <CardContent>
+        {isLoading ? (
+          <Typography variant="body2">Loading...</Typography>
+        ) : (
+          <Box>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Arus Pemasukan
+            </Typography>
+            <Bar data={data} options={options} />
+          </Box>
+        )}
+      </CardContent>
+    </Card>
   );
-};
-
-TotalGrowthBarChart.propTypes = {
-  isLoading: PropTypes.bool,
 };
 
 export default TotalGrowthBarChart;

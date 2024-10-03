@@ -84,34 +84,36 @@ const Kategori = () => {
   };
 
   const handleSave = async () => {
-    if (activeStep === 0) {
-      let imageUrl = formData.category_image_url;
-      if (imageFile) {
-        const uploadResult = await postKategoriImage(
-          currentCategoryId,
-          imageFile
-        );
-        imageUrl = uploadResult.image_url; // Dapatkan URL gambar dari hasil unggahan
+    let imageUrl = formData.category_image_url;
+    if (imageFile) {
+      const uploadResult = await postKategoriImage(
+        currentCategoryId,
+        imageFile
+      );
+      imageUrl = uploadResult.image_url; // Dapatkan URL gambar dari hasil unggahan
 
-        // Refresh data setelah upload gambar berhasil
-      }
+      // Refresh data setelah upload gambar berhasil
+    }
+    if (activeStep === 0) {
       // Langkah pertama
       if (dialogMode === "Create") {
-        // Logika untuk membuat kategori baru
         try {
+          // Langkah pertama: postKategori
           const response = await postKategori({
             category_name: formData.category_name,
-            category_image_url: "",
+            category_image_url: "", // Belum ada gambar di langkah pertama
           });
 
+          // Cek respons untuk memastikan ID tersedia
           if (response.data === "success") {
+            // Fetch data kategori setelah penambahan
             const categories = await getKategori();
             const newCategory = categories.data.find(
               (cat) => cat.category_name === formData.category_name
             );
             if (newCategory) {
-              setCurrentCategoryId(newCategory.id);
-              setActiveStep(1);
+              setCurrentCategoryId(newCategory.id); // Simpan ID kategori baru
+              setActiveStep(1); // Pindah ke langkah kedua
             } else {
               console.error("Kategori baru tidak ditemukan");
             }
@@ -119,8 +121,6 @@ const Kategori = () => {
         } catch (error) {
           console.error("Error creating kategori:", error);
         }
-        setDialogOpen(false);
-        fetchData();
       } else if (dialogMode === "Update") {
         await updateKategori(currentCategoryId, {
           category_name: formData.category_name,
@@ -292,6 +292,7 @@ const Kategori = () => {
             component="label"
             sx={{
               borderColor: theme.palette.grey[400],
+              mt: 1,
             }}
           >
             <IconUpload
@@ -338,6 +339,7 @@ const Kategori = () => {
                 fullWidth
                 value={formData.category_name}
                 onChange={handleInputChange}
+                sx={{ mt: 3 }}
               />
             </>
           )}
@@ -348,6 +350,8 @@ const Kategori = () => {
                 component="label"
                 sx={{
                   borderColor: theme.palette.grey[400],
+                  marginLeft: "70px",
+                  marginTop: "20px",
                 }}
               >
                 <IconUpload
@@ -361,6 +365,7 @@ const Kategori = () => {
                   onChange={handleImageChange}
                   inputProps={{ accept: "image/*" }}
                   hidden
+                  sx={{ display: "none" }}
                 />
               </Button>
             </>

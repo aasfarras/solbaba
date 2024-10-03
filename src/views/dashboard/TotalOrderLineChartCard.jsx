@@ -121,26 +121,26 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                         {timeValue ? (
                           <Typography
                             sx={{
-                              fontSize: "2.125rem",
+                              fontSize: "1.225rem",
                               fontWeight: 500,
                               mr: 1,
                               mt: 1.75,
                               mb: 0.75,
                             }}
                           >
-                            $108
+                            Rp 108.000
                           </Typography>
                         ) : (
                           <Typography
                             sx={{
-                              fontSize: "2.125rem",
+                              fontSize: "1.225rem",
                               fontWeight: 500,
                               mr: 1,
                               mt: 1.75,
                               mb: 0.75,
                             }}
                           >
-                            $961
+                            Rp 800.000
                           </Typography>
                         )}
                       </Grid>
