@@ -17,7 +17,7 @@ export const postSubKategori = async (serviceData) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error posting subkategori data:", error);
+    console.error("Error posting sub kategori data:", error);
     throw error;
   }
 };

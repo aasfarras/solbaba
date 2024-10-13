@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const updateKategori = async (id, serviceData) => {
+export const updateSubKategori = async (id, serviceData) => {
   const token = sessionStorage.getItem("token");
   try {
     const response = await axios.put(
@@ -17,7 +17,7 @@ export const updateKategori = async (id, serviceData) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error updating kategori data:", error);
+    console.error("Error updating sub kategori data:", error);
     throw error;
   }
 };

@@ -9,8 +9,12 @@ import {
   Tooltip,
   DialogTitle,
   Input,
+  Stepper,
+  Step,
+  StepLabel,
   Typography,
   Box,
+  MenuItem,
 } from "@mui/material";
 import {
   IconPencil,
@@ -19,6 +23,8 @@ import {
   IconEye,
 } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
+import { getKategori } from "../../service/kategori/kategori.get.service";
+import { getSubKategori } from "../../service/subKategori/subKategori.get.service";
 import { getProduct } from "../../service/product/product.get.service";
 import { postProduct } from "../../service/product/product.post.service";
 import { updateProduct } from "../../service/product/product.update.service";
@@ -29,21 +35,46 @@ const Product = () => {
   const theme = useTheme();
   const [data, setData] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [dialogOpenn, setDialogOpenn] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState(""); // "Create" or "Update"
   const [currentRowIndex, setCurrentRowIndex] = useState(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     product_name: "",
     product_images: [],
     category_name: "",
+    categoryId: "",
+    subcategory_name: "",
+    subcategoryId: "",
     price: "",
     description: "",
   });
   const [currentProductId, setCurrentProductId] = useState(null);
   const [imageFile, setImageFile] = useState(null); // Menyimpan file gambar yang diunggah
+  const [activeStep, setActiveStep] = useState(0); // Langkah aktif dalam stepper
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [subcategoryMap, setSubcategoryMap] = useState({});
 
-  // Fetch data produk dari API
+  const fetchCategories = async () => {
+    try {
+      const response = await getKategori();
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+  const fetchSubCategories = async () => {
+    try {
+      const response = await getSubKategori();
+      setSubCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  // Fetch data kategori dari API
   const fetchData = async () => {
     try {
       const result = await getProduct();
@@ -51,10 +82,13 @@ const Product = () => {
         item.product_images[0], // Ambil hanya gambar pertama untuk ditampilkan di tabel
         item.product_name,
         item.category_name,
-        item.price,
+        item.subcategory_name,
+        item.price, // Use item.price for price
         item.description, // Tambahkan deskripsi ke dalam data yang diformat
         item.id, // ID produk
-        item.product_images, // Menyimpan semua gambar untuk detail
+        item.product_images,
+        item.category_id,
+        item.subCategory_id,
       ]);
       setData(formattedData);
     } catch (error) {
@@ -63,90 +97,167 @@ const Product = () => {
   };
 
   useEffect(() => {
-    fetchData(); // Panggil data produk setiap kali halaman di-load
+    fetchData(); // Panggil data kategori setiap kali halaman di-load
+    fetchCategories();
+    fetchSubCategories();
   }, []);
 
   const handleCreate = () => {
     setDialogMode("Create");
     setFormData({
       product_name: "",
-      product_images: [],
-      category_name: "",
+      categoryId: "",
+      subcategoryId: "",
       price: "",
       description: "",
-    }); // Reset data
+      product_images: [],
+    });
     setImageFile(null); // Reset file gambar
+    setActiveStep(0); // Reset langkah ke step pertama
     setDialogOpen(true);
   };
 
   const handleUpdate = (rowIndex) => {
+    const rowData = data[rowIndex];
     setDialogMode("Update");
     setCurrentRowIndex(rowIndex);
-    const rowData = data[rowIndex];
+    const category = categories.find((category) => category.id === rowData[8]);
+    const subCategory = subCategories.find(
+      (subcategory) => subcategory.subcategory_name === rowData[3]
+    );
     setFormData({
-      product_name: rowData[1], // Ambil nama produk
-      product_images: rowData[6], // Ambil URL gambar
-      category_name: rowData[2],
-      price: rowData[3],
-      description: rowData[4], // Ambil deskripsi dari data yang diformat
+      product_name: rowData[1],
+      product_images: rowData[7],
+      categoryId: rowData[8],
+      subcategoryId: subCategory ? subCategory.id : null, // Set subcategoryId to the actual id
+      price: rowData[4],
+      description: rowData[5],
+      category_name: category ? category.category_name : "",
+      subcategory_name: subCategory ? subCategory.subcategory_name : "",
     });
-    setCurrentProductId(rowData[5]); // Ambil ID produk
-    setDialogOpen(true); // Buka dialog untuk edit
+    setCurrentProductId(rowData[6]);
+    setDialogOpenn(true);
   };
 
   const handleDetail = (rowIndex) => {
     const rowData = data[rowIndex];
     setFormData({
       product_name: rowData[1],
-      product_images: rowData[6], // Ambil semua gambar dari data yang diformat
-      category_name: rowData[2],
-      price: rowData[3],
-      description: rowData[4], // Ambil deskripsi dari data yang diformat
+      product_images: rowData[7], // Ambil semua gambar dari data yang diformat
+      categoryId: rowData[2],
+      subcategoryId: rowData[3],
+      price: rowData[4], // Use rowData[5] for price
+      description: rowData[5], // Ambil deskripsi dari data yang diformat
     });
-    setCurrentProductId(rowData[5]); // Ambil ID produk
+    setCurrentProductId(rowData[6]); // Ambil ID produk
     setDetailDialogOpen(true);
   };
 
   const handleDialogClose = () => {
     setDialogOpen(false);
+    setDialogOpenn(false);
+    setActiveStep(0); // Reset stepper saat dialog ditutup
     setDetailDialogOpen(false);
   };
 
   const handleSave = async () => {
-    try {
-      let imageUrl = formData.product_images;
-
-      // Jika ada file gambar yang diunggah, upload terlebih dahulu
-      if (imageFile) {
-        const uploadResult = await postProductImage(
-          currentProductId,
-          imageFile
-        );
-        imageUrl = uploadResult.image_url; // Dapatkan URL gambar dari hasil unggahan
-      }
-
+    let imageUrl = formData.product_images;
+    if (imageFile) {
+      const uploadResult = await postProductImage(currentProductId, imageFile);
+      imageUrl = uploadResult.image_url;
+    }
+    if (activeStep === 0) {
       if (dialogMode === "Create") {
-        await postProduct({
-          product_name: formData.product_name,
-          product_images: imageUrl,
-          category_name: formData.category_name,
-          price: formData.price,
-          description: formData.description,
-        });
-        fetchData(); // Refresh data setelah create
+        try {
+          const response = await postProduct({
+            product_name: formData.product_name,
+            category_id: formData.categoryId,
+            subcategory_id: formData.subcategoryId,
+            price: formData.price,
+            description: formData.description,
+            product_images: [],
+          });
+          if (response.data && response.data.id) {
+            setCurrentProductId(response.data.id);
+            setActiveStep(1);
+          } else {
+            console.error("Product baru tidak ditemukan");
+          }
+        } catch (error) {
+          console.error("Error creating product:", error);
+        }
       } else if (dialogMode === "Update") {
         await updateProduct(currentProductId, {
           product_name: formData.product_name,
-          product_images: imageUrl,
-          category_name: formData.category_name,
+          category_id: formData.categoryId,
+          subcategory_id: formData.subcategoryId,
           price: formData.price,
           description: formData.description,
+          product_images: imageUrl,
         });
-        fetchData(); // Refresh data setelah update
+        const updatedData = data.map((row, index) =>
+          index === currentRowIndex
+            ? [
+                imageUrl,
+                formData.product_name,
+                formData.price,
+                formData.description,
+                row[6],
+                row[7],
+                row[8],
+                row[9],
+              ]
+            : row
+        );
+        setData(updatedData);
+        setDialogOpenn(false);
+        fetchData();
       }
-      setDialogOpen(false);
-    } catch (error) {
-      console.error("Error saving product:", error);
+    } else if (activeStep === 1) {
+      if (dialogMode === "Create") {
+        try {
+          if (imageFile) {
+            await postProductImage(currentProductId, imageFile);
+          }
+          fetchData();
+          setDialogOpen(false);
+        } catch (error) {
+          console.error("Error uploading Product image:", error);
+        }
+      } else if (dialogMode === "Update") {
+        try {
+          if (imageFile) {
+            await postProductImage(currentProductId, imageFile);
+          }
+          await updateProduct(currentProductId, {
+            product_name: formData.product_name,
+            category_id: formData.categoryId,
+            subcategory_id: formData.subcategoryId,
+            price: formData.price,
+            description: formData.description,
+            product_images: imageUrl,
+          });
+          const updatedData = data.map((row, index) =>
+            index === currentRowIndex
+              ? [
+                  imageUrl,
+                  formData.product_name,
+                  formData.price,
+                  formData.description,
+                  row[6],
+                  row[7],
+                  row[8],
+                  row[9],
+                ]
+              : row
+          );
+          setData(updatedData);
+          setDialogOpenn(false);
+          fetchData();
+        } catch (error) {
+          console.error("Error updating product image:", error);
+        }
+      }
     }
   };
 
@@ -155,20 +266,17 @@ const Product = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Menyimpan file gambar yang dipilih
   const handleImageChange = (e) => {
-    setImageFile(e.target.files[0]);
+    setImageFile(e.target.files[0]); // Menyimpan file gambar yang diupload
   };
 
-  // Fungsi untuk membuka dialog konfirmasi delete
   const handleDeleteClick = (rowIndex) => {
     setCurrentRowIndex(rowIndex);
     const rowData = data[rowIndex];
-    setCurrentProductId(rowData[5]);
+    setCurrentProductId(rowData[6]); // Use rowData[6] for product ID
     setDeleteDialogOpen(true);
   };
 
-  // Fungsi untuk menghapus produk
   const handleDelete = async () => {
     try {
       await deleteProduct(currentProductId);
@@ -184,10 +292,18 @@ const Product = () => {
     setDeleteDialogOpen(false);
   };
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0, // Add this option to remove the two numbers after the comma
+    }).format(price);
+  };
+
   const columns = [
     {
       name: "product_images",
-      label: "Gambar Produk",
+      label: "Gambar Product",
       options: {
         customBodyRender: (value) => (
           <img src={value} alt="product" style={{ width: 50, height: 50 }} />
@@ -196,7 +312,14 @@ const Product = () => {
     },
     { name: "product_name", label: "Nama Produk" },
     { name: "category_name", label: "Nama Kategori" },
-    { name: "price", label: "Harga" },
+    { name: "subcategory_name", label: "Nama Sub Kategori" },
+    {
+      name: "price",
+      label: "Harga",
+      options: {
+        customBodyRender: (value) => formatPrice(value),
+      },
+    },
     {
       name: "Actions",
       label: "Aksi",
@@ -206,20 +329,20 @@ const Product = () => {
         empty: true,
         customBodyRender: (value, tableMeta) => (
           <>
-            <Tooltip title="Edit">
-              <Button
-                onClick={() => handleUpdate(tableMeta.rowIndex)}
-                sx={{ color: theme.palette.warning.main }}
-              >
-                <IconPencil />
-              </Button>
-            </Tooltip>
             <Tooltip title="Detail">
               <Button
                 onClick={() => handleDetail(tableMeta.rowIndex)}
                 sx={{ color: theme.palette.info.main }}
               >
                 <IconEye />
+              </Button>
+            </Tooltip>
+            <Tooltip title="Edit">
+              <Button
+                onClick={() => handleUpdate(tableMeta.rowIndex)}
+                sx={{ color: theme.palette.warning.main }}
+              >
+                <IconPencil />
               </Button>
             </Tooltip>
             <Tooltip title="Delete">
@@ -250,7 +373,7 @@ const Product = () => {
               },
             }}
           >
-            Tambah Produk
+            Tambah Kategori
           </Button>
         }
         data={data}
@@ -267,34 +390,60 @@ const Product = () => {
           },
         }}
       />
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+
+      <Dialog open={dialogOpenn} onClose={handleDialogClose}>
         <DialogContent>
           <TextField
             margin="dense"
-            label="Nama Produk"
+            label="Nama Product"
             name="product_name"
             fullWidth
             value={formData.product_name}
             onChange={handleInputChange}
+            sx={{ mt: 3, mb: 2 }}
           />
+
           <TextField
-            margin="dense"
-            label="Nama Kategori"
-            name="category_name"
-            fullWidth
-            value={formData.category_name}
+            select
+            label="Kategori"
+            name="categoryId"
+            value={formData.categoryId}
             onChange={handleInputChange}
-            sx={{ marginTop: 2 }}
-          />
+            fullWidth
+            sx={{ mb: 2 }}
+          >
+            {categories.map((category) => (
+              <MenuItem key={category.id} value={category.id}>
+                {category.category_name}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            select
+            label="Sub Kategori"
+            name="subcategoryId"
+            value={formData.subcategoryId}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ mb: 2 }}
+          >
+            {subCategories.map((subcategory) => (
+              <MenuItem key={subcategory.id} value={subcategory.id}>
+                {subcategory.subcategory_name}
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField
             margin="dense"
             label="Harga"
             name="price"
             fullWidth
-            value={formData.price}
+            value={formatPrice(formData.price)}
             onChange={handleInputChange}
-            sx={{ marginTop: 2 }}
+            sx={{ mb: 2 }}
           />
+
           <TextField
             margin="dense"
             label="Deskripsi"
@@ -302,15 +451,13 @@ const Product = () => {
             fullWidth
             value={formData.description}
             onChange={handleInputChange}
-            multiline
-            rows={4}
-            sx={{ marginTop: 2 }}
           />
           <Button
             variant="outlined"
             component="label"
             sx={{
               borderColor: theme.palette.grey[400],
+              mt: 1,
             }}
           >
             <IconUpload
@@ -321,9 +468,9 @@ const Product = () => {
             Tambahkan Gambar
             <Input
               type="file"
-              onChange={handleImageChange} // Menangani perubahan file gambar
+              onChange={handleImageChange}
               inputProps={{ accept: "image/*" }}
-              sx={{ display: "none" }} // Sembunyikan input asli
+              sx={{ display: "none" }}
             />
           </Button>
         </DialogContent>
@@ -332,39 +479,168 @@ const Product = () => {
             Batal
           </Button>
           <Button onClick={handleSave} color="primary">
-            {dialogMode === "Create" ? "Simpan" : "Perbarui"}
+            Simpan
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
-        <DialogTitle>Hapus Produk</DialogTitle>
+      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+        <DialogTitle>Tambah Product</DialogTitle>
         <DialogContent>
-          <Typography>Apakah Anda yakin ingin menghapus produk ini?</Typography>
+          <Stepper activeStep={activeStep}>
+            <Step>
+              <StepLabel>Informasi Product</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>Unggah Gambar</StepLabel>
+            </Step>
+          </Stepper>
+          {activeStep === 0 && (
+            <>
+              <TextField
+                margin="dense"
+                label="Nama Product"
+                name="product_name"
+                fullWidth
+                value={formData.product_name}
+                onChange={handleInputChange}
+                sx={{ mt: 3, mb: 2 }} // added mb: 2 for consistent spacing
+              />
+
+              <TextField
+                select
+                label="Kategori"
+                name="categoryId"
+                value={formData.categoryId}
+                onChange={handleInputChange}
+                fullWidth
+                sx={{ mb: 2 }} // added mb: 2 for consistent spacing
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.category_name}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                select
+                label="Sub Kategori"
+                name="subcategoryId"
+                value={formData.subcategoryId}
+                onChange={handleInputChange}
+                fullWidth
+                sx={{ mb: 2 }} // added mb: 2 for consistent spacing
+              >
+                {subCategories.map((subcategory) => (
+                  <MenuItem key={subcategory.id} value={subcategory.id}>
+                    {subcategory.subcategory_name}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                margin="dense"
+                label="Harga"
+                name="price"
+                fullWidth
+                value={formatPrice(formData.price)}
+                onChange={handleInputChange}
+                sx={{ mb: 2 }}
+              />
+
+              <TextField
+                margin="dense"
+                label="Deskripsi"
+                name="description"
+                fullWidth
+                value={formData.description}
+                onChange={handleInputChange}
+              />
+            </>
+          )}
+          {activeStep === 1 && (
+            <>
+              <Button
+                variant="outlined"
+                component="label"
+                sx={{
+                  borderColor: theme.palette.grey[400],
+                  marginLeft: "70px",
+                  marginTop: "20px",
+                }}
+              >
+                <IconUpload
+                  height="16px"
+                  width="16"
+                  style={{ marginRight: "10px" }}
+                />
+                Tambahkan Gambar
+                <Input
+                  type="file"
+                  onChange={handleImageChange}
+                  inputProps={{ accept: "image/*" }}
+                  hidden
+                  sx={{ display: "none" }}
+                />
+              </Button>
+            </>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteDialogClose} color="primary">
-            Batal
-          </Button>
-          <Button onClick={handleDelete} color="primary">
-            Hapus
+          {activeStep > 0 && (
+            <Button onClick={() => setActiveStep((prev) => prev - 1)}>
+              Kembali
+            </Button>
+          )}
+          <Button onClick={handleSave}>
+            {activeStep === 0 ? "Selanjutnya" : "Simpan"}
           </Button>
         </DialogActions>
       </Dialog>
-
       <Dialog open={detailDialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Detail Produk</DialogTitle>
         <DialogContent>
-          <Typography variant="h6">
-            Nama Produk: {formData.product_name}
-          </Typography>
-          <Typography variant="body1">
-            Kategori: {formData.category_name}
-          </Typography>
-          <Typography variant="body1">Harga: {formData.price}</Typography>
-          <Typography variant="body1">
-            Deskripsi: {formData.description}
-          </Typography>
+          <TextField
+            margin="dense"
+            label="Nama Produk"
+            name="product_name"
+            fullWidth
+            value={formData.product_name}
+            disabled
+          />
+          <TextField
+            margin="dense"
+            label="Kategori"
+            name="category_name"
+            fullWidth
+            value={formData.categoryId}
+            disabled
+          />
+          <TextField
+            margin="dense"
+            label="Sub Kategori"
+            name="subcategory_name"
+            fullWidth
+            value={formData.subcategoryId}
+            disabled
+          />
+          <TextField
+            margin="dense"
+            label="Harga"
+            name="price"
+            fullWidth
+            value={formatPrice(formData.price)}
+            disabled
+          />
+          <TextField
+            margin="dense"
+            label="Deskripsi"
+            name="description"
+            fullWidth
+            value={formData.description}
+            disabled
+          />
           <Typography variant="body1">Gambar:</Typography>
           <Box display="flex" flexWrap="wrap">
             {formData.product_images.map((image, index) => (
@@ -380,6 +656,18 @@ const Product = () => {
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">
             Tutup
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
+        <DialogTitle>Hapus Kategori</DialogTitle>
+        <DialogContent>
+          Apakah Anda yakin ingin menghapus product ini?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteDialogClose}>Batal</Button>
+          <Button onClick={handleDelete} color="error">
+            Hapus
           </Button>
         </DialogActions>
       </Dialog>

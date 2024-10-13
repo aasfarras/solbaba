@@ -10,8 +10,8 @@ export const updateProduct = async (id, serviceData) => {
         subcategory_id: serviceData.subcategory_id,
         product_name: serviceData.product_name,
         description: serviceData.description,
-        location: serviceData.location,
-        status: serviceData.status,
+        // location: serviceData.location,
+        // status: serviceData.status,
         price: serviceData.price,
       },
       {

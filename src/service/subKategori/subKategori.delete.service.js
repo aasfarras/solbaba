@@ -1,11 +1,10 @@
-// kategori.service.js
 import axios from "axios";
 
-export const getSubKategori = async () => {
+export const deleteSubKategori = async (id) => {
   const token = sessionStorage.getItem("token");
   try {
-    const response = await axios.get(
-      `${import.meta.env.VITE_APP_API}superadmin/product/subcategory`,
+    const response = await axios.delete(
+      `${import.meta.env.VITE_APP_API}superadmin/product/subcategory/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -14,7 +13,7 @@ export const getSubKategori = async () => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error fetching sub kategori data:", error);
+    console.error("Error deleting sub kategori:", error);
     throw error;
   }
 };
