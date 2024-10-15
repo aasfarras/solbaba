@@ -428,11 +428,13 @@ const Product = () => {
             fullWidth
             sx={{ mb: 2 }}
           >
-            {subCategories.map((subcategory) => (
-              <MenuItem key={subcategory.id} value={subcategory.id}>
-                {subcategory.subcategory_name}
-              </MenuItem>
-            ))}
+            {subCategories
+              .filter((item) => item.category_id == formData.categoryId)
+              .map((subcategory) => (
+                <MenuItem key={subcategory.id} value={subcategory.id}>
+                  {subcategory.subcategory_name}
+                </MenuItem>
+              ))}
           </TextField>
           <TextField
             margin="dense"
@@ -512,7 +514,9 @@ const Product = () => {
                 label="Kategori"
                 name="categoryId"
                 value={formData.categoryId}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e);
+                }}
                 fullWidth
                 sx={{ mb: 2 }} // added mb: 2 for consistent spacing
               >
@@ -532,11 +536,13 @@ const Product = () => {
                 fullWidth
                 sx={{ mb: 2 }} // added mb: 2 for consistent spacing
               >
-                {subCategories.map((subcategory) => (
-                  <MenuItem key={subcategory.id} value={subcategory.id}>
-                    {subcategory.subcategory_name}
-                  </MenuItem>
-                ))}
+                {subCategories
+                  .filter((item) => item.category_id == formData.categoryId)
+                  .map((subcategory) => (
+                    <MenuItem key={subcategory.id} value={subcategory.id}>
+                      {subcategory.subcategory_name}
+                    </MenuItem>
+                  ))}
               </TextField>
 
               <TextField
@@ -544,7 +550,7 @@ const Product = () => {
                 label="Harga"
                 name="price"
                 fullWidth
-                value={formatPrice(formData.price)}
+                value={formData.price}
                 onChange={handleInputChange}
                 sx={{ mb: 2 }}
               />
