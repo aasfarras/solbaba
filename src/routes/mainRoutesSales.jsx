@@ -10,7 +10,7 @@ const DashboardDefault = Loadable(lazy(() => import("../views/dashboard")));
 const Produk = Loadable(lazy(() => import("../views/manajemen/produk/produk")));
 const Pesanan = Loadable(lazy(() => import("../views/menu/pesanan")));
 const DetailPesanan = Loadable(
-  lazy(() => import("../views/menu/detailPesanan"))
+  lazy(() => import("../views/menu/detailpesanan"))
 ); // Pastikan path ini benar
 const Pelanggan = Loadable(lazy(() => import("../views/menu/pelanggan")));
 const Transaksi = Loadable(lazy(() => import("../views/menu/transaksi")));
