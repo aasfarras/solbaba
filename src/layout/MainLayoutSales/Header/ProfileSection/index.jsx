@@ -1,12 +1,10 @@
 import { useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import {
   Avatar,
   Box,
   Button,
-  Chip,
   ClickAwayListener,
   Divider,
   List,
@@ -19,13 +17,21 @@ import {
   TextField,
   Typography,
   Modal,
+  ListItem,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { IconLogout, IconSettings } from "@tabler/icons-react";
 import PerfectScrollbar from "react-perfect-scrollbar";
+import axios from "axios";
 import MainCard from "../../../../ui-component/cards/MainCard";
 import Transitions from "../../../../ui-component/extended/Transitions";
-import User1 from "../../../../assets/images/users/user-round.svg"; // Placeholder gambar
+import User1 from "../../../../assets/images/user.png"; // Placeholder gambar
+import { getProfile } from "../../../../service/sales-route/profile.get.service"; // Import service
+import { updateProfile } from "../../../../service/sales-route/profile.update.service"; // Import service untuk reset password
+import { updatePassword } from "../../../../service/sales-route/profile.updatepass.service";
+
+import { InputAdornment, IconButton } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const ProfileSection = () => {
   const theme = useTheme();
@@ -33,17 +39,27 @@ const ProfileSection = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [openResetPasswordModal, setOpenResetPasswordModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   // State untuk menyimpan data pengguna dan gambar profil
   const [userData, setUserData] = useState({
     name: "Johne Doe",
+    username: "johne doe",
     email: "johndoe@example.com",
     gender: "laki-laki",
     address: "Minasa Upa",
     referralCode: "hq6dqy",
     profileImage: User1, // Gambar profil default
+    phone: "1234",
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    old_password: "",
+    password: "",
+    password_confirmation: "",
   });
 
   const anchorRef = useRef(null);
@@ -67,7 +83,6 @@ const ProfileSection = () => {
 
       if (response.data.code === 200) {
         sessionStorage.removeItem("token");
-
         navigate("/");
       } else {
         console.error("Logout failed:", response.data.message);
@@ -84,12 +99,34 @@ const ProfileSection = () => {
     setOpen(false);
   };
 
-  const handleListItemClick = (event, index) => {
+  const handleListItemClick = async (event, index) => {
     setSelectedIndex(index);
     handleClose(event);
 
     if (index === 0) {
-      setOpenModal(true); // Membuka modal ketika Account Settings ditekan
+      // Mengambil data dari service ketika Pengaturan Akun ditekan
+      try {
+        const response = await getProfile();
+        if (response.code === 200) {
+          const { data } = response; // Ambil data dari response
+          setUserData({
+            id: data.id,
+            name: data.name,
+            username: data.username,
+            email: data.email,
+            gender: data.gender,
+            address: data.address,
+            referralCode: data.referral_code,
+            profileImage: data.photo_url || User1, // Gunakan gambar dari API atau gambar default
+            phone: data.phone,
+          });
+          setOpenModal(true); // Membuka modal ketika data berhasil diambil
+        } else {
+          console.error("Failed to fetch profile:", response.message);
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
     }
   };
 
@@ -110,7 +147,14 @@ const ProfileSection = () => {
     });
   };
 
-  // Mengubah gambar profil
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData({
+      ...passwordData,
+      [name]: value,
+    });
+  };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -122,13 +166,48 @@ const ProfileSection = () => {
     }
   };
 
-  const handleSave = () => {
-    console.log("Data berhasil disimpan:", userData);
-    setIsEditMode(false);
+  const handleSave = async () => {
+    try {
+      const response = await updateProfile(userData.id, userData); // Panggil service updateProfile
+      if (response.code === 200) {
+        console.log("Profile updated successfully:", response.message);
+        setIsEditMode(false);
+      } else {
+        console.error("Failed to update profile:", response.message);
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    try {
+      const response = await updatePassword(userData.id, passwordData);
+      if (response.code === 200) {
+        console.log("Password reset successfully:", response.message);
+        setPasswordData({
+          old_password: "",
+          password: "",
+          password_confirmation: "",
+        }); // Reset form
+      } else {
+        console.error("Failed to reset password:", response.message);
+      }
+    } catch (error) {
+      console.error("Error resetting password:", error);
+    }
   };
 
   const toggleEditMode = () => {
     setIsEditMode(true);
+  };
+
+  const toggleResetPasswordModal = () => {
+    setOpenResetPasswordModal((prev) => !prev);
+  };
+
+  const handleCloseResetPasswordModal = () => {
+    setOpenResetPasswordModal(false);
   };
 
   return (
@@ -177,7 +256,7 @@ const ProfileSection = () => {
                   boxShadow
                   shadow={theme.shadows[16]}
                 >
-                  <Box sx={{ p: 2, pb: 0 }}>
+                  <Box sx={{ p: 2, pb: 1 }}>
                     <Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
                         <Typography variant="h4">Selamat Pagi,</Typography>
@@ -190,7 +269,6 @@ const ProfileSection = () => {
                         </Typography>
                       </Stack>
                     </Stack>
-                    <Divider />
                   </Box>
                   <PerfectScrollbar
                     style={{
@@ -280,25 +358,19 @@ const ProfileSection = () => {
           </div>
           {isEditMode ? (
             <Box component="form" sx={{ mt: 2 }}>
-              <Button
-                variant="contained"
-                component="label"
-                fullWidth
-                sx={{ mb: 2 }}
-              >
-                Ubah Foto Profil
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={handleImageChange}
-                />
-              </Button>
               <TextField
                 fullWidth
                 label="Nama"
                 name="name"
                 value={userData.name}
+                onChange={handleInputChange}
+                margin="normal"
+              />
+              <TextField
+                fullWidth
+                label="Username"
+                name="username"
+                value={userData.username}
                 onChange={handleInputChange}
                 margin="normal"
               />
@@ -310,6 +382,14 @@ const ProfileSection = () => {
                 onChange={handleInputChange}
                 margin="normal"
               />
+              {/* <TextField
+                fullWidth
+                label="No.Hp"
+                name="phone"
+                value={userData.phone}
+                onChange={handleInputChange}
+                margin="normal"
+              /> */}
               <TextField
                 fullWidth
                 label="Jenis Kelamin"
@@ -346,6 +426,9 @@ const ProfileSection = () => {
                 <Button variant="contained" onClick={handleSave}>
                   Save
                 </Button>
+                <Button variant="outlined" onClick={toggleResetPasswordModal}>
+                  Reset Password
+                </Button>
               </Stack>
             </Box>
           ) : (
@@ -360,12 +443,28 @@ const ProfileSection = () => {
               />
               <TextField
                 fullWidth
+                label="Username"
+                name="username"
+                value={userData.username}
+                margin="normal"
+                disabled
+              />
+              <TextField
+                fullWidth
                 label="Email"
                 name="email"
                 value={userData.email}
                 margin="normal"
                 disabled
               />
+              {/* <TextField
+                fullWidth
+                label="No.Hp"
+                name="phone"
+                value={userData.phone}
+                margin="normal"
+                disabled
+              /> */}
               <TextField
                 fullWidth
                 label="Gender"
@@ -402,9 +501,109 @@ const ProfileSection = () => {
                 <Button variant="outlined" onClick={toggleEditMode}>
                   Edit
                 </Button>
+                <Button variant="outlined" onClick={toggleResetPasswordModal}>
+                  Reset Password
+                </Button>
               </Stack>
             </Box>
           )}
+        </Box>
+      </Modal>
+
+      {/* Modal untuk Reset Password */}
+      <Modal
+        open={openResetPasswordModal}
+        onClose={handleCloseResetPasswordModal}
+        aria-labelledby="reset-password-modal"
+        aria-describedby="reset-password-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            Reset Password
+          </Typography>
+          <TextField
+            fullWidth
+            label="Old Password"
+            name="old_password"
+            type={showPassword ? "text" : "password"}
+            value={passwordData.old_password}
+            onChange={handlePasswordChange}
+            margin="normal"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="New Password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            value={passwordData.password}
+            onChange={handlePasswordChange}
+            margin="normal"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Confirm New Password"
+            name="password_confirmation"
+            type={showPassword ? "text" : "password"}
+            value={passwordData.password_confirmation}
+            onChange={handlePasswordChange}
+            margin="normal"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Stack direction="row" justifyContent="flex-end" spacing={2} mt={2}>
+            <Button variant="outlined" onClick={handleCloseResetPasswordModal}>
+              Close
+            </Button>
+            <Button variant="contained" onClick={handleResetPassword}>
+              Reset Password
+            </Button>
+          </Stack>
         </Box>
       </Modal>
     </>

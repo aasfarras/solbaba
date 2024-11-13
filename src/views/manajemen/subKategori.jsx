@@ -229,9 +229,9 @@ const SubKategori = () => {
         </DialogActions>
       </Dialog>
       <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
-        <DialogTitle>Hapus Kategori</DialogTitle>
+        <DialogTitle variant="h5">Hapus Sub Kategori</DialogTitle>
         <DialogContent>
-          Apakah Anda yakin ingin menghapus kategori ini?
+          Apakah Anda yakin ingin menghapus sub kategori ini?
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteDialogClose}>Batal</Button>

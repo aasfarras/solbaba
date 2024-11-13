@@ -7,15 +7,33 @@ import AuthGuard from "../utils/AuthGuard"; // Import AuthGuard
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import("../views/dashboard")));
-const Produk = Loadable(lazy(() => import("../views/manajemen/produk")));
+const Produk = Loadable(lazy(() => import("../views/manajemen/produk/produk")));
+const TambahProduk = Loadable(
+  lazy(() => import("../views/manajemen/produk/tambahProduk"))
+);
+const DetailProduk = Loadable(
+  lazy(() => import("../views/manajemen/produk/detailProduk"))
+);
+const EditProduk = Loadable(
+  lazy(() => import("../views/manajemen/produk/editProduk"))
+);
 const Kategori = Loadable(lazy(() => import("../views/manajemen/kategori")));
 const SubKategori = Loadable(
   lazy(() => import("../views/manajemen/subKategori"))
 );
-const Sales = Loadable(lazy(() => import("../views/manajemen/sales")));
+const Sales = Loadable(lazy(() => import("../views/manajemen/salesman/sales")));
+const TambahSales = Loadable(
+  lazy(() => import("../views/manajemen/salesman/tambahSales"))
+);
+const EditSales = Loadable(
+  lazy(() => import("../views/manajemen/salesman/editSales"))
+);
 const Pelanggan = Loadable(lazy(() => import("../views/manajemen/pelanggan")));
+const DetailPelanggan = Loadable(
+  lazy(() => import("../views/manajemen/detailPelanggan"))
+);
 const Transaksi = Loadable(lazy(() => import("../views/other/transaksi")));
-const Laporan = Loadable(lazy(() => import("../views/other/laporan")));
+// const Laporan = Loadable(lazy(() => import("../views/other/laporan")));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -27,7 +45,7 @@ const MainRoutes = {
       path: "",
       element: (
         <AuthGuard>
-          <DashboardDefault />,
+          <DashboardDefault />
         </AuthGuard>
       ),
     },
@@ -35,7 +53,7 @@ const MainRoutes = {
       path: "dashboard",
       element: (
         <AuthGuard>
-          <DashboardDefault />,
+          <DashboardDefault />
         </AuthGuard>
       ),
     },
@@ -46,7 +64,39 @@ const MainRoutes = {
           path: "produk",
           element: (
             <AuthGuard>
-              <Produk />,
+              <Produk />
+            </AuthGuard>
+          ),
+        },
+        // {
+        //   path: "produk",
+        //   element: (
+        //     <AuthGuard>
+        //       <Produk />
+        //     </AuthGuard>
+        //   ),
+        // },
+        {
+          path: "produk/tambahproduk",
+          element: (
+            <AuthGuard>
+              <TambahProduk />
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "produk/detailproduk/:id",
+          element: (
+            <AuthGuard>
+              <DetailProduk />
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "produk/editProduk/:id",
+          element: (
+            <AuthGuard>
+              <EditProduk />
             </AuthGuard>
           ),
         },
@@ -54,7 +104,7 @@ const MainRoutes = {
           path: "kategori",
           element: (
             <AuthGuard>
-              <Kategori />,
+              <Kategori />
             </AuthGuard>
           ),
         },
@@ -62,7 +112,7 @@ const MainRoutes = {
           path: "subKategori",
           element: (
             <AuthGuard>
-              <SubKategori />,
+              <SubKategori />
             </AuthGuard>
           ),
         },
@@ -70,7 +120,23 @@ const MainRoutes = {
           path: "sales",
           element: (
             <AuthGuard>
-              <Sales />,
+              <Sales />
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "sales/tambahsales",
+          element: (
+            <AuthGuard>
+              <TambahSales />
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "sales/editsales/:id",
+          element: (
+            <AuthGuard>
+              <EditSales />
             </AuthGuard>
           ),
         },
@@ -78,7 +144,15 @@ const MainRoutes = {
           path: "pelanggan",
           element: (
             <AuthGuard>
-              <Pelanggan />,
+              <Pelanggan />
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "pelanggan/detailpelanggan/:id",
+          element: (
+            <AuthGuard>
+              <DetailPelanggan />
             </AuthGuard>
           ),
         },
@@ -91,7 +165,7 @@ const MainRoutes = {
           path: "transaksi",
           element: (
             <AuthGuard>
-              <Transaksi />,
+              <Transaksi />
             </AuthGuard>
           ),
         },

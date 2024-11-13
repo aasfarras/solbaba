@@ -1,191 +1,144 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MUIDataTable from "mui-datatables";
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  TextField,
   Tooltip,
+  DialogTitle,
   Typography,
-  IconButton,
 } from "@mui/material";
-import { IconEye, IconPencil, IconBrandWhatsapp } from "@tabler/icons-react";
+import { IconEye } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
+import { getPesananSales } from "../../service/sales-route/pesanansales.get.service"; // Ganti dengan path yang sesuai
+import { useNavigate } from "react-router-dom";
+import { getPesananSalesById } from "../../service/sales-route/pesanansales.getSpesifik.service";
+import { Box } from "@mui/system";
 
 const Pesanan = () => {
   const theme = useTheme();
-  const [data, setData] = useState([
-    ["2024-09-01", "Laptop ASUS", 2, 20000000, "Agus", "Lunas", "Dikirim"],
-    [
-      "2024-09-02",
-      "Smartphone Samsung",
-      1,
-      10000000,
-      "Budi",
-      "Belum Lunas",
-      "Pending",
-    ],
-    ["2024-09-03", "Headset Sony", 3, 1500000, "Citra", "Lunas", "Selesai"],
-    [
-      "2024-09-04",
-      "Kamera Canon",
-      1,
-      5000000,
-      "Dewi",
-      "Belum Lunas",
-      "Dibatalkan",
-    ],
-  ]);
+  const navigate = useNavigate();
+  const [data, setData] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(""); // State untuk menyimpan pesan kesalahan
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false); // State untuk mengontrol modal kesalahan
 
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState(""); // "Create", "Detail", "Update"
-  const [currentRow, setCurrentRow] = useState(null);
-  const [formData, setFormData] = useState({
-    tanggalPemesanan: "",
-    namaBarang: "",
-    jumlahBarang: "",
-    totalBayar: "",
-    namaCustomer: "",
-    statusBayar: "",
-    statusPesanan: "",
-  });
-
-  const handleCreate = () => {
-    setDialogMode("Create");
-    setFormData({
-      tanggalPemesanan: "",
-      namaBarang: "",
-      jumlahBarang: "",
-      totalBayar: "",
-      namaCustomer: "",
-      statusBayar: "",
-      statusPesanan: "",
-    });
-    setDialogOpen(true);
+  const statusTranslations = {
+    received: "Diterima",
+    pending_payment: "Menunggu Pembayaran",
+    payment_verified: "Pembayaran Terverifikasi",
+    processing: "Sedang Diproses",
+    shipped: "Dikirim",
+    completed: "Selesai",
+    canceled: "Dibatalkan",
+    returned: "Dikembalikan",
   };
 
-  const handleRead = (rowIndex) => {
-    setDialogMode("Detail");
-    setCurrentRow(data[rowIndex]);
-    setFormData({
-      tanggalPemesanan: data[rowIndex][0],
-      namaBarang: data[rowIndex][1],
-      jumlahBarang: data[rowIndex][2],
-      totalBayar: data[rowIndex][3],
-      namaCustomer: data[rowIndex][4],
-      statusBayar: data[rowIndex][5],
-      statusPesanan: data[rowIndex][6],
-    });
-    setDialogOpen(true);
-  };
-
-  const handleUpdate = (rowIndex) => {
-    setDialogMode("Update");
-    setCurrentRow(data[rowIndex]);
-    setFormData({
-      tanggalPemesanan: data[rowIndex][0],
-      namaBarang: data[rowIndex][1],
-      jumlahBarang: data[rowIndex][2],
-      totalBayar: data[rowIndex][3],
-      namaCustomer: data[rowIndex][4],
-      statusBayar: data[rowIndex][5],
-      statusPesanan: data[rowIndex][6],
-    });
-    setDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-  };
-
-  const handleSave = () => {
-    if (dialogMode === "Create") {
-      const newData = [
-        ...data,
-        [
-          formData.tanggalPemesanan,
-          formData.namaBarang,
-          formData.jumlahBarang,
-          formData.totalBayar,
-          formData.namaCustomer,
-          formData.statusBayar,
-          formData.statusPesanan,
-        ],
-      ];
-      setData(newData);
-    } else if (dialogMode === "Update") {
-      const newData = data.map((row, index) =>
-        index === data.indexOf(currentRow)
-          ? [
-              formData.tanggalPemesanan,
-              formData.namaBarang,
-              formData.jumlahBarang,
-              formData.totalBayar,
-              formData.namaCustomer,
-              formData.statusBayar,
-              formData.statusPesanan,
-            ]
-          : row
-      );
-      setData(newData);
+  const fetchData = async () => {
+    try {
+      const result = await getPesananSales();
+      const formattedData = result.data.map((item) => [
+        item.transaction_code,
+        item.customer_name,
+        item.customer_address,
+        item.total_price,
+        item.status,
+        item.created_at,
+        item.id,
+      ]);
+      setData(formattedData);
+    } catch (error) {
+      console.error("Failed to fetch transaction data", error);
     }
-    setDialogOpen(false);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleDetail = async (rowIndex) => {
+    const rowData = data[rowIndex];
+    const PesananId = rowData[6];
+
+    try {
+      // Panggil fungsi untuk mendapatkan detail pesanan berdasarkan ID
+      await getPesananSalesById(PesananId); // Ganti dengan fungsi yang sesuai untuk mendapatkan detail
+      navigate(`/sales/menu/pesanan/detailpesanan/${PesananId}`);
+    } catch (error) {
+      // Tangkap kesalahan dan simpan pesan kesalahan
+      if (error.response && error.response.data) {
+        setErrorMessage(error.response.data.message); // Ambil pesan dari respons kesalahan
+      } else {
+        setErrorMessage("Terjadi kesalahan saat mengambil detail pesanan.");
+      }
+      setErrorDialogOpen(true); // Buka modal kesalahan
+    }
   };
 
-  const handleWhatsAppClick = () => {
-    window.open("https://wa.me/6285341614066", "_blank");
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(price);
   };
 
   const columns = [
-    { name: "Tanggal Pemesanan", label: "Tanggal Pemesanan" },
-    { name: "Nama Barang", label: "Nama Barang" },
-    { name: "Jumlah Barang", label: "Jumlah Barang" },
-    { name: "Total Bayar", label: "Total Bayar" },
-    { name: "Nama Customer", label: "Nama Customer" },
-    { name: "Status Bayar", label: "Status Bayar" },
-    { name: "Status Pesanan", label: "Status Pesanan" },
+    { name: "transaction_code", label: "Kode Pesanan" },
+    { name: "customer_name", label: "Nama Pelanggan" },
+    { name: "customer_address", label: "Alamat Pelanggan" },
+    {
+      name: "total_price",
+      label: "Total Harga",
+      options: {
+        customBodyRender: (value) => formatPrice(value),
+      },
+    },
+    {
+      name: "status",
+      label: "Status",
+      options: {
+        customBodyRender: (value) => {
+          return statusTranslations[value] || value; // Menggunakan pemetaan untuk menampilkan status dalam bahasa Indonesia
+        },
+      },
+    },
+    {
+      name: "created_at",
+      label: "Tanggal Pesanan",
+      options: {
+        customBodyRender: (value) => {
+          const date = new Date(value); // Mengubah string menjadi objek Date
+          return new Intl.DateTimeFormat("id-ID", {
+            year: "numeric",
+            month: "long", // Menggunakan 'long' untuk nama bulan
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }).format(date);
+        },
+      },
+    },
     {
       name: "Actions",
       label: "Aksi",
       options: {
         filter: false,
         sort: false,
-        empty: true,
-        customBodyRender: (value, tableMeta, updateValue) => {
+        customBodyRender: (value, tableMeta) => {
           return (
             <>
-              <div style={{ display: "flex", gap: "10px" }}>
-                <Tooltip title="Detail">
+              <Tooltip title="Detail">
+                <span>
                   <Button
-                    onClick={() => handleRead(tableMeta.rowIndex)}
-                    sx={{ color: theme.palette.primary.main }}
+                    onClick={() => handleDetail(tableMeta.rowIndex)}
+                    sx={{ color: theme.palette.info.main }}
                   >
                     <IconEye />
                   </Button>
-                </Tooltip>
-                <Tooltip title="Edit">
-                  <Button
-                    onClick={() => handleUpdate(tableMeta.rowIndex)}
-                    sx={{ color: theme.palette.warning.main }}
-                  >
-                    <IconPencil />
-                  </Button>
-                </Tooltip>
-                <Tooltip title="Hubungi via WhatsApp">
-                  <Button
-                    onClick={handleWhatsAppClick}
-                    sx={{ color: theme.palette.success.main }}
-                  >
-                    <IconBrandWhatsapp />
-                  </Button>
-                </Tooltip>
-              </div>
+                </span>
+              </Tooltip>
             </>
           );
         },
@@ -194,95 +147,38 @@ const Pesanan = () => {
   ];
 
   return (
-    <>
+    <Box sx={{ pb: 8 }}>
       <MUIDataTable
-        title={<Typography variant="h4">Manajemen Pesanan</Typography>}
-        search={false}
+        title={<Typography variant="h3">Pesanan</Typography>}
         data={data}
         columns={columns}
         options={{
           selectableRows: "none",
           elevation: 0,
-          rowsPerPage: 10,
-          rowsPerPageOptions: [5, 10, 20, 50, 100],
+          rowsPerPageOptions: [5, 10, 20, 50],
+          textLabels: {
+            pagination: {
+              rowsPerPage: "Baris per Halaman",
+            },
+          },
         }}
       />
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+      <Dialog
+        fullWidth
+        open={errorDialogOpen}
+        onClose={() => setErrorDialogOpen(false)}
+      >
+        <DialogTitle>Kesalahan</DialogTitle>
         <DialogContent>
-          <TextField
-            margin="dense"
-            label="Tanggal Pemesanan"
-            name="tanggalPemesanan"
-            fullWidth
-            value={formData.tanggalPemesanan}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Detail"}
-          />
-          <TextField
-            margin="dense"
-            label="Nama Barang"
-            name="namaBarang"
-            fullWidth
-            value={formData.namaBarang}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Detail"}
-          />
-          <TextField
-            margin="dense"
-            label="Jumlah Barang"
-            name="jumlahBarang"
-            fullWidth
-            value={formData.jumlahBarang}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Detail"}
-          />
-          <TextField
-            margin="dense"
-            label="Total Bayar"
-            name="totalBayar"
-            fullWidth
-            value={formData.totalBayar}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Detail"}
-          />
-          <TextField
-            margin="dense"
-            label="Nama Customer"
-            name="namaCustomer"
-            fullWidth
-            value={formData.namaCustomer}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Detail"}
-          />
-          <TextField
-            margin="dense"
-            label="Status Bayar"
-            name="statusBayar"
-            fullWidth
-            value={formData.statusBayar}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Detail"}
-          />
-          <TextField
-            margin="dense"
-            label="Status Pesanan"
-            name="statusPesanan"
-            fullWidth
-            value={formData.statusPesanan}
-            onChange={handleInputChange}
-            disabled={dialogMode === "Detail"}
-          />
+          <Typography>{errorMessage}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose}>Batal</Button>
-          {dialogMode !== "Detail" && (
-            <Button onClick={handleSave} color="primary">
-              Simpan
-            </Button>
-          )}
+          <Button onClick={() => setErrorDialogOpen(false)} color="primary">
+            Tutup
+          </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </Box>
   );
 };
 

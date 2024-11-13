@@ -66,6 +66,8 @@ const AuthLogin = ({ ...others }) => {
         // Redirect berdasarkan role
         if (userRole === "superadmin") {
           navigate("/super-admin");
+        } else if (userRole === "admin") {
+          navigate("/admin");
         } else if (userRole === "salesman") {
           navigate("/sales");
         } else {

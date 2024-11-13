@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import ButtonBase from "@mui/material/ButtonBase";
 
 // project imports
-import LogoSection from "../LogoSection";
+// import LogoSection from "../LogoSection";
 import SearchSection from "./SearchSection";
 // import NotificationSection from "./NotificationSection";
 import ProfileSection from "./ProfileSection";
@@ -25,7 +25,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
   return (
     <>
       {/* logo & toggler button */}
-      <Box
+      {/* <Box
         sx={{
           width: 228,
           display: "flex",
@@ -65,7 +65,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
         >
           <IconMenu2 stroke={1.5} size="1.3rem" />
         </Avatar>
-      </Box>
+      </Box> */}
 
       {/* header search */}
       <SearchSection />

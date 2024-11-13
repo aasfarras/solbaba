@@ -1,8 +1,8 @@
 // assets
-import { IconCash, IconFileAnalytics } from "@tabler/icons-react";
+import { IconCash, IconFileAnalytics, IconReceipt } from "@tabler/icons-react";
 
 // constant
-const icons = { IconCash, IconFileAnalytics };
+const icons = { IconCash, IconFileAnalytics, IconReceipt };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
@@ -13,10 +13,10 @@ const other = {
   children: [
     {
       id: "transaksi",
-      title: "Transaksi",
+      title: "Arsip",
       type: "item",
       url: "/super-admin/other/transaksi",
-      icon: icons.IconCash,
+      icon: icons.IconReceipt,
       breadcrumbs: false,
     },
     // {

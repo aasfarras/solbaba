@@ -34,7 +34,7 @@ const manajemenSales = {
     },
     {
       id: "transaksi",
-      title: "Transaksi",
+      title: "Arsip",
       type: "item",
       url: "/sales/menu/transaksi", // Update URL
       icon: icons.IconUsersGroup,

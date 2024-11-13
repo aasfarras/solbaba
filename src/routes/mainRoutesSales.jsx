@@ -7,8 +7,11 @@ import AuthGuard from "../utils/AuthGuard"; // Import AuthGuard
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import("../views/dashboard")));
-const Produk = Loadable(lazy(() => import("../views/manajemen/produk")));
+const Produk = Loadable(lazy(() => import("../views/manajemen/produk/produk")));
 const Pesanan = Loadable(lazy(() => import("../views/menu/pesanan")));
+const DetailPesanan = Loadable(
+  lazy(() => import("../views/menu/detailPesanan"))
+); // Pastikan path ini benar
 const Pelanggan = Loadable(lazy(() => import("../views/menu/pelanggan")));
 const Transaksi = Loadable(lazy(() => import("../views/menu/transaksi")));
 
@@ -22,7 +25,7 @@ const MainRoutesSales = {
       path: "",
       element: (
         <AuthGuard>
-          <DashboardDefault />,
+          <DashboardDefault />
         </AuthGuard>
       ),
     },
@@ -30,7 +33,7 @@ const MainRoutesSales = {
       path: "dashboard",
       element: (
         <AuthGuard>
-          <DashboardDefault />,
+          <DashboardDefault />
         </AuthGuard>
       ),
     },
@@ -41,33 +44,31 @@ const MainRoutesSales = {
           path: "pesanan",
           element: (
             <AuthGuard>
-              <Pesanan />,
+              <Pesanan />
             </AuthGuard>
           ),
         },
-      ],
-    },
-    {
-      path: "menu",
-      children: [
+        {
+          path: "pesanan/detailpesanan/:id", // Rute untuk detail pesanan
+          element: (
+            <AuthGuard>
+              <DetailPesanan />
+            </AuthGuard>
+          ),
+        },
         {
           path: "customer",
           element: (
             <AuthGuard>
-              <Pelanggan />,
+              <Pelanggan />
             </AuthGuard>
           ),
         },
-      ],
-    },
-    {
-      path: "menu",
-      children: [
         {
           path: "transaksi",
           element: (
             <AuthGuard>
-              <Transaksi />,
+              <Transaksi />
             </AuthGuard>
           ),
         },
@@ -75,4 +76,5 @@ const MainRoutesSales = {
     },
   ],
 };
+
 export default MainRoutesSales;

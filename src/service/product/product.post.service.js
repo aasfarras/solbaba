@@ -15,6 +15,14 @@ export const postProduct = async (serviceData) => {
         location: serviceData.location,
         status: serviceData.status,
         price: serviceData.price,
+        specification: serviceData.specification,
+        location: serviceData.location,
+        status: serviceData.status,
+        special_price: serviceData.special_price,
+        include_free_shipping: serviceData.free_shipping,
+        include_vat: serviceData.vat,
+        additional_fee_area_2: serviceData.additional_fee_area_2,
+        stock: serviceData.stock,
       },
       {
         headers: {

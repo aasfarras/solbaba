@@ -383,7 +383,7 @@ const Kategori = () => {
         </DialogActions>
       </Dialog>
       <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
-        <DialogTitle>Hapus Kategori</DialogTitle>
+        <DialogTitle variant="h5">Hapus Kategori</DialogTitle>
         <DialogContent>
           Apakah Anda yakin ingin menghapus kategori ini?
         </DialogContent>
