@@ -34,7 +34,8 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import MainCard from "../../../../ui-component/cards/MainCard";
 import Transitions from "../../../../ui-component/extended/Transitions";
 import UpgradePlanCard from "./UpgradePlanCard";
-import User1 from "../../../../assets/images/users/user-round.svg";
+// import User1 from "../../../../assets/images/users/user-round.svg";
+import Usere from "../../../../assets/images/usere.png";
 
 // assets
 import {
@@ -119,7 +120,7 @@ const ProfileSection = () => {
   return (
     <>
       <Avatar
-        src={User1}
+        src={Usere}
         sx={{
           ...theme.typography.mediumAvatar,
           margin: "8px 0 8px 8px !important",

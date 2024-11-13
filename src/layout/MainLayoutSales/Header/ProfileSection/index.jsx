@@ -25,7 +25,8 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import axios from "axios";
 import MainCard from "../../../../ui-component/cards/MainCard";
 import Transitions from "../../../../ui-component/extended/Transitions";
-import User1 from "../../../../assets/images/user.png"; // Placeholder gambar
+// import User1 from "../../../../assets/images/user.png"; // Placeholder gambar
+import Usere from "../../../../assets/images/usere.png";
 import { getProfile } from "../../../../service/sales-route/profile.get.service"; // Import service
 import { updateProfile } from "../../../../service/sales-route/profile.update.service"; // Import service untuk reset password
 import { updatePassword } from "../../../../service/sales-route/profile.updatepass.service";
@@ -52,7 +53,7 @@ const ProfileSection = () => {
     gender: "laki-laki",
     address: "Minasa Upa",
     referralCode: "hq6dqy",
-    profileImage: User1, // Gambar profil default
+    profileImage: Usere, // Gambar profil default
     phone: "1234",
   });
 
@@ -117,7 +118,7 @@ const ProfileSection = () => {
             gender: data.gender,
             address: data.address,
             referralCode: data.referral_code,
-            profileImage: data.photo_url || User1, // Gunakan gambar dari API atau gambar default
+            profileImage: data.photo_url || Usere, // Gunakan gambar dari API atau gambar default
             phone: data.phone,
           });
           setOpenModal(true); // Membuka modal ketika data berhasil diambil
