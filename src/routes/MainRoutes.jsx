@@ -22,6 +22,9 @@ const SubKategori = Loadable(
   lazy(() => import("../views/manajemen/subKategori"))
 );
 const Sales = Loadable(lazy(() => import("../views/manajemen/salesman/sales")));
+const DetailSales = Loadable(
+  lazy(() => import("../views/manajemen/salesman/detailSales"))
+);
 const TambahSales = Loadable(
   lazy(() => import("../views/manajemen/salesman/tambahSales"))
 );
@@ -32,7 +35,8 @@ const Pelanggan = Loadable(lazy(() => import("../views/manajemen/pelanggan")));
 const DetailPelanggan = Loadable(
   lazy(() => import("../views/manajemen/detailPelanggan"))
 );
-const Transaksi = Loadable(lazy(() => import("../views/other/transaksi")));
+const Arsip = Loadable(lazy(() => import("../views/other/arsip")));
+const DetailArsip = Loadable(lazy(() => import("../views/other/detailArsip")));
 // const Laporan = Loadable(lazy(() => import("../views/other/laporan")));
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -125,6 +129,14 @@ const MainRoutes = {
           ),
         },
         {
+          path: "sales/detailsales/:id",
+          element: (
+            <AuthGuard>
+              <DetailSales />
+            </AuthGuard>
+          ),
+        },
+        {
           path: "sales/tambahsales",
           element: (
             <AuthGuard>
@@ -162,10 +174,18 @@ const MainRoutes = {
       path: "other",
       children: [
         {
-          path: "transaksi",
+          path: "arsip",
           element: (
             <AuthGuard>
-              <Transaksi />
+              <Arsip />
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "arsip/detailArsip/:id",
+          element: (
+            <AuthGuard>
+              <DetailArsip />
             </AuthGuard>
           ),
         },

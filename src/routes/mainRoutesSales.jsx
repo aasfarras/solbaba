@@ -13,7 +13,8 @@ const DetailPesanan = Loadable(
   lazy(() => import("../views/menu/detailpesanan"))
 ); // Pastikan path ini benar
 const Pelanggan = Loadable(lazy(() => import("../views/menu/pelanggan")));
-const Transaksi = Loadable(lazy(() => import("../views/menu/transaksi")));
+const Arsip = Loadable(lazy(() => import("../views/menu/arsip")));
+const DetailArsip = Loadable(lazy(() => import("../views/menu/detailArsip")));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -65,10 +66,18 @@ const MainRoutesSales = {
           ),
         },
         {
-          path: "transaksi",
+          path: "arsip",
           element: (
             <AuthGuard>
-              <Transaksi />
+              <Arsip />
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "arsip/detailarsip/:id",
+          element: (
+            <AuthGuard>
+              <DetailArsip />
             </AuthGuard>
           ),
         },

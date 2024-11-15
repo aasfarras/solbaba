@@ -24,10 +24,10 @@ const manajemenAdmin = {
       icon: icons.IconHammer,
     },
     {
-      id: "transaksi",
+      id: "Arsip",
       title: "Arsip",
       type: "item",
-      url: "/admin/manajemen/transaksi", // Update URL
+      url: "/admin/manajemen/arsip", // Update URL
       icon: icons.IconReceipt,
     },
     {

@@ -12,10 +12,10 @@ const other = {
   type: "group",
   children: [
     {
-      id: "transaksi",
+      id: "arsip",
       title: "Arsip",
       type: "item",
-      url: "/super-admin/other/transaksi",
+      url: "/super-admin/other/arsip",
       icon: icons.IconReceipt,
       breadcrumbs: false,
     },

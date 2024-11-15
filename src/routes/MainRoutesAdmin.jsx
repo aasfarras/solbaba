@@ -8,7 +8,7 @@ import AuthGuard from "../utils/AuthGuard"; // Import AuthGuard
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import("../views/dashboard")));
 const Pesanan = Loadable(lazy(() => import("../views/admin/pesanan")));
-const Transaksi = Loadable(lazy(() => import("../views/admin/transaksi")));
+const ArsipAdmin = Loadable(lazy(() => import("../views/admin/arsipAdmin")));
 const DetailPesanan = Loadable(
   lazy(() => import("../views/admin/detailPesanan"))
 );
@@ -48,10 +48,18 @@ const MainRoutesAdmin = {
           ),
         },
         {
-          path: "transaksi",
+          path: "arsip",
           element: (
             <AuthGuard>
-              <Transaksi />
+              <ArsipAdmin />
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "arsip/detailarsip/:id",
+          element: (
+            <AuthGuard>
+              <DetailArsipAdmin />
             </AuthGuard>
           ),
         },

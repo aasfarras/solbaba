@@ -45,7 +45,7 @@ const BottomNav = () => {
       />
       <BottomNavigationAction
         label="Arsip"
-        value="menu/transaksi"
+        value="menu/arsip"
         icon={<IconReceipt />}
       />
     </BottomNavigation>

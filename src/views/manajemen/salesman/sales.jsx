@@ -10,19 +10,22 @@ import {
   Grid,
   TextField,
   Box,
+  MenuItem,
 } from "@mui/material";
 import {
   IconPencil,
   IconTrash,
-  // IconAccountCircle,
+  IconEye,
   IconUser,
   IconKey,
+  IconAdjustments,
 } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
 import { getSalesman } from "../../../service/salesman/salesman.get.service"; // Adjust the import according to your service structure
 import { deleteSalesman } from "../../../service/salesman/salesman.delete.service"; // Adjust the import according to your service structure
 import { updateSalesResetPass } from "../../../service/salesman/salesman.resetPassword.service";
 import { updateSalesResetUsername } from "../../../service/salesman/salesman.resetUsername.service";
+import { updateStatusSalesman } from "../../../service/salesman/salesman.editstatus.service";
 
 import { InputAdornment, IconButton } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -48,6 +51,14 @@ const Salesman = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showPasswordConfirmation, setShowPasswordConfirmation] =
     useState(false);
+  const [editStatusDialogOpen, setEditStatusDialogOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  const statusMapping = {
+    active: "Aktif",
+    suspended: "Menangguhkan",
+    inactive: "Tidak Aktif",
+  };
 
   const fetchData = async (page) => {
     try {
@@ -56,9 +67,11 @@ const Salesman = () => {
         item.name,
         item.username,
         item.email,
-        item.gender === "male" ? "Pria" : "Wanita",
-        item.address,
+        // item.gender === "male" ? "Pria" : "Wanita",
+        // item.address,
+        item.phone,
         item.referral_code,
+        statusMapping[item.account_status] || "Status Tidak Diketahui", // Pemetaan status
         item.id,
       ]);
       setData(formattedData);
@@ -72,6 +85,13 @@ const Salesman = () => {
   useEffect(() => {
     fetchData(currentPage);
   }, [currentPage]);
+
+  const handleDetail = (rowIndex) => {
+    const rowData = data[rowIndex];
+    const salesmanId = rowData[6]; // Assuming this is the ID of the product
+    // Navigate to detail page with the product ID
+    window.location.href = `/super-admin/manajemen/sales/detailsales/${salesmanId}`; // Adjust the path based on your routing setup
+  };
 
   const handleDeleteClick = (rowIndex) => {
     setCurrentRowIndex(rowIndex);
@@ -102,7 +122,7 @@ const Salesman = () => {
 
   const handleResetPasswordClick = (rowIndex) => {
     const rowData = data[rowIndex];
-    setCurrentSalesmanId(rowData[6]); // Use rowData[6] for salesman ID
+    setCurrentSalesmanId(rowData[6]);
     setResetPasswordDialogOpen(true);
   };
 
@@ -126,7 +146,7 @@ const Salesman = () => {
 
   const handleResetAccountClick = (rowIndex) => {
     const rowData = data[rowIndex];
-    setCurrentSalesmanId(rowData[6]); // Use rowData[6] for salesman ID
+    setCurrentSalesmanId(rowData[6]);
     setResetAccountDialogOpen(true);
   };
 
@@ -147,13 +167,33 @@ const Salesman = () => {
     }
   };
 
+  const handleEditStatusClick = (rowIndex) => {
+    const rowData = data[rowIndex];
+    setCurrentSalesmanId(rowData[6]); // ID salesman
+    setEditStatusDialogOpen(true);
+  };
+
+  const handleChangeStatus = async () => {
+    try {
+      await updateStatusSalesman(currentSalesmanId, { status: selectedStatus });
+      fetchData(currentPage); // Refresh data setelah update
+      message.success(`Akun berhasil diubah menjadi ${selectedStatus}`);
+      setEditStatusDialogOpen(false); // Tutup modal setelah berhasil
+    } catch (error) {
+      console.error("Error changing status:", error);
+      message.error("Gagal mengubah status akun");
+    }
+  };
+
   const columns = [
     { name: "name", label: "Nama" },
     { name: "username", label: "Username" },
     { name: "email", label: "Email" },
-    { name: "gender", label: "Jenis Kelamin" },
-    { name: "address", label: "Alamat" },
+    // { name: "gender", label: "Jenis Kelamin" },
+    // { name: "address", label: "Alamat" },
+    { name: "phone", label: "No. Hp" },
     { name: "referral_code", label: "Kode Rujukan" },
+    { name: "account_status", label: "Status Akun" },
     {
       name: "Actions",
       label: "Aksi",
@@ -162,11 +202,19 @@ const Salesman = () => {
         sort: false,
         customBodyRender: (value, tableMeta) => (
           <Box display="flex" gap={0.25}>
+            <Tooltip title="Detail">
+              <Button
+                onClick={() => handleDetail(tableMeta.rowIndex)}
+                sx={{ color: theme.palette.info.main }}
+              >
+                <IconEye />
+              </Button>
+            </Tooltip>
             <Tooltip title="Edit">
               <Button
                 onClick={() =>
                   navigate(
-                    `/super-admin/manajemen/sales/editsales/${data[tableMeta.rowIndex][6]}`
+                    `/super-admin/manajemen/sales/editsales/${data[tableMeta.rowIndex][5]}`
                   )
                 }
                 sx={{ color: theme.palette.warning.main }}
@@ -196,6 +244,14 @@ const Salesman = () => {
                 sx={{ color: theme.palette.success.main }}
               >
                 <IconKey />
+              </Button>
+            </Tooltip>
+            <Tooltip title="Edit Status">
+              <Button
+                onClick={() => handleEditStatusClick(tableMeta.rowIndex)}
+                sx={{ color: theme.palette.primary.main }}
+              >
+                <IconAdjustments />
               </Button>
             </Tooltip>
           </Box>
@@ -335,6 +391,38 @@ const Salesman = () => {
           </Button>
           <Button onClick={handleResetAccount} color="primary">
             Mengatur Ulang Akun
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={editStatusDialogOpen}
+        onClose={() => setEditStatusDialogOpen(false)}
+      >
+        <DialogTitle variant="h5">Edit Status Akun</DialogTitle>
+        <DialogContent>
+          <TextField
+            select
+            label="edit status"
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            fullWidth
+          >
+            {[
+              { key: "active", value: "Aktif" },
+              { key: "suspended", value: "Menangguhkan" },
+              { key: "inactive", value: "Tidak Aktif" },
+            ].map((status) => (
+              <MenuItem key={status.key} value={status.key}>
+                {status.value}
+              </MenuItem>
+            ))}
+          </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditStatusDialogOpen(false)}>Batal</Button>
+          <Button onClick={handleChangeStatus} color="primary">
+            Simpan
           </Button>
         </DialogActions>
       </Dialog>
