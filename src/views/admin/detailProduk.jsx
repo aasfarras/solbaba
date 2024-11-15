@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getProductById } from "../../../service/product/product.getSpesifik.service"; // Import the new service
-import { getKategori } from "../../../service/kategori/kategori.get.service";
-import { getSubKategori } from "../../../service/subKategori/subKategori.get.service";
+import { getProductById } from "../../service/admin/product/product.getSpesifik.service"; // Import the new service
+import { getKategori } from "../../service/admin/kategori.get.service";
+import { getSubKategori } from "../../service/admin/subKategori.get.service";
 import {
   Box,
   Typography,
@@ -15,7 +15,7 @@ import {
   TableRow,
   Button,
 } from "@mui/material";
-import MainCard from "../../../ui-component/cards/MainCard";
+import MainCard from "../../ui-component/cards/MainCard";
 import { Image } from "antd";
 
 const DetailProduk = () => {

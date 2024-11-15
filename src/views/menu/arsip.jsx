@@ -19,6 +19,7 @@ import { getArsipSalesman } from "../../service/sales-route/arsip.get.service"; 
 import { useNavigate } from "react-router-dom";
 import { updatePesanan } from "../../service/admin/pesanan.update.service"; // Ganti dengan path yang sesuai
 import { getArsipSalesmanById } from "../../service/sales-route/arsip.detail.service";
+import { Box } from "@mui/system";
 
 const ArsipAdmin = () => {
   const theme = useTheme();
@@ -199,7 +200,7 @@ const ArsipAdmin = () => {
   ];
 
   return (
-    <>
+    <Box sx={{ pb: 8 }}>
       <MUIDataTable
         title={<Typography variant="h3">Pesanan</Typography>}
         data={data}
@@ -266,7 +267,7 @@ const ArsipAdmin = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </Box>
   );
 };
 
