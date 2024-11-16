@@ -114,7 +114,7 @@ const DetailArsip = () => {
                 <TableCell>{transaction.data.note}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>Kode Rujukan</TableCell>
+                <TableCell>Kode Referral</TableCell>
                 <TableCell>{transaction.data.referral_code}</TableCell>
               </TableRow>
               <TableRow>

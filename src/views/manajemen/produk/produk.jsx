@@ -388,6 +388,9 @@ const Product = () => {
           // rowsPerPage: perPage,
           rowsPerPageOptions: [5, 10, 20, 50, 100],
           textLabels: {
+            body: {
+              noMatch: "Maaf, tidak ada data yang cocok ditemukan", // Ubah pesan di sini
+            },
             pagination: {
               rowsPerPage: "Baris per Halaman",
             },

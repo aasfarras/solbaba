@@ -12,6 +12,7 @@ import {
   Stepper,
   Step,
   StepLabel,
+  Grid,
 } from "@mui/material";
 import { IconPencil, IconTrash, IconUpload } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
@@ -270,6 +271,9 @@ const Kategori = () => {
           rowsPerPage: 10,
           rowsPerPageOptions: [5, 10, 20, 50, 100],
           textLabels: {
+            body: {
+              noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
+            },
             pagination: {
               rowsPerPage: "Baris per Halaman",
             },
@@ -278,16 +282,23 @@ const Kategori = () => {
       />
 
       <Dialog open={dialogOpenn} onClose={handleDialogClose}>
+        <DialogTitle variant="h5">Edit Kategori</DialogTitle>
         <DialogContent>
-          <TextField
-            margin="dense"
-            label="Nama Kategori"
-            name="category_name"
-            fullWidth
-            value={formData.category_name}
-            onChange={handleInputChange}
-          />
-          <Button
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                label="Nama Kategori"
+                name="category_name"
+                fullWidth
+                style={{ width: "300px" }} // Mengatur lebar menjadi 400 piksel
+                value={formData.category_name}
+                onChange={handleInputChange}
+              />
+            </Grid>
+          </Grid>
+
+          {/* <Button
             variant="outlined"
             component="label"
             sx={{
@@ -307,7 +318,7 @@ const Kategori = () => {
               inputProps={{ accept: "image/*" }}
               sx={{ display: "none" }} // Sembunyikan input asli
             />
-          </Button>
+          </Button> */}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">
@@ -322,7 +333,17 @@ const Kategori = () => {
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Tambah Kategori</DialogTitle>
         <DialogContent>
-          <Stepper activeStep={activeStep}>
+          <>
+            <TextField
+              margin="dense"
+              label="Nama Kategori"
+              name="category_name"
+              fullWidth
+              value={formData.category_name}
+              onChange={handleInputChange}
+            />
+          </>
+          {/* <Stepper activeStep={activeStep}>
             <Step>
               <StepLabel>Informasi Kategori</StepLabel>
             </Step>
@@ -332,16 +353,16 @@ const Kategori = () => {
           </Stepper>
           {activeStep === 0 && (
             <>
-              <TextField
-                margin="dense"
-                label="Nama Kategori"
-                name="category_name"
-                fullWidth
-                value={formData.category_name}
-                onChange={handleInputChange}
-                sx={{ mt: 3 }}
-              />
-            </>
+            <TextField
+              margin="dense"
+              label="Nama Kategori"
+              name="category_name"
+              fullWidth
+              value={formData.category_name}
+              onChange={handleInputChange}
+              sx={{ mt: 3 }}
+            />
+          </>
           )}
           {activeStep === 1 && (
             <>
@@ -369,7 +390,7 @@ const Kategori = () => {
                 />
               </Button>
             </>
-          )}
+          )} */}
         </DialogContent>
         <DialogActions>
           {activeStep > 0 && (

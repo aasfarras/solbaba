@@ -192,6 +192,9 @@ const SubKategori = () => {
           rowsPerPage: 10,
           rowsPerPageOptions: [5, 10, 20, 50, 100],
           textLabels: {
+            body: {
+              noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
+            },
             pagination: {
               rowsPerPage: "Baris per Halaman",
             },
@@ -199,13 +202,14 @@ const SubKategori = () => {
         }}
       />
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <DialogTitle variant="h5">Edit Sub Kategori</DialogTitle>
         <DialogContent sx={{ minWidth: "400px" }}>
           <TextField
             label="Nama Sub Kategori"
             name="subKategoriName"
             value={formData.subKategoriName}
             onChange={handleInputChange}
-            sx={{ mb: "10px" }}
+            sx={{ mb: "10px", mt: 2 }}
             fullWidth
           />
           <TextField

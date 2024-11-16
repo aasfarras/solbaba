@@ -30,10 +30,11 @@ const Desk = ({ description, setDescription }) => {
         modules={MyCustomModules}
         placeholder="Deskripsi"
         style={{
-          border: "0.8px solid #ccc",
+          border: "1px solid #eee",
           borderRadius: "5px",
           overflow: "hidden",
-          height: 300,
+          height: 400,
+          paddingBottom: 30,
         }}
       />
     </form>

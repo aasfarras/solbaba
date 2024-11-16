@@ -88,7 +88,7 @@ const DetailPesanan = () => {
                   <TableCell>{transaction.note}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>Kode Rujukan</TableCell>
+                  <TableCell>Kode Referral</TableCell>
                   <TableCell>{transaction.referral_code}</TableCell>
                 </TableRow>
                 <TableRow>

@@ -132,22 +132,34 @@ const TambahSales = () => {
           <Grid item xs={6}>
             <TextField
               margin="dense"
-              label="Alamat"
+              label="No. Telp"
               fullWidth
-              value={formData.address}
+              type="number"
+              value={formData.phone}
               onChange={(e) =>
-                setFormData({ ...formData, address: e.target.value })
+                setFormData({ ...formData, phone: e.target.value })
               }
             />
           </Grid>
           <Grid item xs={6}>
             <TextField
               margin="dense"
-              label="Kode Rujukan"
+              label="Kode Referral"
               fullWidth
               value={formData.referral_code}
               onChange={(e) =>
                 setFormData({ ...formData, referral_code: e.target.value })
+              }
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              margin="dense"
+              label="Alamat"
+              fullWidth
+              value={formData.address}
+              onChange={(e) =>
+                setFormData({ ...formData, address: e.target.value })
               }
             />
           </Grid>

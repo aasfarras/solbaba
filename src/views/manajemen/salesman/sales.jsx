@@ -191,8 +191,8 @@ const Salesman = () => {
     { name: "email", label: "Email" },
     // { name: "gender", label: "Jenis Kelamin" },
     // { name: "address", label: "Alamat" },
-    { name: "phone", label: "No. Hp" },
-    { name: "referral_code", label: "Kode Rujukan" },
+    { name: "phone", label: "No. Telp" },
+    { name: "referral_code", label: "Kode Referral" },
     { name: "account_status", label: "Status Akun" },
     {
       name: "Actions",
@@ -275,6 +275,9 @@ const Salesman = () => {
           elevation: 0,
           rowsPerPageOptions: [5, 10, 20, 50],
           textLabels: {
+            body: {
+              noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
+            },
             pagination: {
               rowsPerPage: "Baris per Halaman",
             },
@@ -406,6 +409,7 @@ const Salesman = () => {
             label="edit status"
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
+            sx={{ width: "300px" }}
             fullWidth
           >
             {[

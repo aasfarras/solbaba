@@ -120,19 +120,19 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
   return (
     <Paper>
       <TableContainer>
-        <Table {...getTableProps()} style={{ border: "0.5px solid black" }}>
+        <Table {...getTableProps()} style={{ border: "0.2px solid #ccc" }}>
           <TableHead>
             {headerGroups.map((headerGroup) => (
               <TableRow
                 {...headerGroup.getHeaderGroupProps()}
                 key={`header-${headerGroup.id}`} // Menggunakan kombinasi 'header-' dan id
-                style={{ borderBottom: "0.5px solid black" }}
+                style={{ borderBottom: "0.2px solid #ccc" }}
               >
                 {headerGroup.headers.map((column, index) => (
                   <TableCell
                     {...column.getHeaderProps()}
                     key={`header-${column.id}`} // Menggunakan kombinasi 'header-' dan id kolom
-                    style={{ border: "0.5px solid black", height: "3rem" }}
+                    style={{ border: "0.2px solid #ccc", height: "3rem" }}
                   >
                     {isEditingHeader === index ? (
                       <TextField
@@ -171,7 +171,7 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
                     )}
                   </TableCell>
                 ))}
-                <TableCell style={{ border: "0.5px solid black" }}>
+                <TableCell style={{ border: "0.2px solid #ccc" }}>
                   Aksi
                 </TableCell>
               </TableRow>
@@ -179,7 +179,7 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
           </TableHead>
           <TableBody
             {...getTableBodyProps()}
-            style={{ border: "0.5px solid black" }}
+            style={{ border: "0.2px solid #ccc" }}
           >
             {rows.map((row, rowIndex) => {
               prepareRow(row);
@@ -187,13 +187,13 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
                 <TableRow
                   {...row.getRowProps()}
                   key={`row-${row.id}`} // Menggunakan kombinasi 'row-' dan id baris
-                  style={{ borderBottom: "0.5px solid black" }}
+                  style={{ borderBottom: "0.2px solid #ccc" }}
                 >
                   {row.cells.map((cell) => (
                     <TableCell
                       {...cell.getCellProps()}
                       key={`cell-${cell.column.id}-${rowIndex}`} // Menggunakan kombinasi 'cell-', id kolom, dan indeks baris
-                      style={{ border: "0.5px solid black" }}
+                      style={{ border: "0.2px solid #ccc" }}
                     >
                       <TextField
                         value={cell.value || ""}
@@ -211,7 +211,7 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
                       />
                     </TableCell>
                   ))}
-                  <TableCell style={{ border: "0.5px solid black" }}>
+                  <TableCell style={{ border: "0.2px solid #ccc" }}>
                     <Button
                       sx={{ color: "black" }}
                       onClick={() => handleDeleteRow(rowIndex)}

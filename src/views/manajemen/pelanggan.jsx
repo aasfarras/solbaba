@@ -122,6 +122,9 @@ const Customer = () => {
           elevation: 0,
           rowsPerPageOptions: [5, 10, 20, 50],
           textLabels: {
+            body: {
+              noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
+            },
             pagination: {
               rowsPerPage: "Baris per Halaman",
             },

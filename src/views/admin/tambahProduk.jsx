@@ -478,7 +478,9 @@ const TambahProduk = () => {
               )}
             </Upload>
           </Box>
-          <Typography variant="body">maksimal ukuran gambar 1 mb</Typography>
+          <Typography variant="body" sx={{ color: "grey" }}>
+            <span style={{ color: "red" }}>*</span> maksimal ukuran gambar 1 mb
+          </Typography>
           {previewImage && (
             <Box
               sx={{

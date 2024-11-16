@@ -80,7 +80,19 @@ const EditSales = () => {
               ))}
             </TextField>
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
+            <TextField
+              margin="dense"
+              label="No. Telp"
+              fullWidth
+              type="number"
+              value={formData.phone}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
+            />
+          </Grid>
+          <Grid item xs={6}>
             <TextField
               margin="dense"
               label="Alamat"
