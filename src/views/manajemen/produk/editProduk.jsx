@@ -11,6 +11,11 @@ import {
   Checkbox,
   FormControlLabel,
   Typography,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
 } from "@mui/material";
 import { Upload, message, Image } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -21,6 +26,8 @@ import { getProductById } from "../../../service/product/product.getSpesifik.ser
 import { updateProduct } from "../../../service/product/product.update.service";
 import { deleteProductImage } from "../../../service/product/productgambar.delete.service";
 import { postProductImage } from "../../../service/product/productgambar.post.service";
+import { postProductVariants } from "../../../service/product/product.postVariants.service"; // Import the service for adding variants
+import { deleteVariantImage } from "../../../service/product/product.deleteVariants.service"; // Import the service for deleting variants
 import MainCard from "../../../ui-component/cards/MainCard";
 import Desk from "../../../ui-component/Desk";
 import DynamicTable from "../../../ui-component/DynamicTable";
@@ -32,14 +39,12 @@ const EditProduk = () => {
   const { id } = useParams(); // Get the product ID from the URL
   const [formData, setFormData] = useState({
     product_name: "",
-    product_images: [], // Menyimpan gambar produk
-    category_name: "", // Menyimpan nama kategori
+    product_images: [],
     categoryId: "",
-    subcategory_name: "", // Menyimpan nama subkategori
     subcategoryId: "",
     price: "",
     additional_fee_area_2: "",
-    description: "", // Menyimpan deskripsi produk
+    description: "",
     location: "",
     status: "",
     special_price: false,
@@ -52,9 +57,13 @@ const EditProduk = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
-  const [imageFile, setImageFile] = useState([]); // State untuk gambar yang diupload
+  const [imageFile, setImageFile] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState([]);
+
+  // State for managing product variants
+  const [variantName, setVariantName] = useState("");
+  const [fetchedVariants, setFetchedVariants] = useState([]);
 
   const fetchCategories = async () => {
     try {
@@ -85,7 +94,7 @@ const EditProduk = () => {
         categoryId: product.category_id || "",
         subcategoryId: product.subcategory_id || "",
         price: product.price,
-        additional_fee_area_2: product.additional_fee_area_2 || "", // Ambil nilai dari API
+        additional_fee_area_2: product.additional_fee_area_2 || "",
         description: product.description,
         location: product.location,
         status: product.status,
@@ -94,7 +103,7 @@ const EditProduk = () => {
         vat: product.vat,
         specification: Array.isArray(product.specification)
           ? product.specification
-          : [], // Ensure it's an array
+          : [],
         stock: product.stock,
       });
 
@@ -106,6 +115,9 @@ const EditProduk = () => {
         id: img.id,
       }));
       setImageFile(existingImages);
+
+      // Fetch existing product variants
+      setFetchedVariants(product.product_variants || []);
     } catch (error) {
       console.error("Error fetching product data:", error);
     }
@@ -113,23 +125,17 @@ const EditProduk = () => {
 
   const handleImageUpload = async ({ file }) => {
     try {
-      // Mengunggah gambar
       const uploadResult = await postProductImage(id, file);
-
-      // Memperbarui state formData dengan URL gambar yang baru diunggah
       setFormData((prevData) => ({
         ...prevData,
-        product_images: [...prevData.product_images, uploadResult.data.id], // Simpan id gambar
+        product_images: [...prevData.product_images, uploadResult.data.id],
       }));
 
-      // Tambahkan gambar yang berhasil diupload ke fileList
       setImageFile((prevFileList) => {
         const isExistingFile = prevFileList.some(
           (item) => item.uid === file.uid
         );
-
         if (isExistingFile) {
-          // Jika file sudah ada dalam fileList, perbarui status dan URL
           return prevFileList.map((item) =>
             item.uid === file.uid
               ? {
@@ -137,25 +143,23 @@ const EditProduk = () => {
                   status: "done",
                   url: uploadResult.imageFile,
                   id: uploadResult.data.id,
-                } // Simpan id
+                }
               : item
           );
         } else {
-          // Jika file belum ada, tambahkan sebagai item baru
           return [
             ...prevFileList,
             {
-              uid: file.uid, // Unique ID dari file
+              uid: file.uid,
               name: file.name,
-              status: "done", // Set status menjadi 'done'
-              url: uploadResult.imageFile, // URL dari gambar yang telah diupload
-              id: uploadResult.data.id, // Simpan id gambar
+              status: "done",
+              url: uploadResult.imageFile,
+              id: uploadResult.data.id,
             },
           ];
         }
       });
 
-      // Tampilkan pesan sukses
       message.success("Gambar berhasil terkirim.");
     } catch (error) {
       console.error("Error uploading product image:", error);
@@ -165,13 +169,11 @@ const EditProduk = () => {
 
   const handleRemove = async (file) => {
     try {
-      await deleteProductImage(file.id); // Hapus gambar berdasarkan ID
+      await deleteProductImage(file.id);
       message.success("Gambar berhasil terhapus.");
-
       setImageFile((prevFileList) =>
         prevFileList.filter((item) => item.uid !== file.uid)
       );
-
       setFormData((prevData) => ({
         ...prevData,
         product_images: prevData.product_images.filter(
@@ -184,34 +186,55 @@ const EditProduk = () => {
     }
   };
 
-  const handlePreview = async (file) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
+  const handleAddVariant = async () => {
+    if (variantName.trim() === "") {
+      message.error("Nama varian tidak boleh kosong.");
+      return;
     }
-    setPreviewImage(file.url || file.preview);
-    setPreviewOpen(true);
+
+    const serviceData = {
+      product_id: id,
+      variant_name: variantName,
+    };
+
+    try {
+      const response = await postProductVariants(serviceData);
+      if (response.code === 200) {
+        message.success("Varian berhasil ditambahkan.");
+        setFetchedVariants((prevVariants) => [
+          ...prevVariants,
+          { id: response.data.id, variant_name: variantName },
+        ]);
+        setVariantName(""); // Reset the variant name input
+      } else {
+        message.error("Gagal menambahkan varian: " + response.message);
+      }
+    } catch (error) {
+      console.error("Error adding variant:", error);
+      message.error("Gagal menambahkan varian.");
+    }
   };
 
-  useEffect(() => {
-    fetchCategories();
-    fetchSubCategories();
-    fetchProductData();
-  }, []);
-
-  const handleChange = ({ fileList }) => {
-    setImageFile(fileList);
+  const handleRemoveVariant = async (index) => {
+    const variantToDelete = fetchedVariants[index];
+    try {
+      await deleteVariantImage(variantToDelete.id);
+      setFetchedVariants((prevVariants) =>
+        prevVariants.filter((_, i) => i !== index)
+      );
+      message.success("Varian berhasil dihapus.");
+    } catch (error) {
+      message.error("Gagal menghapus varian: " + error.message);
+    }
   };
 
   const handleUpdateProduct = async () => {
-    console.log("Updating product with data:", formData);
     try {
       await updateProduct(id, {
         category_id: formData.categoryId,
         subcategory_id: formData.subcategoryId,
         product_name: formData.product_name,
         product_images: formData.product_images,
-        category_name: formData.category_name,
-        subcategory_name: formData.subcategory_name,
         description: formData.description,
         price: formData.price,
         additional_fee_area_2: formData.additional_fee_area_2,
@@ -231,7 +254,23 @@ const EditProduk = () => {
     }
   };
 
-  //   console.log(formData);
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
+  };
+
+  const handleChange = ({ fileList }) => {
+    setImageFile(fileList);
+  };
+
+  useEffect(() => {
+    fetchCategories();
+    fetchSubCategories();
+    fetchProductData();
+  }, []);
 
   return (
     <MainCard title="Edit Produk">
@@ -262,7 +301,7 @@ const EditProduk = () => {
               {[
                 { key: "available", value: "Tersedia" },
                 { key: "out_of_stock", value: "Tidak Tersedia" },
-                { key: "Preorder", value: "Preorder/Inden" },
+                { key: "pre_order", value: "Preorder/Inden" },
               ].map((status) => (
                 <MenuItem key={status.key} value={status.key}>
                   {status.value}
@@ -308,7 +347,7 @@ const EditProduk = () => {
               name="additional_fee_area_2"
               fullWidth
               type="number"
-              value={formData.additional_fee_area_2} // Pastikan ini terhubung dengan state
+              value={formData.additional_fee_area_2}
               onChange={(e) =>
                 setFormData({
                   ...formData,
@@ -363,18 +402,16 @@ const EditProduk = () => {
               fullWidth
               value={formData.stock}
               onChange={(e) => {
-                console.log("Stock input value:", e.target.value);
-
                 setFormData({ ...formData, stock: e.target.value });
               }}
             />
           </Grid>
           <Grid item xs={12} sx={{ mt: 1 }}>
             <Desk
-              description={formData.description} // Pass description to Desk
+              description={formData.description}
               setDescription={(newDescription) =>
                 setFormData({ ...formData, description: newDescription })
-              } // Pass function to update description
+              }
             />
           </Grid>
           <Grid item xs={12} sx={{ mt: 1 }}>
@@ -383,12 +420,73 @@ const EditProduk = () => {
                 Array.isArray(formData.specification)
                   ? formData.specification
                   : []
-              } // Ensure it's an array
+              }
               setSpecifications={(specs) =>
                 setFormData({ ...formData, specification: specs })
               }
             />
           </Grid>
+
+          <Grid item xs={12}>
+            <Table
+              style={{ border: "0.2px solid #ccc" }}
+              sx={{ borderRadius: "200px" }}
+            >
+              <TableHead style={{ border: "0.2px solid #ccc" }}>
+                <TableRow style={{ border: "0.2px solid #ccc" }}>
+                  <TableCell style={{ border: "0.2px solid #ccc" }}>
+                    Variant Produk
+                    <TextField
+                      margin="dense"
+                      label="Nama Varian"
+                      value={variantName}
+                      onChange={(e) => setVariantName(e.target.value)}
+                      fullWidth
+                    />
+                  </TableCell>
+                  <TableCell style={{ border: "0.2px solid #ccc" }}>
+                    Aksi
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody style={{ border: "0.2px solid #ccc" }}>
+                {fetchedVariants.map((variant, index) => (
+                  <TableRow
+                    key={variant.id}
+                    style={{ border: "0.2px solid #ccc" }}
+                  >
+                    <TableCell style={{ border: "0.2px solid #ccc" }}>
+                      <Typography variant="body1">
+                        {variant.variant_name}
+                      </Typography>
+                    </TableCell>
+                    <TableCell style={{ border: "0.2px solid #ccc" }}>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleRemoveVariant(index)}
+                      >
+                        Hapus
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <Button
+              variant="outlined"
+              sx={{
+                backgroundColor: "white",
+                color: "#555",
+                borderColor: "#999",
+                mt: 1,
+              }}
+              onClick={handleAddVariant}
+            >
+              Tambah Varian
+            </Button>
+          </Grid>
+
           <Grid container item xs={12} direction="column">
             <FormControlLabel
               control={
@@ -430,10 +528,10 @@ const EditProduk = () => {
             {previewImage && (
               <Box
                 sx={{
-                  display: previewOpen ? "block" : "none", // Menyembunyikan Box jika tidak terlihat
-                  opacity: previewOpen ? 1 : 0, // Mengatur opacity
-                  transition: "opacity 0.5s ease", // Menambahkan animasi transisi
-                  position: "relative", // Agar dapat mengatur posisi jika diperlukan
+                  display: previewOpen ? "block" : "none",
+                  opacity: previewOpen ? 1 : 0,
+                  transition: "opacity 0.5s ease",
+                  position: "relative",
                 }}
               >
                 <Image
@@ -446,12 +544,54 @@ const EditProduk = () => {
                       !visible && setPreviewImage(""),
                   }}
                   src={previewImage}
-                  style={{ objectFit: "contain" }} // Menyesuaikan cara gambar ditampilkan
+                  style={{ objectFit: "contain" }}
                 />
               </Box>
             )}
           </Grid>
         </Grid>
+
+        {/* <Grid item xs={12} sx={{ mt: 2 }}>
+          <Typography variant="h6">Product Variants</Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={8}>
+              <TextField
+                margin="dense"
+                label="Nama Varian"
+                value={variantName}
+                onChange={(e) => setVariantName(e.target.value)}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <Button variant="contained" onClick={handleAddVariant}>
+                Tambah Varian
+              </Button>
+            </Grid>
+          </Grid>
+          <Grid container spacing={1} sx={{ mt: 2 }}>
+            {fetchedVariants.map((variant, index) => (
+              <Grid item xs={12} key={variant.id}>
+                <Grid container spacing={1} sx={{ padding: "8px 0" }}>
+                  <Grid item xs={8}>
+                    <Typography variant="body1">
+                      {variant.variant_name}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => handleRemoveVariant(index)}
+                    >
+                      Hapus
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Grid>
+            ))}
+          </Grid>
+        </Grid> */}
         <Grid
           container
           justifyContent="space-between"

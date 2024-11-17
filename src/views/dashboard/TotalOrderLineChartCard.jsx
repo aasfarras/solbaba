@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
@@ -9,33 +9,58 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 
-// third-party
-import Chart from "react-apexcharts";
-
 // project imports
 import MainCard from "../../ui-component/cards/MainCard";
 import SkeletonTotalOrderCard from "../../ui-component/cards/Skeleton/EarningCard";
+import EarningIcon from "../../assets/images/icons/earning.svg";
 
-import ChartDataMonth from "./chart-data/total-order-month-line-chart";
-import ChartDataYear from "./chart-data/total-order-year-line-chart";
+// Import service
+import { getPeriod } from "../../service/dashboard/period.get.service"; // Sesuaikan dengan path yang benar
 
 // assets
-import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import Visibility from "@mui/icons-material/Visibility"; // Tambahkan ini
+import VisibilityOff from "@mui/icons-material/VisibilityOff"; // Tambahkan ini
 
 // ==============================|| DASHBOARD - TOTAL ORDER LINE CHART CARD ||============================== //
 
 const TotalOrderLineChartCard = ({ isLoading }) => {
   const theme = useTheme();
 
-  const [timeValue, setTimeValue] = React.useState(false);
-  const handleChangeTime = (event, newValue) => {
-    setTimeValue(newValue);
+  const [timeValue, setTimeValue] = React.useState("monthly"); // Default ke bulanan
+  const [incomeData, setIncomeData] = useState({
+    daily: 0,
+    weekly: 0,
+    monthly: 0,
+    annual: 0,
+  });
+  const [loading, setLoading] = useState(true); // State untuk loading
+  const [isVisible, setIsVisible] = useState(false); // State untuk visibilitas nominal
+
+  const handleChangeTime = (value) => {
+    setTimeValue(value);
   };
+
+  // Fetch data from API
+  const fetchData = async () => {
+    try {
+      const result = await getPeriod(); // Menggunakan getPeriod dari service
+      if (result.code === 200) {
+        setIncomeData(result.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading ke false setelah fetch selesai
+    }
+  };
+
+  useEffect(() => {
+    fetchData(); // Panggil fungsi fetchData saat komponen dimuat
+  }, []);
 
   return (
     <>
-      {isLoading ? (
+      {loading || isLoading ? (
         <SkeletonTotalOrderCard />
       ) : (
         <MainCard
@@ -88,61 +113,55 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                         mt: 1,
                       }}
                     >
-                      <LocalMallOutlinedIcon fontSize="inherit" />
+                      <img src={EarningIcon} alt="Notification" />
                     </Avatar>
                   </Grid>
                   <Grid item>
                     <Button
                       disableElevation
-                      variant={timeValue ? "contained" : "text"}
+                      variant={timeValue === "monthly" ? "contained" : "text"}
                       size="small"
                       sx={{ color: "inherit" }}
-                      onClick={(e) => handleChangeTime(e, true)}
+                      onClick={() => handleChangeTime("monthly")}
                     >
-                      Bulan
+                      Bulanan
                     </Button>
                     <Button
                       disableElevation
-                      variant={!timeValue ? "contained" : "text"}
+                      variant={timeValue === "annual" ? "contained" : "text"}
                       size="small"
                       sx={{ color: "inherit" }}
-                      onClick={(e) => handleChangeTime(e, false)}
+                      onClick={() => handleChangeTime("annual")}
                     >
-                      Tahun
+                      Tahunan
                     </Button>
                   </Grid>
                 </Grid>
               </Grid>
               <Grid item sx={{ mb: 0.75 }}>
                 <Grid container alignItems="center">
-                  <Grid item xs={6}>
+                  <Grid item xs={12}>
                     <Grid container alignItems="center">
                       <Grid item>
-                        {timeValue ? (
-                          <Typography
-                            sx={{
-                              fontSize: "1.225rem",
-                              fontWeight: 500,
-                              mr: 1,
-                              mt: 1.75,
-                              mb: 0.75,
-                            }}
-                          >
-                            Rp 108.000
-                          </Typography>
-                        ) : (
-                          <Typography
-                            sx={{
-                              fontSize: "1.225rem",
-                              fontWeight: 500,
-                              mr: 1,
-                              mt: 1.75,
-                              mb: 0.75,
-                            }}
-                          >
-                            Rp 800.000
-                          </Typography>
-                        )}
+                        <Typography
+                          sx={{
+                            fontSize: "2.125rem",
+                            fontWeight: 500,
+                            mr: 1,
+                            mt: 1.75,
+                            mb: 1.1,
+                          }}
+                        >
+                          {isVisible
+                            ? timeValue === "daily"
+                              ? `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.daily)}`
+                              : timeValue === "weekly"
+                                ? `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.weekly)}`
+                                : timeValue === "monthly"
+                                  ? `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.monthly)}`
+                                  : `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.annual)}`
+                            : "****"}
+                        </Typography>
                       </Grid>
                       <Grid item>
                         <Avatar
@@ -152,11 +171,13 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                             bgcolor: "primary.200",
                             color: "primary.dark",
                           }}
+                          onClick={() => setIsVisible(!isVisible)} // Toggle visibility
                         >
-                          <ArrowDownwardIcon
-                            fontSize="inherit"
-                            sx={{ transform: "rotate3d(1, 1, 1, 45deg)" }}
-                          />
+                          {isVisible ? (
+                            <VisibilityOff fontSize="inherit" />
+                          ) : (
+                            <Visibility fontSize="inherit" />
+                          )}
                         </Avatar>
                       </Grid>
                       <Grid item xs={12}>
@@ -171,13 +192,6 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                         </Typography>
                       </Grid>
                     </Grid>
-                  </Grid>
-                  <Grid item xs={6}>
-                    {timeValue ? (
-                      <Chart {...ChartDataMonth} />
-                    ) : (
-                      <Chart {...ChartDataYear} />
-                    )}
                   </Grid>
                 </Grid>
               </Grid>

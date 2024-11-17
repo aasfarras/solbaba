@@ -141,7 +141,7 @@ const DetailProduk = () => {
               <TableRow>
                 <TableCell>Gratis Ongkir</TableCell>
                 <TableCell>
-                  {product.data.free_shipping ? "Ya" : "Tidak"}
+                  {product.data.include_free_shipping === 1 ? "Ya" : "Tidak"}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -201,19 +201,50 @@ const DetailProduk = () => {
               </TableRow>
 
               <TableRow>
+                <TableCell>Variants</TableCell>
+                <TableCell>
+                  {Array.isArray(product.data.product_variants) &&
+                  product.data.product_variants.length > 0 ? (
+                    <Table
+                      style={{
+                        border: "0.5px solid black",
+                        width: "20%",
+                      }}
+                    >
+                      <TableHead style={{ border: "0.5px solid black" }}>
+                        <TableRow style={{ border: "0.5px solid black" }}>
+                          <TableCell style={{ border: "0.5px solid black" }}>
+                            Variant Name
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody style={{ border: "0.5px solid black" }}>
+                        {product.data.product_variants.map((variant, index) => (
+                          <TableRow
+                            style={{ border: "0.5px solid black" }}
+                            key={index}
+                          >
+                            <TableCell style={{ border: "0.5px solid black" }}>
+                              {variant.variant_name}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <Typography variant="body2">
+                      Tidak ada varian tersedia
+                    </Typography>
+                  )}
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
                 <TableCell>Gambar</TableCell>
                 <TableCell>
                   <Box display="flex" flexWrap="wrap">
                     {product.data.product_images.map((image, index) => (
-                      <Image.PreviewGroup
-                        key={index}
-                        preview={{
-                          onChange: (current, prev) =>
-                            console.log(
-                              `current index: ${current}, prev index: ${prev}`
-                            ),
-                        }}
-                      >
+                      <Image.PreviewGroup key={index}>
                         <Image
                           key={index}
                           src={image.image_url}

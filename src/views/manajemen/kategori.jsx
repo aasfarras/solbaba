@@ -298,7 +298,7 @@ const Kategori = () => {
             </Grid>
           </Grid>
 
-          {/* <Button
+          <Button
             variant="outlined"
             component="label"
             sx={{
@@ -318,7 +318,7 @@ const Kategori = () => {
               inputProps={{ accept: "image/*" }}
               sx={{ display: "none" }} // Sembunyikan input asli
             />
-          </Button> */}
+          </Button>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">
@@ -334,63 +334,55 @@ const Kategori = () => {
         <DialogTitle>Tambah Kategori</DialogTitle>
         <DialogContent>
           <>
-            <TextField
-              margin="dense"
-              label="Nama Kategori"
-              name="category_name"
-              fullWidth
-              value={formData.category_name}
-              onChange={handleInputChange}
-            />
-          </>
-          {/* <Stepper activeStep={activeStep}>
-            <Step>
-              <StepLabel>Informasi Kategori</StepLabel>
-            </Step>
-            <Step>
-              <StepLabel>Unggah Gambar</StepLabel>
-            </Step>
-          </Stepper>
-          {activeStep === 0 && (
-            <>
-            <TextField
-              margin="dense"
-              label="Nama Kategori"
-              name="category_name"
-              fullWidth
-              value={formData.category_name}
-              onChange={handleInputChange}
-              sx={{ mt: 3 }}
-            />
-          </>
-          )}
-          {activeStep === 1 && (
-            <>
-              <Button
-                variant="outlined"
-                component="label"
-                sx={{
-                  borderColor: theme.palette.grey[400],
-                  marginLeft: "70px",
-                  marginTop: "20px",
-                }}
-              >
-                <IconUpload
-                  height="16px"
-                  width="16"
-                  style={{ marginRight: "10px" }}
+            <Stepper activeStep={activeStep}>
+              <Step>
+                <StepLabel>Informasi Kategori</StepLabel>
+              </Step>
+              <Step>
+                <StepLabel>Unggah Gambar</StepLabel>
+              </Step>
+            </Stepper>
+            {activeStep === 0 && (
+              <>
+                <TextField
+                  margin="dense"
+                  label="Nama Kategori"
+                  name="category_name"
+                  fullWidth
+                  value={formData.category_name}
+                  onChange={handleInputChange}
+                  sx={{ mt: 3 }}
                 />
-                Tambahkan Gambar
-                <Input
-                  type="file"
-                  onChange={handleImageChange}
-                  inputProps={{ accept: "image/*" }}
-                  hidden
-                  sx={{ display: "none" }}
-                />
-              </Button>
-            </>
-          )} */}
+              </>
+            )}
+            {activeStep === 1 && (
+              <>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  sx={{
+                    borderColor: theme.palette.grey[400],
+                    marginLeft: "70px",
+                    marginTop: "20px",
+                  }}
+                >
+                  <IconUpload
+                    height="16px"
+                    width="16"
+                    style={{ marginRight: "10px" }}
+                  />
+                  Tambahkan Gambar
+                  <Input
+                    type="file"
+                    onChange={handleImageChange}
+                    inputProps={{ accept: "image/*" }}
+                    hidden
+                    sx={{ display: "none" }}
+                  />
+                </Button>
+              </>
+            )}
+          </>
         </DialogContent>
         <DialogActions>
           {activeStep > 0 && (

@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 
 // material-ui
 import { styled, useTheme } from "@mui/material/styles";
@@ -13,9 +14,13 @@ import Typography from "@mui/material/Typography";
 // project imports
 import MainCard from "../../ui-component/cards/MainCard";
 import TotalIncomeCard from "../../ui-component/cards/Skeleton/TotalIncomeCard";
+import PercentIcon from "@mui/icons-material/Percent";
 
 // assets
 import TableChartOutlinedIcon from "@mui/icons-material/TableChartOutlined";
+
+// Import service
+import { getSummary } from "../../service/dashboard/summary.get.service"; // Sesuaikan dengan path yang benar
 
 // styles
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -49,6 +54,22 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 const TotalIncomeDarkCard = ({ isLoading }) => {
   const theme = useTheme();
+  const [averageTransactionAmount, setAverageTransactionAmount] = useState(0); // State untuk average_transaction_amount
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await getSummary(); // Mengambil data dari API
+        if (result.code === 200) {
+          setAverageTransactionAmount(result.data.average_transaction_amount); // Menyimpan average_transaction_amount
+        }
+      } catch (error) {
+        console.error("Error fetching summary data:", error);
+      }
+    };
+
+    fetchData(); // Panggil fungsi fetchData saat komponen dimuat
+  }, []);
 
   return (
     <>
@@ -69,14 +90,17 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                       color: "#fff",
                     }}
                   >
-                    <TableChartOutlinedIcon fontSize="inherit" />
+                    <PercentIcon />
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
                   sx={{ py: 0, my: 0.45 }}
                   primary={
                     <Typography variant="h4" sx={{ color: "#fff" }}>
-                      Rp.203.000
+                      Rp{" "}
+                      {new Intl.NumberFormat("id-ID").format(
+                        averageTransactionAmount
+                      )}
                     </Typography>
                   }
                   secondary={
@@ -84,7 +108,7 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                       variant="subtitle2"
                       sx={{ color: "primary.light", mt: 0.25 }}
                     >
-                      Jumlah Pemasukan
+                      Rata-rata Transaksi
                     </Typography>
                   }
                 />

@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 // material-ui
 import Avatar from "@mui/material/Avatar";
@@ -17,6 +17,7 @@ import BajajAreaChartCard from "./BajajAreaChartCard";
 import MainCard from "../../ui-component/cards/MainCard";
 import SkeletonPopularCard from "../../ui-component/cards/Skeleton/PopularCard";
 import { gridSpacing } from "../../store/constant";
+import { useNavigate } from "react-router-dom";
 
 // assets
 import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
@@ -24,10 +25,15 @@ import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 
+// Import service
+import { getPopularity } from "../../service/dashboard/popularity.get.service"; // Sesuaikan dengan path yang benar
+
 // ==============================|| DASHBOARD DEFAULT - POPULAR CARD ||============================== //
 
 const PopularCard = ({ isLoading }) => {
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [popularProducts, setPopularProducts] = useState([]); // State untuk menyimpan produk terlaris
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -37,6 +43,26 @@ const PopularCard = ({ isLoading }) => {
     setAnchorEl(null);
   };
 
+  const handleViewAll = () => {
+    navigate("/super-admin/manajemen/produk");
+  };
+
+  // Fetch data from API
+  const fetchPopularityData = async () => {
+    try {
+      const result = await getPopularity(); // Mengambil data dari API
+      if (result.code === 200) {
+        setPopularProducts(result.data.products); // Menyimpan produk terlaris
+      }
+    } catch (error) {
+      console.error("Error fetching popularity data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPopularityData(); // Panggil fungsi fetchPopularityData saat komponen dimuat
+  }, []);
+
   return (
     <>
       {isLoading ? (
@@ -44,7 +70,7 @@ const PopularCard = ({ isLoading }) => {
       ) : (
         <MainCard content={false}>
           <CardContent>
-            <Grid container spacing={gridSpacing}>
+            <Grid container spacing={gridSpacing} sx={{ mb: 9 }}>
               <Grid item xs={12}>
                 <Grid
                   container
@@ -54,7 +80,7 @@ const PopularCard = ({ isLoading }) => {
                   <Grid item>
                     <Typography variant="h4">Produk Terlaris</Typography>
                   </Grid>
-                  <Grid item>
+                  {/* <Grid item>
                     <MoreHorizOutlinedIcon
                       fontSize="small"
                       sx={{
@@ -85,25 +111,16 @@ const PopularCard = ({ isLoading }) => {
                       <MenuItem onClick={handleClose}> This Month</MenuItem>
                       <MenuItem onClick={handleClose}> This Year </MenuItem>
                     </Menu>
-                  </Grid>
+                  </Grid> */}
                 </Grid>
               </Grid>
-              <Grid item xs={12} sx={{ pt: "16px !important" }}>
+              {/* <Grid item xs={12} sx={{ pt: "16px !important" }}>
                 <BajajAreaChartCard />
-              </Grid>
+              </Grid> */}
               <Grid item xs={12}>
                 <Grid container direction="column">
-                  <Grid item>
-                    <Grid
-                      container
-                      alignItems="center"
-                      justifyContent="space-between"
-                    >
-                      <Grid item>
-                        <Typography variant="subtitle1" color="inherit">
-                          Produk baru Lagi
-                        </Typography>
-                      </Grid>
+                  {popularProducts.map((product) => (
+                    <React.Fragment key={product.product_id}>
                       <Grid item>
                         <Grid
                           container
@@ -112,256 +129,58 @@ const PopularCard = ({ isLoading }) => {
                         >
                           <Grid item>
                             <Typography variant="subtitle1" color="inherit">
-                              Rp 1.000.000
+                              {product.product_name}
                             </Typography>
                           </Grid>
                           <Grid item>
-                            <Avatar
-                              variant="rounded"
-                              sx={{
-                                width: 16,
-                                height: 16,
-                                borderRadius: "5px",
-                                bgcolor: "success.light",
-                                color: "success.dark",
-                                ml: 2,
-                              }}
+                            <Grid
+                              container
+                              alignItems="center"
+                              justifyContent="space-between"
                             >
-                              <KeyboardArrowUpOutlinedIcon
-                                fontSize="small"
-                                color="inherit"
-                              />
-                            </Avatar>
+                              <Grid item>
+                                <Typography variant="subtitle1" color="inherit">
+                                  {product.product_count}
+                                </Typography>
+                              </Grid>
+                              {/* <Grid item>
+                                <Avatar
+                                  variant="rounded"
+                                  sx={{
+                                    width: 16,
+                                    height: 16,
+                                    borderRadius: "5px",
+                                    bgcolor:
+                                      product.product_count > 0
+                                        ? "success.light"
+                                        : "orange.light",
+                                    color:
+                                      product.product_count > 0
+                                        ? "success.dark"
+                                        : "orange.dark",
+                                    ml: 2,
+                                  }}
+                                >
+                                  {product.product_count > 0 ? (
+                                    <KeyboardArrowUpOutlinedIcon
+                                      fontSize="small"
+                                      color="inherit"
+                                    />
+                                  ) : (
+                                    <KeyboardArrowDownOutlinedIcon
+                                      fontSize="small"
+                                      color="inherit"
+                                    />
+                                  )}
+                                </Avatar>
+                              </Grid> */}
+                            </Grid>
                           </Grid>
                         </Grid>
                       </Grid>
-                    </Grid>
-                  </Grid>
-                  <Divider sx={{ my: 1.5 }} />
-                  <Grid item>
-                    <Grid
-                      container
-                      alignItems="center"
-                      justifyContent="space-between"
-                    >
-                      <Grid item>
-                        <Typography variant="subtitle1" color="inherit">
-                          Produk baru Lagi ii guys
-                        </Typography>
-                      </Grid>
-                      <Grid item>
-                        <Grid
-                          container
-                          alignItems="center"
-                          justifyContent="space-between"
-                        >
-                          <Grid item>
-                            <Typography variant="subtitle1" color="inherit">
-                              Rp 500.000
-                            </Typography>
-                          </Grid>
-                          <Grid item>
-                            <Avatar
-                              variant="rounded"
-                              sx={{
-                                width: 16,
-                                height: 16,
-                                borderRadius: "5px",
-                                bgcolor: "orange.light",
-                                color: "orange.dark",
-                                marginLeft: 1.875,
-                              }}
-                            >
-                              <KeyboardArrowDownOutlinedIcon
-                                fontSize="small"
-                                color="inherit"
-                              />
-                            </Avatar>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Divider sx={{ my: 1.5 }} />
-                  <Grid item>
-                    <Grid
-                      container
-                      alignItems="center"
-                      justifyContent="space-between"
-                    >
-                      <Grid item>
-                        <Typography variant="subtitle1" color="inherit">
-                          Inventore Fugiat Uta
-                        </Typography>
-                      </Grid>
-                      <Grid item>
-                        <Grid
-                          container
-                          alignItems="center"
-                          justifyContent="space-between"
-                        >
-                          <Grid item>
-                            <Typography variant="subtitle1" color="inherit">
-                              Rp 300.000
-                            </Typography>
-                          </Grid>
-                          <Grid item>
-                            <Avatar
-                              variant="rounded"
-                              sx={{
-                                width: 16,
-                                height: 16,
-                                borderRadius: "5px",
-                                bgcolor: "success.light",
-                                color: "success.dark",
-                                ml: 2,
-                              }}
-                            >
-                              <KeyboardArrowUpOutlinedIcon
-                                fontSize="small"
-                                color="inherit"
-                              />
-                            </Avatar>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Divider sx={{ my: 1.5 }} />
-                  <Grid item>
-                    <Grid
-                      container
-                      alignItems="center"
-                      justifyContent="space-between"
-                    >
-                      <Grid item>
-                        <Typography variant="subtitle1" color="inherit">
-                          Quasi Et Nostrum
-                        </Typography>
-                      </Grid>
-                      <Grid item>
-                        <Grid
-                          container
-                          alignItems="center"
-                          justifyContent="space-between"
-                        >
-                          <Grid item>
-                            <Typography variant="subtitle1" color="inherit">
-                              Rp 400.000
-                            </Typography>
-                          </Grid>
-                          <Grid item>
-                            <Avatar
-                              variant="rounded"
-                              sx={{
-                                width: 16,
-                                height: 16,
-                                borderRadius: "5px",
-                                bgcolor: "orange.light",
-                                color: "orange.dark",
-                                ml: 2,
-                              }}
-                            >
-                              <KeyboardArrowDownOutlinedIcon
-                                fontSize="small"
-                                color="inherit"
-                              />
-                            </Avatar>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Divider sx={{ my: 1.5 }} />
-                  <Grid item>
-                    <Grid
-                      container
-                      alignItems="center"
-                      justifyContent="space-between"
-                    >
-                      <Grid item>
-                        <Typography variant="subtitle1" color="inherit">
-                          Inventore Harum Sed
-                        </Typography>
-                      </Grid>
-                      <Grid item>
-                        <Grid
-                          container
-                          alignItems="center"
-                          justifyContent="space-between"
-                        >
-                          <Grid item>
-                            <Typography variant="subtitle1" color="inherit">
-                              Rp 250.000
-                            </Typography>
-                          </Grid>
-                          <Grid item>
-                            <Avatar
-                              variant="rounded"
-                              sx={{
-                                width: 16,
-                                height: 16,
-                                borderRadius: "5px",
-                                bgcolor: "success.light",
-                                color: "success.dark",
-                                ml: 2,
-                              }}
-                            >
-                              <KeyboardArrowUpOutlinedIcon
-                                fontSize="small"
-                                color="inherit"
-                              />
-                            </Avatar>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Divider sx={{ my: 1.5 }} />
-                  <Grid item>
-                    <Grid
-                      container
-                      alignItems="center"
-                      justifyContent="space-between"
-                    >
-                      <Grid item>
-                        <Typography variant="subtitle1" color="inherit">
-                          Adipisci Sunt Natus
-                        </Typography>
-                      </Grid>
-                      <Grid item>
-                        <Grid
-                          container
-                          alignItems="center"
-                          justifyContent="space-between"
-                        >
-                          <Grid item>
-                            <Typography variant="subtitle1" color="inherit">
-                              Rp 600.000
-                            </Typography>
-                          </Grid>
-                          <Grid item>
-                            <Avatar
-                              variant="rounded"
-                              sx={{
-                                width: 16,
-                                height: 16,
-                                borderRadius: "5px",
-                                bgcolor: "orange.light",
-                                color: "orange.dark",
-                                ml: 2,
-                              }}
-                            >
-                              <KeyboardArrowDownOutlinedIcon
-                                fontSize="small"
-                                color="inherit"
-                              />
-                            </Avatar>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  </Grid>
+                      <Divider sx={{ my: 1.5 }} />
+                    </React.Fragment>
+                  ))}
                 </Grid>
               </Grid>
             </Grid>
@@ -371,6 +190,7 @@ const PopularCard = ({ isLoading }) => {
               fullWidth
               variant="contained"
               endIcon={<ChevronRightOutlinedIcon />}
+              onClick={handleViewAll}
             >
               Lihat Semua
             </Button>

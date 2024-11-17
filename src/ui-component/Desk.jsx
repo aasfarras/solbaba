@@ -13,7 +13,6 @@ const Desk = ({ description, setDescription }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(editorHtml); // You can send this data to the server or use it as needed
   };
 
   // Optional: Use useEffect to set initial description

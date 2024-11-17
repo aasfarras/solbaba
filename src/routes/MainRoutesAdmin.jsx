@@ -6,7 +6,9 @@ import Loadable from "../ui-component/Loadable";
 import AuthGuard from "../utils/AuthGuard"; // Import AuthGuard
 
 // dashboard routing
-const DashboardDefault = Loadable(lazy(() => import("../views/dashboard")));
+const DashboardDefault = Loadable(
+  lazy(() => import("../views/dashboard-admin"))
+);
 const Pesanan = Loadable(lazy(() => import("../views/admin/pesanan")));
 const ArsipAdmin = Loadable(lazy(() => import("../views/admin/arsipAdmin")));
 const DetailArsipAdmin = Loadable(

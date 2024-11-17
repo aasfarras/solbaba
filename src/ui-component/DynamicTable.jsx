@@ -227,12 +227,28 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
       </TableContainer>
 
       <Button
-        sx={{ color: "black", backgroundColor: "white" }}
+        variant="outlined"
+        sx={{
+          backgroundColor: "white",
+          color: "#555",
+          borderColor: "#999",
+          mt: 1,
+          mr: 1,
+        }}
         onClick={addColumn}
       >
         Tambah Kolom
       </Button>
-      <Button sx={{ color: "black" }} onClick={addRow}>
+      <Button
+        variant="outlined"
+        sx={{
+          backgroundColor: "white",
+          color: "#555",
+          borderColor: "#999",
+          mt: 1,
+        }}
+        onClick={addRow}
+      >
         Tambah Baris
       </Button>
     </Paper>

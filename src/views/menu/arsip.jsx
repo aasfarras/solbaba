@@ -119,12 +119,6 @@ const ArsipAdmin = () => {
   const handleSubmitStatus = async () => {
     try {
       await updatePesanan(currentPesananId, { status: selectedStatus });
-      console.log(
-        "Update status Pesanan ID:",
-        currentPesananId,
-        "ke status:",
-        selectedStatus
-      );
       // Refresh data setelah update
       fetchData();
       handleCloseStatusDialog();

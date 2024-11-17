@@ -6,7 +6,9 @@ import Loadable from "../ui-component/Loadable";
 import AuthGuard from "../utils/AuthGuard"; // Import AuthGuard
 
 // dashboard routing
-const DashboardDefault = Loadable(lazy(() => import("../views/dashboard")));
+const DashboardDefault = Loadable(
+  lazy(() => import("../views/dashboard-sales"))
+);
 const Produk = Loadable(lazy(() => import("../views/manajemen/produk/produk")));
 const Pesanan = Loadable(lazy(() => import("../views/menu/pesanan")));
 const DetailPesanan = Loadable(

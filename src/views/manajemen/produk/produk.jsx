@@ -101,7 +101,6 @@ const Product = () => {
       });
       setData(formattedData);
       setTotal(result.data.total);
-      // console.log(result.data.total);
       setCurrentPage(result.data.current_page);
     } catch (error) {
       console.error("Failed to fetch product data", error);

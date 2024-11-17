@@ -2,7 +2,6 @@ import axios from "axios";
 
 export const updateDonePesanan = async (id) => {
   const token = sessionStorage.getItem("token");
-  console.log(token);
   try {
     const response = await axios.put(
       `${import.meta.env.VITE_APP_API}admin/order/${id}`,

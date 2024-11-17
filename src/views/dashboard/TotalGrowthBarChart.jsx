@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { Card, CardContent, Typography, Box } from "@mui/material";
 import {
@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { getMonthly } from "../../service/dashboard/monthly.get.service"; // Sesuaikan dengan path yang benar
 
 // Register chart components
 ChartJS.register(
@@ -22,19 +23,50 @@ ChartJS.register(
 );
 
 const TotalGrowthBarChart = ({ isLoading }) => {
-  // Data untuk bar chart
-  const data = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
+  const [chartData, setChartData] = useState({
+    labels: [],
     datasets: [
       {
-        label: "Pertumbuhan",
-        data: [65, 59, 80, 81, 56, 55, 40], // Data pertumbuhan
+        label: "Pendapatan",
+        data: [],
         backgroundColor: "#52b1ff",
         borderColor: "#52b1ff",
         borderWidth: 1,
       },
     ],
+  });
+
+  // Fetch data from API
+  const fetchMonthlyData = async () => {
+    try {
+      const result = await getMonthly(); // Mengambil data dari API
+      if (result.code === 200) {
+        const monthlyData = result.data;
+        const labels = Object.keys(monthlyData); // Mendapatkan nama bulan
+        const data = Object.values(monthlyData); // Mendapatkan nilai pertumbuhan
+
+        setChartData({
+          labels: labels,
+          datasets: [
+            {
+              label: "pendapatan",
+              data: data,
+              backgroundColor: "#52b1ff",
+              borderColor: "#52b1ff",
+              borderWidth: 1,
+              borderRadius: 8,
+            },
+          ],
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching monthly data:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchMonthlyData(); // Panggil fungsi fetchMonthlyData saat komponen dimuat
+  }, []);
 
   // Opsi konfigurasi chart
   const options = {
@@ -51,16 +83,20 @@ const TotalGrowthBarChart = ({ isLoading }) => {
   };
 
   return (
-    <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
+    <Card
+      sx={{
+        borderRadius: 3,
+        backgroundColor: "#fff",
+        height: "calc(100% + 2px)",
+      }}
+    >
       <CardContent>
         {isLoading ? (
           <Typography variant="body2">Loading...</Typography>
         ) : (
           <Box>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Arus Pemasukan
-            </Typography>
-            <Bar data={data} options={options} />
+            <Typography variant="h6">Arus Pemasukan</Typography>
+            <Bar data={chartData} options={options} />
           </Box>
         )}
       </CardContent>

@@ -13,20 +13,29 @@ import {
   FormControlLabel,
   Box,
   Typography,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
 } from "@mui/material";
 import { Upload, message, Image } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { IconUpload } from "@tabler/icons-react";
+
 import { useTheme } from "@mui/material/styles";
 import { getKategori } from "../../service/admin/kategori.get.service";
 import { getSubKategori } from "../../service/admin/subKategori.get.service";
 import { postProduct } from "../../service/admin/product/product.post.service";
+import { postProductVariants } from "../../service/admin/product/product.postVariants.service";
 import { postProductImage } from "../../service/admin/product/productgambar.post.service";
 import { deleteProductImage } from "../../service/admin/product/productgambar.delete.service";
 import MainCard from "../../ui-component/cards/MainCard";
 import DynamicTable from "../../ui-component/DynamicTable";
 import Desk from "../../ui-component/Desk";
 import { useDropzone } from "react-dropzone";
+import { getVariantById } from "../../service/admin/product/product.getVariants.service"; // Adjust the path as necessary
+import { deleteVariantImage } from "../../service/admin/product/product.deleteVariants.service"; // Adjust the path as necessary
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -57,6 +66,7 @@ const TambahProduk = () => {
     free_shipping: false,
     vat: false,
     specification: [],
+    product_variants: [], // Add this line
   });
 
   const [activeStep, setActiveStep] = useState(0);
@@ -68,6 +78,9 @@ const TambahProduk = () => {
   const [imageFile, setImageFile] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
+  const [variantName, setVariantName] = useState(""); // Add this line
+  const [variantNames, setVariantNames] = useState([]); // Change this line
+  const [fetchedVariants, setFetchedVariants] = useState([]); // State to store fetched variants
 
   // const handleSaveTable = (htmlOutput) => {
   //   setFormData((prevData) => ({
@@ -76,19 +89,50 @@ const TambahProduk = () => {
   //   }));
   // };
 
-  const getDataForApi = () => {
-    return data
-      .map((row) => {
-        const formattedRow = {};
-        columns.forEach((column) => {
-          // Hanya tambahkan ke formattedRow jika nilainya tidak kosong
-          if (row[column.accessor] && row[column.accessor].trim() !== "") {
-            formattedRow[column.Header] = row[column.accessor];
-          }
-        });
-        return formattedRow;
-      })
-      .filter((row) => Object.keys(row).length > 0); // Hanya ambil row yang tidak kosong
+  const handleRemoveVariant = async (index) => {
+    const variantToDelete = fetchedVariants[index]; // Get the variant to delete
+    try {
+      await deleteVariantImage(variantToDelete.id); // Call the API to delete the variant
+      setFetchedVariants(
+        (prevVariants) => prevVariants.filter((_, i) => i !== index) // Update the state to remove the deleted variant
+      );
+      message.success("Varian berhasil dihapus.");
+    } catch (error) {
+      message.error("Gagal menghapus varian: " + error.message);
+    }
+  };
+
+  const handleAddVariant = async () => {
+    if (!productId) {
+      message.error("Harap simpan informasi produk terlebih dahulu.");
+      return;
+    }
+
+    if (variantName.trim() === "") {
+      message.error("Nama varian tidak boleh kosong.");
+      return;
+    }
+
+    const serviceData = {
+      product_id: productId,
+      variant_name: variantName,
+    };
+
+    try {
+      const response = await postProductVariants(serviceData);
+      if (response.code === 200) {
+        message.success("Varian berhasil ditambahkan.");
+        // Optionally, you can reset the variant name input
+        setVariantName("");
+        setVariantNames([...variantNames, variantName]); // Tambahkan ini
+        await fetchVariants();
+      } else {
+        message.error("Gagal menambahkan varian: " + response.message);
+      }
+    } catch (error) {
+      console.error("Error adding variant:", error);
+      message.error("Gagal menambahkan varian.");
+    }
   };
 
   const handleNextStep = async () => {
@@ -109,8 +153,6 @@ const TambahProduk = () => {
         })
         .filter((spec) => Object.keys(spec).length > 0); // Hanya ambil spesifikasi yang tidak kosong
 
-      console.log("Filtered Specifications:", filteredSpecifications); // Log filtered specifications
-
       try {
         const response = await postProduct({
           product_name: formData.product_name,
@@ -126,11 +168,17 @@ const TambahProduk = () => {
           additional_fee_area_2: formData.additional_fee_area_2,
           specification: filteredSpecifications, // Kirim data yang sudah difilter
           stock: formData.stock,
+          product_variants: formData.product_variants,
         });
 
         if (response.code === 200) {
           setProductId(response.data.id);
-          console.log("Product ID:", response.data.id);
+
+          // Send variants to the server
+          for (const variant of formData.product_variants) {
+            await postProductVariants(variant.variant_name, response.data.id);
+          }
+
           setActiveStep((prevStep) => prevStep + 1);
           message.success("Informasi Produk telah tersimpan.");
         } else {
@@ -252,10 +300,22 @@ const TambahProduk = () => {
     }
   };
 
+  const fetchVariants = async () => {
+    if (productId) {
+      try {
+        const response = await getVariantById(productId);
+        setFetchedVariants(response.data);
+      } catch (error) {
+        message.error("Gagal mengambil varian produk.");
+      }
+    }
+  };
+
   useEffect(() => {
+    fetchVariants();
     fetchCategories();
     fetchSubCategories();
-  }, []);
+  }, [productId]);
 
   return (
     <MainCard>
@@ -295,7 +355,7 @@ const TambahProduk = () => {
                 {[
                   { key: "available", value: "Tersedia" },
                   { key: "out_of_stock", value: "Tidak Tersedia" },
-                  { key: "Preorder", value: "Preorder/Inden" },
+                  { key: "pre_order", value: "Preorder/Inden" },
                 ].map((status) => (
                   <MenuItem key={status.key} value={status.key}>
                     {status.value}
@@ -478,16 +538,75 @@ const TambahProduk = () => {
               )}
             </Upload>
           </Box>
+
           <Typography variant="body" sx={{ color: "grey" }}>
             <span style={{ color: "red" }}>*</span> maksimal ukuran gambar 1 mb
           </Typography>
+          <Table
+            style={{ border: "0.2px solid #ccc" }}
+            sx={{ borderRadius: "200px", mt: 2 }}
+          >
+            <TableHead style={{ border: "0.2px solid #ccc" }}>
+              <TableRow style={{ border: "0.2px solid #ccc" }}>
+                <TableCell style={{ border: "0.2px solid #ccc" }}>
+                  Variant Produk
+                  <TextField
+                    margin="dense"
+                    label="Nama Varian"
+                    value={variantName}
+                    onChange={(e) => setVariantName(e.target.value)}
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell style={{ border: "0.2px solid #ccc" }}>
+                  Aksi
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody style={{ border: "0.2px solid #ccc" }}>
+              {fetchedVariants.map((variant, index) => (
+                <TableRow
+                  key={variant.id}
+                  style={{ border: "0.2px solid #ccc" }}
+                >
+                  <TableCell style={{ border: "0.2px solid #ccc" }}>
+                    <Typography variant="body1">
+                      {variant.variant_name}
+                    </Typography>
+                  </TableCell>
+                  <TableCell style={{ border: "0.2px solid #ccc" }}>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => handleRemoveVariant(index)}
+                    >
+                      Hapus
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <Button
+            variant="outlined"
+            sx={{
+              backgroundColor: "white",
+              color: "#555",
+              borderColor: "#999",
+              mt: 1,
+            }}
+            onClick={handleAddVariant}
+          >
+            Tambah Varian
+          </Button>
+
           {previewImage && (
             <Box
               sx={{
-                display: previewOpen ? "block" : "none", // Menyembunyikan Box jika tidak terlihat
-                opacity: previewOpen ? 1 : 0, // Mengatur opacity
-                transition: "opacity 0.5s ease", // Menambahkan animasi transisi
-                position: "relative", // Agar dapat mengatur posisi jika diperlukan
+                display: previewOpen ? "block" : "none",
+                opacity: previewOpen ? 1 : 0,
+                transition: "opacity 0.5s ease",
+                position: "relative",
               }}
             >
               <Image
@@ -499,7 +618,7 @@ const TambahProduk = () => {
                   afterOpenChange: (visible) => !visible && setPreviewImage(""),
                 }}
                 src={previewImage}
-                style={{ objectFit: "contain" }} // Menyesuaikan cara gambar ditampilkan
+                style={{ objectFit: "contain" }}
               />
             </Box>
           )}

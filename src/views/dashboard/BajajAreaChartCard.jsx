@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 // material-ui
@@ -13,6 +13,7 @@ import Chart from "react-apexcharts";
 
 // project imports
 import chartData from "./chart-data/bajaj-area-chart";
+import { getSummary } from "../../service/dashboard/summary.get.service"; // Sesuaikan dengan path yang benar
 
 // ===========================|| DASHBOARD DEFAULT - BAJAJ AREA CHART CARD ||=========================== //
 
@@ -23,7 +24,25 @@ const BajajAreaChartCard = () => {
   const customization = useSelector((state) => state.customization);
   const { navType } = customization;
 
-  React.useEffect(() => {
+  const [transactionCount, setTransactionCount] = useState(0); // State untuk menyimpan transaction_count
+
+  // Fetch data from API
+  const fetchSummaryData = async () => {
+    try {
+      const result = await getSummary(); // Mengambil data dari API
+      if (result.code === 200) {
+        setTransactionCount(result.data.transaction_count); // Menyimpan transaction_count
+      }
+    } catch (error) {
+      console.error("Error fetching summary data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSummaryData(); // Panggil fungsi fetchSummaryData saat komponen dimuat
+  }, []);
+
+  useEffect(() => {
     const newSupportChart = {
       ...chartData.options,
       colors: [orangeDark],
@@ -44,7 +63,8 @@ const BajajAreaChartCard = () => {
             </Grid>
             <Grid item>
               <Typography variant="h4" sx={{ color: "grey.800" }}>
-                Rp 3.200.000
+                Rp {new Intl.NumberFormat("id-ID").format(transactionCount)}{" "}
+                {/* Menampilkan transaction_count */}
               </Typography>
             </Grid>
           </Grid>

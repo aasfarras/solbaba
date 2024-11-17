@@ -34,7 +34,6 @@ const TambahSales = () => {
 
     try {
       const response = await postSalesman(formData);
-      console.log("Salesman ID:", response.data.id);
       message.success("Salesman berhasil dibuat.");
       navigate(-1); // Kembali setelah berhasil
     } catch (error) {

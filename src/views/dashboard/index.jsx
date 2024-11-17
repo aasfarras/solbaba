@@ -16,26 +16,31 @@ import { gridSpacing } from "../../store/constant";
 // assets
 import StorefrontTwoToneIcon from "@mui/icons-material/StorefrontTwoTone";
 
-// Fungsi untuk memformat angka menjadi format rupiah tanpa "K" dan simbol dolar
-const formatRupiah = (amount) => {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  })
-    .format(amount)
-    .replace("IDR", "")
-    .trim(); // Menghilangkan simbol IDR
-};
+// Import service
+import { getSummary } from "../../service/dashboard/summary.get.service"; // Sesuaikan dengan path yang benar
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
 const Dashboard = () => {
   const [isLoading, setLoading] = useState(true);
+  const [transactionCount, setTransactionCount] = useState(0); // State untuk menyimpan jumlah transaksi
   const currencyRate = 14000; // Nilai tukar rupiah
 
   useEffect(() => {
-    setLoading(false);
+    const fetchData = async () => {
+      try {
+        const result = await getSummary(); // Mengambil data dari API
+        if (result.code === 200) {
+          setTransactionCount(result.data.transaction_count); // Menyimpan jumlah transaksi
+        }
+      } catch (error) {
+        console.error("Error fetching summary data:", error);
+      } finally {
+        setLoading(false); // Set loading ke false setelah fetch selesai
+      }
+    };
+
+    fetchData(); // Panggil fungsi fetchData saat komponen dimuat
   }, []);
 
   return (
@@ -43,7 +48,6 @@ const Dashboard = () => {
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item lg={4} md={6} sm={6} xs={12}>
-            {/* Menambahkan konversi dari dolar ke rupiah */}
             <EarningCard isLoading={isLoading} currencyRate={currencyRate} />
           </Grid>
           <Grid item lg={4} md={6} sm={6} xs={12}>
@@ -55,12 +59,12 @@ const Dashboard = () => {
                 <TotalIncomeDarkCard isLoading={isLoading} />
               </Grid>
               <Grid item sm={6} xs={12} md={6} lg={12}>
-                {/* Menambahkan total dalam format rupiah tanpa simbol */}
+                {/* Menampilkan total transaksi */}
                 <TotalIncomeLightCard
                   {...{
                     isLoading: isLoading,
-                    total: formatRupiah(202 * currencyRate), // Mengubah total menjadi format rupiah tanpa simbol
-                    label: "Jumlah Pemasukan",
+                    total: transactionCount, // Menggunakan jumlah transaksi dari API
+                    label: "Total Transaksi", // Mengubah label menjadi Total Transaksi
                     icon: <StorefrontTwoToneIcon fontSize="inherit" />, // Ikon tetap
                   }}
                 />

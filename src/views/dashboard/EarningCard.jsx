@@ -1,47 +1,68 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 
 // project imports
 import MainCard from "../../ui-component/cards/MainCard";
-import SkeletonEarningCard from "../../ui-component/cards/Skeleton/EarningCard";
+import SkeletonTotalOrderCard from "../../ui-component/cards/Skeleton/EarningCard";
+import EarningIcon from "../../assets/images/icons/earning.svg";
+
+// Import service
+import { getPeriod } from "../../service/dashboard/period.get.service"; // Sesuaikan dengan path yang benar
 
 // assets
-import EarningIcon from "../../assets/images/icons/earning.svg";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import GetAppTwoToneIcon from "@mui/icons-material/GetAppOutlined";
-import FileCopyTwoToneIcon from "@mui/icons-material/FileCopyOutlined";
-import PictureAsPdfTwoToneIcon from "@mui/icons-material/PictureAsPdfOutlined";
-import ArchiveTwoToneIcon from "@mui/icons-material/ArchiveOutlined";
+import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
+import Visibility from "@mui/icons-material/Visibility"; // Tambahkan ini
+import VisibilityOff from "@mui/icons-material/VisibilityOff"; // Tambahkan ini
 
-// ===========================|| DASHBOARD DEFAULT - EARNING CARD ||=========================== //
+// ==============================|| DASHBOARD - TOTAL ORDER LINE CHART CARD ||============================== //
 
 const EarningCard = ({ isLoading }) => {
   const theme = useTheme();
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [timeValue, setTimeValue] = React.useState("monthly"); // Default ke bulanan
+  const [incomeData, setIncomeData] = useState({
+    daily: 0,
+    weekly: 0,
+    monthly: 0,
+    annual: 0,
+  });
+  const [loading, setLoading] = useState(true); // State untuk loading
+  const [isVisible, setIsVisible] = useState(false); // State untuk visibilitas nominal
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+  const handleChangeTime = (value) => {
+    setTimeValue(value);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  // Fetch data from API
+  const fetchData = async () => {
+    try {
+      const result = await getPeriod(); // Menggunakan getPeriod dari service
+      if (result.code === 200) {
+        setIncomeData(result.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading ke false setelah fetch selesai
+    }
   };
+
+  useEffect(() => {
+    fetchData(); // Panggil fungsi fetchData saat komponen dimuat
+  }, []);
 
   return (
     <>
-      {isLoading ? (
-        <SkeletonEarningCard />
+      {loading || isLoading ? (
+        <SkeletonTotalOrderCard />
       ) : (
         <MainCard
           border={false}
@@ -51,6 +72,10 @@ const EarningCard = ({ isLoading }) => {
             color: "#fff",
             overflow: "hidden",
             position: "relative",
+            "&>div": {
+              position: "relative",
+              zIndex: 5,
+            },
             "&:after": {
               content: '""',
               position: "absolute",
@@ -85,6 +110,7 @@ const EarningCard = ({ isLoading }) => {
                         ...theme.typography.commonAvatar,
                         ...theme.typography.largeAvatar,
                         bgcolor: "secondary.800",
+                        color: "#fff",
                         mt: 1,
                       }}
                     >
@@ -92,95 +118,83 @@ const EarningCard = ({ isLoading }) => {
                     </Avatar>
                   </Grid>
                   <Grid item>
-                    <Avatar
-                      variant="rounded"
-                      sx={{
-                        ...theme.typography.commonAvatar,
-                        ...theme.typography.mediumAvatar,
-                        bgcolor: "secondary.dark",
-                        color: "secondary.200",
-                        zIndex: 1,
-                      }}
-                      aria-controls="menu-earning-card"
-                      aria-haspopup="true"
-                      onClick={handleClick}
+                    <Button
+                      disableElevation
+                      variant={timeValue === "daily" ? "contained" : "text"}
+                      size="small"
+                      sx={{ color: "inherit" }}
+                      onClick={() => handleChangeTime("daily")}
                     >
-                      <MoreHorizIcon fontSize="inherit" />
-                    </Avatar>
-                    <Menu
-                      id="menu-earning-card"
-                      anchorEl={anchorEl}
-                      keepMounted
-                      open={Boolean(anchorEl)}
-                      onClose={handleClose}
-                      variant="selectedMenu"
-                      anchorOrigin={{
-                        vertical: "bottom",
-                        horizontal: "right",
-                      }}
-                      transformOrigin={{
-                        vertical: "top",
-                        horizontal: "right",
-                      }}
+                      Harian
+                    </Button>
+                    <Button
+                      disableElevation
+                      variant={timeValue === "weekly" ? "contained" : "text"}
+                      size="small"
+                      sx={{ color: "inherit" }}
+                      onClick={() => handleChangeTime("weekly")}
                     >
-                      <MenuItem onClick={handleClose}>
-                        <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Import Card
-                      </MenuItem>
-                      <MenuItem onClick={handleClose}>
-                        <FileCopyTwoToneIcon sx={{ mr: 1.75 }} /> Copy Data
-                      </MenuItem>
-                      <MenuItem onClick={handleClose}>
-                        <PictureAsPdfTwoToneIcon sx={{ mr: 1.75 }} /> Export
-                      </MenuItem>
-                      <MenuItem onClick={handleClose}>
-                        <ArchiveTwoToneIcon sx={{ mr: 1.75 }} /> Archive File
-                      </MenuItem>
-                    </Menu>
+                      Mingguan
+                    </Button>
                   </Grid>
                 </Grid>
               </Grid>
-              <Grid item>
+              <Grid item sx={{ mb: 0.75 }}>
                 <Grid container alignItems="center">
-                  <Grid item>
-                    <Typography
-                      sx={{
-                        fontSize: "2.125rem",
-                        fontWeight: 500,
-                        mr: 1,
-                        mt: 1.75,
-                        mb: 0.75,
-                      }}
-                    >
-                      Rp 500.000
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <Avatar
-                      sx={{
-                        cursor: "pointer",
-                        ...theme.typography.smallAvatar,
-                        bgcolor: "secondary.200",
-                        color: "secondary.dark",
-                      }}
-                    >
-                      <ArrowUpwardIcon
-                        fontSize="inherit"
-                        sx={{ transform: "rotate3d(1, 1, 1, 45deg)" }}
-                      />
-                    </Avatar>
+                  <Grid item xs={12}>
+                    <Grid container alignItems="center">
+                      <Grid item>
+                        <Typography
+                          sx={{
+                            fontSize: "2.125rem",
+                            fontWeight: 500,
+                            mr: 1,
+                            mt: 1.75,
+                            mb: 1.1,
+                          }}
+                        >
+                          {isVisible
+                            ? timeValue === "daily"
+                              ? `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.daily)}`
+                              : timeValue === "weekly"
+                                ? `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.weekly)}`
+                                : timeValue === "monthly"
+                                  ? `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.monthly)}`
+                                  : `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.annual)}`
+                            : "****"}
+                        </Typography>
+                      </Grid>
+                      <Grid item>
+                        <Avatar
+                          sx={{
+                            ...theme.typography.smallAvatar,
+                            cursor: "pointer",
+                            bgcolor: "primary.200",
+                            color: "primary.dark",
+                          }}
+                          onClick={() => setIsVisible(!isVisible)} // Toggle visibility
+                        >
+                          {isVisible ? (
+                            <VisibilityOff fontSize="inherit" />
+                          ) : (
+                            <Visibility fontSize="inherit" />
+                          )}
+                        </Avatar>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography
+                          sx={{
+                            fontSize: "1rem",
+                            fontWeight: 500,
+                            color: "primary.200",
+                          }}
+                        >
+                          Jumlah Penghasilan
+                        </Typography>
+                      </Grid>
+                    </Grid>
                   </Grid>
                 </Grid>
-              </Grid>
-              <Grid item sx={{ mb: 1.25 }}>
-                <Typography
-                  sx={{
-                    fontSize: "1rem",
-                    fontWeight: 500,
-                    color: "secondary.200",
-                  }}
-                >
-                  Jumlah Penghasilan
-                </Typography>
               </Grid>
             </Grid>
           </Box>

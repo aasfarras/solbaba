@@ -171,7 +171,6 @@ const ProfileSection = () => {
     try {
       const response = await updateProfile(userData.id, userData); // Panggil service updateProfile
       if (response.code === 200) {
-        console.log("Profile updated successfully:", response.message);
         setIsEditMode(false);
       } else {
         console.error("Failed to update profile:", response.message);
@@ -185,7 +184,6 @@ const ProfileSection = () => {
     try {
       const response = await updatePassword(userData.id, passwordData);
       if (response.code === 200) {
-        console.log("Password reset successfully:", response.message);
         setPasswordData({
           old_password: "",
           password: "",
