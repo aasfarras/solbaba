@@ -27,7 +27,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff"; // Tambahkan ini
 const EarningCard = ({ isLoading }) => {
   const theme = useTheme();
 
-  const [timeValue, setTimeValue] = React.useState("monthly"); // Default ke bulanan
+  const [timeValue, setTimeValue] = React.useState("daily"); // Default ke bulanan
   const [incomeData, setIncomeData] = useState({
     daily: 0,
     weekly: 0,

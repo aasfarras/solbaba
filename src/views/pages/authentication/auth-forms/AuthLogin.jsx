@@ -49,7 +49,7 @@ const AuthLogin = ({ ...others }) => {
   const handleLogin = async (values, setSubmitting) => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_APP_API}login`, // Mengambil URL dari .env
+        `${import.meta.env.VITE_APP_API}login`,
         {
           username: values.username,
           password: values.password,
@@ -57,13 +57,14 @@ const AuthLogin = ({ ...others }) => {
       );
 
       if (response.data.code === 200) {
-        // Simpan token di localStorage atau context
-        sessionStorage.setItem("token", response.data.data.access_token);
-
-        // Cek role dari respons API
+        const accessToken = response.data.data.access_token;
         const userRole = response.data.data.user.role;
 
-        // Redirect berdasarkan role
+        // Store access token and role in local storage or context
+        sessionStorage.setItem("token", accessToken);
+        sessionStorage.setItem("role", userRole);
+
+        // Redirect based on role
         if (userRole === "superadmin") {
           navigate("/super-admin");
         } else if (userRole === "admin") {
@@ -74,7 +75,6 @@ const AuthLogin = ({ ...others }) => {
           setLoginError("Role tidak dikenal");
         }
       } else {
-        // Menampilkan pesan error jika login gagal
         setLoginError("Nama Pengguna atau Kata Sandi salah");
       }
     } catch (error) {

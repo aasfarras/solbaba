@@ -97,10 +97,11 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                   sx={{ py: 0, my: 0.45 }}
                   primary={
                     <Typography variant="h4" sx={{ color: "#fff" }}>
-                      Rp{" "}
-                      {new Intl.NumberFormat("id-ID").format(
-                        averageTransactionAmount
-                      )}
+                      {new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR",
+                        minimumFractionDigits: 0,
+                      }).format(averageTransactionAmount)}
                     </Typography>
                   }
                   secondary={

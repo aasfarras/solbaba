@@ -1,8 +1,8 @@
 // assets
-import { IconCash, IconFileAnalytics, IconReceipt } from "@tabler/icons-react";
+import { IconReceipt, IconShoppingCart } from "@tabler/icons-react";
 
 // constant
-const icons = { IconCash, IconFileAnalytics, IconReceipt };
+const icons = { IconReceipt, IconShoppingCart };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
@@ -18,6 +18,13 @@ const other = {
       url: "/super-admin/other/arsip",
       icon: icons.IconReceipt,
       breadcrumbs: false,
+    },
+    {
+      id: "pesanan",
+      title: "Pesanan",
+      type: "item",
+      url: "/super-admin/other/pesanan", // Update URL
+      icon: icons.IconShoppingCart,
     },
     // {
     //   id: "laporan",

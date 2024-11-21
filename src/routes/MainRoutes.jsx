@@ -37,6 +37,10 @@ const DetailPelanggan = Loadable(
 );
 const Arsip = Loadable(lazy(() => import("../views/other/arsip")));
 const DetailArsip = Loadable(lazy(() => import("../views/other/detailArsip")));
+const Pesanan = Loadable(lazy(() => import("../views/other/pesanan")));
+const DetailPesanan = Loadable(
+  lazy(() => import("../views/other/detailPesanan"))
+);
 // const Laporan = Loadable(lazy(() => import("../views/other/laporan")));
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -186,6 +190,22 @@ const MainRoutes = {
           element: (
             <AuthGuard>
               <DetailArsip />
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "pesanan",
+          element: (
+            <AuthGuard>
+              <Pesanan />
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "pesanan/detailpesanan/:id",
+          element: (
+            <AuthGuard>
+              <DetailPesanan />
             </AuthGuard>
           ),
         },

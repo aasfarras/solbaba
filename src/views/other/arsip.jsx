@@ -12,6 +12,8 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  CircularProgress,
+  Box,
 } from "@mui/material";
 import { IconClipboardList, IconEye } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
@@ -29,6 +31,7 @@ const Pesanan = () => {
   const [currentPesananId, setCurrentPesananId] = useState(null); // Definisikan state ini
   const [errorMessage, setErrorMessage] = useState(""); // State untuk menyimpan pesan kesalahan
   const [errorDialogOpen, setErrorDialogOpen] = useState(false); // State untuk mengontrol modal kesalahan
+  const [loading, setLoading] = useState(false); // Add this line
 
   const statusTranslations = {
     received: "Diterima",
@@ -53,6 +56,7 @@ const Pesanan = () => {
   ];
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const result = await getArsip();
       const formattedData = result.data.data.map((item) => [
@@ -67,6 +71,8 @@ const Pesanan = () => {
       setData(formattedData);
     } catch (error) {
       console.error("Failed to fetch transaction data", error);
+    } finally {
+      setLoading(false); // Set loading to false after fetching
     }
   };
 
@@ -194,75 +200,88 @@ const Pesanan = () => {
 
   return (
     <>
-      <MUIDataTable
-        title={<Typography variant="h3">Pesanan</Typography>}
-        data={data}
-        columns={columns}
-        options={{
-          selectableRows: "none",
-          elevation: 0,
-          rowsPerPageOptions: [5, 10, 20, 50],
-          textLabels: {
-            body: {
-              noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
-            },
-            pagination: {
-              rowsPerPage: "Baris per Halaman",
-            },
-          },
-        }}
-      />
-      <Dialog
-        fullWidth
-        open={statusDialogOpen}
-        onClose={handleCloseStatusDialog}
-      >
-        <DialogTitle>Pilih Status Pesanan</DialogTitle>
-        <DialogContent>
-          <FormControl fullWidth>
-            <InputLabel>Status</InputLabel>
-            <Select
-              value={selectedStatus}
-              onChange={handleStatusChange}
-              label="Status"
-            >
-              {statuses.map((status) => (
-                <MenuItem key={status} value={status}>
-                  {statusTranslations[status]}{" "}
-                  {/* Menggunakan pemetaan untuk menampilkan status dalam bahasa Indonesia */}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseStatusDialog} color="primary">
-            Batal
-          </Button>
-          <Button
-            onClick={handleSubmitStatus}
-            color="primary"
-            disabled={!selectedStatus}
+      {loading ? ( // Conditional rendering for loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="70vh"
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <MUIDataTable
+            title={<Typography variant="h3">Pesanan</Typography>}
+            data={data}
+            columns={columns}
+            options={{
+              selectableRows: "none",
+              elevation: 0,
+              rowsPerPageOptions: [5, 10, 20, 50],
+              textLabels: {
+                body: {
+                  noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
+                },
+                pagination: {
+                  rowsPerPage: "Baris per Halaman",
+                },
+              },
+            }}
+          />
+          <Dialog
+            fullWidth
+            open={statusDialogOpen}
+            onClose={handleCloseStatusDialog}
           >
-            Kirim
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        fullWidth
-        open={errorDialogOpen}
-        onClose={() => setErrorDialogOpen(false)}
-      >
-        <DialogTitle>Kesalahan</DialogTitle>
-        <DialogContent>
-          <Typography>{errorMessage}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setErrorDialogOpen(false)} color="primary">
-            Tutup
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <DialogTitle>Pilih Status Pesanan</DialogTitle>
+            <DialogContent>
+              <FormControl fullWidth>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={selectedStatus}
+                  onChange={handleStatusChange}
+                  label="Status"
+                >
+                  {statuses.map((status) => (
+                    <MenuItem key={status} value={status}>
+                      {statusTranslations[status]}{" "}
+                      {/* Menggunakan pemetaan untuk menampilkan status dalam bahasa Indonesia */}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseStatusDialog} color="primary">
+                Batal
+              </Button>
+              <Button
+                onClick={handleSubmitStatus}
+                color="primary"
+                disabled={!selectedStatus}
+              >
+                Kirim
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            fullWidth
+            open={errorDialogOpen}
+            onClose={() => setErrorDialogOpen(false)}
+          >
+            <DialogTitle>Kesalahan</DialogTitle>
+            <DialogContent>
+              <Typography>{errorMessage}</Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setErrorDialogOpen(false)} color="primary">
+                Tutup
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      )}
     </>
   );
 };

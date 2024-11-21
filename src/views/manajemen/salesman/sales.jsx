@@ -11,6 +11,7 @@ import {
   TextField,
   Box,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import {
   IconPencil,
@@ -53,6 +54,7 @@ const Salesman = () => {
     useState(false);
   const [editStatusDialogOpen, setEditStatusDialogOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [loading, setLoading] = useState(false); // Add this line
 
   const statusMapping = {
     active: "Aktif",
@@ -61,6 +63,7 @@ const Salesman = () => {
   };
 
   const fetchData = async (page) => {
+    setLoading(true);
     try {
       const result = await getSalesman(page);
       const formattedData = result.data.data.map((item) => [
@@ -79,6 +82,8 @@ const Salesman = () => {
       setCurrentPage(result.data.current_page);
     } catch (error) {
       console.error("Failed to fetch salesman data", error);
+    } finally {
+      setLoading(false); // Set loading to false after fetching
     }
   };
 
@@ -177,7 +182,7 @@ const Salesman = () => {
     try {
       await updateStatusSalesman(currentSalesmanId, { status: selectedStatus });
       fetchData(currentPage); // Refresh data setelah update
-      message.success(`Akun berhasil diubah menjadi ${selectedStatus}`);
+      message.success(`Akun berhasil diubah`);
       setEditStatusDialogOpen(false); // Tutup modal setelah berhasil
     } catch (error) {
       console.error("Error changing status:", error);
@@ -214,7 +219,7 @@ const Salesman = () => {
               <Button
                 onClick={() =>
                   navigate(
-                    `/super-admin/manajemen/sales/editsales/${data[tableMeta.rowIndex][5]}`
+                    `/super-admin/manajemen/sales/editsales/${data[tableMeta.rowIndex][6]}`
                   )
                 }
                 sx={{ color: theme.palette.warning.main }}
@@ -262,174 +267,195 @@ const Salesman = () => {
 
   return (
     <>
-      <MUIDataTable
-        title={
-          <Link to="tambahsales">
-            <Button variant="contained">Tambah Produk</Button>
-          </Link>
-        }
-        data={data}
-        columns={columns}
-        options={{
-          selectableRows: "none",
-          elevation: 0,
-          rowsPerPageOptions: [5, 10, 20, 50],
-          textLabels: {
-            body: {
-              noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
-            },
-            pagination: {
-              rowsPerPage: "Baris per Halaman",
-            },
-          },
-        }}
-      />
-      <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
-        <DialogTitle variant="h5">Menghapus Salesman</DialogTitle>
-        <DialogContent>
-          Apakah Anda yakin ingin menghapus salesman ini?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteDialogClose}>Cancel</Button>
-          <Button onClick={handleDelete} color="error">
-            Hapus
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        open={resetPasswordDialogOpen}
-        onClose={() => setResetPasswordDialogOpen(false)}
-      >
-        <DialogTitle variant="h5">Atur Ulang Kata sandi</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sx={{ mt: 1 }}>
-              <TextField
-                label="Kata Sandi Baru"
-                type={showNewPassword ? "text" : "password"} // Mengubah tipe input berdasarkan state
-                fullWidth
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowNewPassword((prev) => !prev)} // Toggle visibility
-                        edge="end"
-                      >
-                        {showNewPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Konfirmasi Kata Sandi"
-                type={showPasswordConfirmation ? "text" : "password"} // Mengubah tipe input berdasarkan state
-                fullWidth
-                value={passwordConfirmation}
-                onChange={(e) => setPasswordConfirmation(e.target.value)}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() =>
-                          setShowPasswordConfirmation((prev) => !prev)
-                        } // Toggle visibility
-                        edge="end"
-                      >
-                        {showPasswordConfirmation ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setResetPasswordDialogOpen(false)}>
-            Batal
-          </Button>
-          <Button onClick={handleResetPassword} color="primary">
-            Atur Ulang Kata Sandi
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        open={resetAccountDialogOpen}
-        onClose={() => setResetAccountDialogOpen(false)}
-      >
-        <DialogTitle variant="h5">Atur Ulang Username and Email</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                label="Username Baru"
-                fullWidth
-                value={newUsername}
-                onChange={(e) => setNewUsername(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Email Baru"
-                type="email"
-                fullWidth
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setResetAccountDialogOpen(false)}>
-            Batal
-          </Button>
-          <Button onClick={handleResetAccount} color="primary">
-            Mengatur Ulang Akun
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={editStatusDialogOpen}
-        onClose={() => setEditStatusDialogOpen(false)}
-      >
-        <DialogTitle variant="h5">Edit Status Akun</DialogTitle>
-        <DialogContent>
-          <TextField
-            select
-            label="edit status"
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            sx={{ width: "300px" }}
-            fullWidth
+      {loading ? ( // Conditional rendering for loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="70vh"
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <MUIDataTable
+            title={
+              <Link to="tambahsales">
+                <Button variant="contained">Tambah Sales</Button>
+              </Link>
+            }
+            data={data}
+            columns={columns}
+            options={{
+              selectableRows: "none",
+              elevation: 0,
+              rowsPerPageOptions: [5, 10, 20, 50],
+              textLabels: {
+                body: {
+                  noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
+                },
+                pagination: {
+                  rowsPerPage: "Baris per Halaman",
+                },
+              },
+            }}
+          />
+          <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
+            <DialogTitle variant="h5">Menghapus Salesman</DialogTitle>
+            <DialogContent>
+              Apakah Anda yakin ingin menghapus salesman ini?
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+              <Button onClick={handleDelete} color="error">
+                Hapus
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={resetPasswordDialogOpen}
+            onClose={() => setResetPasswordDialogOpen(false)}
           >
-            {[
-              { key: "active", value: "Aktif" },
-              { key: "suspended", value: "Menangguhkan" },
-              { key: "inactive", value: "Tidak Aktif" },
-            ].map((status) => (
-              <MenuItem key={status.key} value={status.key}>
-                {status.value}
-              </MenuItem>
-            ))}
-          </TextField>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditStatusDialogOpen(false)}>Batal</Button>
-          <Button onClick={handleChangeStatus} color="primary">
-            Simpan
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <DialogTitle variant="h5">Atur Ulang Kata sandi</DialogTitle>
+            <DialogContent>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    label="Kata Sandi Baru"
+                    type={showNewPassword ? "text" : "password"} // Mengubah tipe input berdasarkan state
+                    fullWidth
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowNewPassword((prev) => !prev)} // Toggle visibility
+                            edge="end"
+                          >
+                            {showNewPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Konfirmasi Kata Sandi"
+                    type={showPasswordConfirmation ? "text" : "password"} // Mengubah tipe input berdasarkan state
+                    fullWidth
+                    value={passwordConfirmation}
+                    onChange={(e) => setPasswordConfirmation(e.target.value)}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() =>
+                              setShowPasswordConfirmation((prev) => !prev)
+                            } // Toggle visibility
+                            edge="end"
+                          >
+                            {showPasswordConfirmation ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setResetPasswordDialogOpen(false)}>
+                Batal
+              </Button>
+              <Button onClick={handleResetPassword} color="primary">
+                Atur Ulang Kata Sandi
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={resetAccountDialogOpen}
+            onClose={() => setResetAccountDialogOpen(false)}
+          >
+            <DialogTitle variant="h5">
+              Atur Ulang Username and Email
+            </DialogTitle>
+            <DialogContent>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Username Baru"
+                    fullWidth
+                    value={newUsername}
+                    onChange={(e) => setNewUsername(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Email Baru"
+                    type="email"
+                    fullWidth
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                  />
+                </Grid>
+              </Grid>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setResetAccountDialogOpen(false)}>
+                Batal
+              </Button>
+              <Button onClick={handleResetAccount} color="primary">
+                Mengatur Ulang Akun
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog
+            open={editStatusDialogOpen}
+            onClose={() => setEditStatusDialogOpen(false)}
+          >
+            <DialogTitle variant="h5">Edit Status Akun</DialogTitle>
+            <DialogContent>
+              <TextField
+                select
+                label="edit status"
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                sx={{ width: "300px" }}
+                fullWidth
+              >
+                {[
+                  { key: "active", value: "Aktif" },
+                  { key: "suspended", value: "Menangguhkan" },
+                  { key: "inactive", value: "Tidak Aktif" },
+                ].map((status) => (
+                  <MenuItem key={status.key} value={status.key}>
+                    {status.value}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setEditStatusDialogOpen(false)}>
+                Batal
+              </Button>
+              <Button onClick={handleChangeStatus} color="primary">
+                Simpan
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      )}
     </>
   );
 };

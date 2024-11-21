@@ -24,6 +24,7 @@ import { IconLogout, IconSettings } from "@tabler/icons-react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import axios from "axios";
 import MainCard from "../../../../ui-component/cards/MainCard";
+import { message } from "antd";
 import Transitions from "../../../../ui-component/extended/Transitions";
 // import User1 from "../../../../assets/images/user.png"; // Placeholder gambar
 import Usere from "../../../../assets/images/usere.png";
@@ -171,6 +172,7 @@ const ProfileSection = () => {
     try {
       const response = await updateProfile(userData.id, userData); // Panggil service updateProfile
       if (response.code === 200) {
+        message.success("Profile berhasil diperbarui!");
         setIsEditMode(false);
       } else {
         console.error("Failed to update profile:", response.message);
@@ -184,6 +186,7 @@ const ProfileSection = () => {
     try {
       const response = await updatePassword(userData.id, passwordData);
       if (response.code === 200) {
+        message.success("Password berhasil diperbarui!");
         setPasswordData({
           old_password: "",
           password: "",
@@ -381,14 +384,15 @@ const ProfileSection = () => {
                 onChange={handleInputChange}
                 margin="normal"
               />
-              {/* <TextField
+              <TextField
                 fullWidth
                 label="No.Hp"
                 name="phone"
                 value={userData.phone}
                 onChange={handleInputChange}
                 margin="normal"
-              /> */}
+                type="number"
+              />
               <TextField
                 fullWidth
                 label="Jenis Kelamin"
@@ -412,6 +416,7 @@ const ProfileSection = () => {
                 value={userData.referralCode}
                 onChange={handleInputChange}
                 margin="normal"
+                disabled
               />
               <Stack
                 direction="row"
@@ -456,14 +461,15 @@ const ProfileSection = () => {
                 margin="normal"
                 disabled
               />
-              {/* <TextField
+              <TextField
                 fullWidth
                 label="No.Hp"
                 name="phone"
                 value={userData.phone}
                 margin="normal"
                 disabled
-              /> */}
+                type="number"
+              />
               <TextField
                 fullWidth
                 label="Gender"

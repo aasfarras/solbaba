@@ -8,19 +8,28 @@ import {
   Tooltip,
   DialogTitle,
   Typography,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Box,
   CircularProgress,
 } from "@mui/material";
-import { IconEye } from "@tabler/icons-react";
+import { IconClipboardList, IconEye } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
-import { getPesananSales } from "../../service/sales-route/pesanansales.get.service"; // Ganti dengan path yang sesuai
+import { getPesanan } from "../../service/pesanan/pesanan.get.service"; // Ganti dengan path yang sesuai
 import { useNavigate } from "react-router-dom";
-import { getPesananSalesById } from "../../service/sales-route/pesanansales.getSpesifik.service";
+import { updatePesanan } from "../../service/pesanan/pesanan.update.service"; // Ganti dengan path yang sesuai
+import { getPesananById } from "../../service/pesanan/pesanan.getSpesifik.service";
+import { message } from "antd";
 
 const Pesanan = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [currentPesananId, setCurrentPesananId] = useState(null); // Definisikan state ini
   const [errorMessage, setErrorMessage] = useState(""); // State untuk menyimpan pesan kesalahan
   const [errorDialogOpen, setErrorDialogOpen] = useState(false); // State untuk mengontrol modal kesalahan
   const [loading, setLoading] = useState(false); // Add this line
@@ -36,10 +45,21 @@ const Pesanan = () => {
     returned: "Dikembalikan",
   };
 
+  const statuses = [
+    "received",
+    "pending_payment",
+    "payment_verified",
+    "processing",
+    "shipped",
+    "completed",
+    "canceled",
+    "returned",
+  ];
+
   const fetchData = async () => {
     setLoading(true);
     try {
-      const result = await getPesananSales();
+      const result = await getPesanan();
       const formattedData = result.data.map((item) => [
         item.transaction_code,
         item.customer_name,
@@ -67,8 +87,8 @@ const Pesanan = () => {
 
     try {
       // Panggil fungsi untuk mendapatkan detail pesanan berdasarkan ID
-      await getPesananSalesById(PesananId); // Ganti dengan fungsi yang sesuai untuk mendapatkan detail
-      navigate(`/sales/menu/pesanan/detailpesanan/${PesananId}`);
+      await getPesananById(PesananId); // Ganti dengan fungsi yang sesuai untuk mendapatkan detail
+      navigate(`/super-admin/other/pesanan/detailpesanan/${PesananId}`);
     } catch (error) {
       // Tangkap kesalahan dan simpan pesan kesalahan
       if (error.response && error.response.data) {
@@ -86,6 +106,32 @@ const Pesanan = () => {
       currency: "IDR",
       minimumFractionDigits: 0,
     }).format(price);
+  };
+
+  const handleOpenStatusDialog = (rowIndex) => {
+    const rowData = data[rowIndex];
+    setCurrentPesananId(rowData[6]);
+    setStatusDialogOpen(true);
+  };
+
+  const handleCloseStatusDialog = () => {
+    setStatusDialogOpen(false);
+  };
+
+  const handleStatusChange = (event) => {
+    setSelectedStatus(event.target.value);
+  };
+
+  const handleSubmitStatus = async () => {
+    try {
+      await updatePesanan(currentPesananId, { status: selectedStatus });
+      message.success("Status telah di ubah");
+      // Refresh data setelah update
+      fetchData();
+      handleCloseStatusDialog();
+    } catch (error) {
+      console.error("Failed to update transaction status", error);
+    }
   };
 
   const columns = [
@@ -127,13 +173,16 @@ const Pesanan = () => {
     },
     {
       name: "Actions",
-      label: "Aksi",
+      label: " Aksi",
       options: {
         filter: false,
         sort: false,
         customBodyRender: (value, tableMeta) => {
+          const rowData = data[tableMeta.rowIndex];
+          const status = rowData[4]; // Ambil status dari data
+
           return (
-            <>
+            <Box display="flex" gap={0.25}>
               <Tooltip title="Detail">
                 <span>
                   <Button
@@ -144,7 +193,15 @@ const Pesanan = () => {
                   </Button>
                 </span>
               </Tooltip>
-            </>
+              <Tooltip title="Status">
+                <Button
+                  onClick={() => handleOpenStatusDialog(tableMeta.rowIndex)}
+                  sx={{ color: theme.palette.warning.main }}
+                >
+                  <IconClipboardList />
+                </Button>
+              </Tooltip>
+            </Box>
           );
         },
       },
@@ -163,7 +220,7 @@ const Pesanan = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <Box sx={{ pb: 8 }}>
+        <>
           <MUIDataTable
             title={<Typography variant="h3">Pesanan</Typography>}
             data={data}
@@ -184,6 +241,38 @@ const Pesanan = () => {
           />
           <Dialog
             fullWidth
+            open={statusDialogOpen}
+            onClose={handleCloseStatusDialog}
+          >
+            <DialogTitle>Pilih Status Pesanan</DialogTitle>
+            <DialogContent>
+              <FormControl fullWidth>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={selectedStatus}
+                  onChange={handleStatusChange}
+                  label="Status"
+                >
+                  {statuses.map((status) => (
+                    <MenuItem key={status} value={status}>
+                      {statusTranslations[status]}{" "}
+                      {/* Menggunakan pemetaan untuk menampilkan status dalam bahasa Indonesia */}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseStatusDialog} color="primary">
+                Batal
+              </Button>
+              <Button onClick={handleSubmitStatus} color="primary">
+                Kirim
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            fullWidth
             open={errorDialogOpen}
             onClose={() => setErrorDialogOpen(false)}
           >
@@ -197,7 +286,7 @@ const Pesanan = () => {
               </Button>
             </DialogActions>
           </Dialog>
-        </Box>
+        </>
       )}
     </>
   );

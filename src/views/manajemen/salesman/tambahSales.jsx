@@ -23,6 +23,7 @@ const TambahSales = () => {
     password: "",
     password_confirmation: "",
     referral_code: "",
+    phone: "",
   });
 
   const handleSubmit = async () => {

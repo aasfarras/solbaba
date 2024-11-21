@@ -8,10 +8,12 @@ import {
   Tooltip,
   DialogTitle,
   Typography,
+  Box,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
+  CircularProgress,
 } from "@mui/material";
 import { IconClipboardList, IconEye } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
@@ -28,6 +30,7 @@ const Customer = () => {
   const [currentCustomerId, setCurrentCustomerId] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false); // Add this line
 
   const statusTranslations = {
     active: "Aktif",
@@ -37,6 +40,7 @@ const Customer = () => {
   const statuses = ["active", "inactive"];
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const result = await getCustomer();
       const formattedData = result.data.data.map((item) => [
@@ -51,6 +55,8 @@ const Customer = () => {
       setData(formattedData);
     } catch (error) {
       console.error("Failed to fetch customer data", error);
+    } finally {
+      setLoading(false); // Set loading to false after fetching
     }
   };
 
@@ -113,24 +119,37 @@ const Customer = () => {
 
   return (
     <>
-      <MUIDataTable
-        title={<Typography variant="h3">Pelanggan</Typography>}
-        data={data}
-        columns={columns}
-        options={{
-          selectableRows: "none",
-          elevation: 0,
-          rowsPerPageOptions: [5, 10, 20, 50],
-          textLabels: {
-            body: {
-              noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
-            },
-            pagination: {
-              rowsPerPage: "Baris per Halaman",
-            },
-          },
-        }}
-      />
+      {loading ? ( // Conditional rendering for loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="70vh"
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <MUIDataTable
+            title={<Typography variant="h3">Pelanggan</Typography>}
+            data={data}
+            columns={columns}
+            options={{
+              selectableRows: "none",
+              elevation: 0,
+              rowsPerPageOptions: [5, 10, 20, 50],
+              textLabels: {
+                body: {
+                  noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
+                },
+                pagination: {
+                  rowsPerPage: "Baris per Halaman",
+                },
+              },
+            }}
+          />
+        </>
+      )}
     </>
   );
 };

@@ -7,6 +7,8 @@ import {
   DialogContent,
   Tooltip,
   DialogTitle,
+  CircularProgress,
+  Box,
 } from "@mui/material";
 import { IconPencil, IconTrash, IconEye } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
@@ -55,6 +57,7 @@ const Product = () => {
   const [perPage, setPerPage] = useState(100); // Default 10 baris per halaman
   const [currentPage, setCurrentPage] = useState(1); // Default ke halaman 1
   const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false); // Add this line
 
   const fetchCategories = async () => {
     try {
@@ -75,6 +78,7 @@ const Product = () => {
 
   // Fetch data kategori dari API
   const fetchData = async (page) => {
+    setLoading(true);
     try {
       const result = await getProduct(page);
       const formattedData = result.data.data.map((item) => {
@@ -104,6 +108,8 @@ const Product = () => {
       setCurrentPage(result.data.current_page);
     } catch (error) {
       console.error("Failed to fetch product data", error);
+    } finally {
+      setLoading(false); // Set loading to false after fetching
     }
   };
 
@@ -372,49 +378,62 @@ const Product = () => {
 
   return (
     <>
-      <MUIDataTable
-        title={
-          <Link to="tambahproduk">
-            <Button variant="contained">Tambah Produk</Button>
-          </Link>
-        }
-        data={data}
-        columns={columns}
-        options={{
-          selectableRows: "none",
-          elevation: 0,
-          // pagination: false,
-          // rowsPerPage: perPage,
-          rowsPerPageOptions: [5, 10, 20, 50, 100],
-          textLabels: {
-            body: {
-              noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
-            },
-            pagination: {
-              rowsPerPage: "Baris per Halaman",
-            },
-          },
-          // onChangeRowsPerPage: (newPerPage) => {
-          //   setPerPage(newPerPage);
-          //   fetchData(1); // Reset ke halaman 1 saat mengubah perPage
-          // },
-          // onChangePage: (newPage) => {
-          //   fetchData(newPage + 1); // MUIDataTable menggunakan 0-indexed, jadi tambahkan 1
-          // },
-        }}
-      />
-      <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
-        <DialogTitle variant="h5">Hapus Kategori</DialogTitle>
-        <DialogContent>
-          Apakah Anda yakin ingin menghapus produk ini?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteDialogClose}>Batal</Button>
-          <Button onClick={handleDelete} color="error">
-            Hapus
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {loading ? ( // Conditional rendering for loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="70vh"
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <MUIDataTable
+            title={
+              <Link to="tambahproduk">
+                <Button variant="contained">Tambah Produk</Button>
+              </Link>
+            }
+            data={data}
+            columns={columns}
+            options={{
+              selectableRows: "none",
+              elevation: 0,
+              // pagination: false,
+              // rowsPerPage: perPage,
+              rowsPerPageOptions: [5, 10, 20, 50, 100],
+              textLabels: {
+                body: {
+                  noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
+                },
+                pagination: {
+                  rowsPerPage: "Baris per Halaman",
+                },
+              },
+              // onChangeRowsPerPage: (newPerPage) => {
+              //   setPerPage(newPerPage);
+              //   fetchData(1); // Reset ke halaman 1 saat mengubah perPage
+              // },
+              // onChangePage: (newPage) => {
+              //   fetchData(newPage + 1); // MUIDataTable menggunakan 0-indexed, jadi tambahkan 1
+              // },
+            }}
+          />
+          <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
+            <DialogTitle variant="h5">Hapus Kategori</DialogTitle>
+            <DialogContent>
+              Apakah Anda yakin ingin menghapus produk ini?
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleDeleteDialogClose}>Batal</Button>
+              <Button onClick={handleDelete} color="error">
+                Hapus
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      )}
     </>
   );
 };

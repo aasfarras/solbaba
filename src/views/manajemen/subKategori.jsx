@@ -9,6 +9,8 @@ import {
   Tooltip,
   MenuItem,
   DialogTitle,
+  CircularProgress,
+  Box,
 } from "@mui/material";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
@@ -17,6 +19,7 @@ import { getKategori } from "../../service/kategori/kategori.get.service";
 import { postSubKategori } from "../../service/subKategori/subKategori.post.service";
 import { updateSubKategori } from "../../service/subKategori/subKategori.update.service"; // Import service update
 import { deleteSubKategori } from "../../service/subKategori/subKategori.delete.service";
+import { message } from "antd";
 
 const SubKategori = () => {
   const theme = useTheme();
@@ -32,8 +35,10 @@ const SubKategori = () => {
   const [selectedSubKategoriId, setSelectedSubKategoriId] = useState(null); // To store the selected sub kategori ID
   const [currentRowIndex, setCurrentRowIndex] = useState(null); // Missing state to track the row index for deletion
   const [currentCategoryId, setCurrentCategoryId] = useState(null);
+  const [loading, setLoading] = useState(false); // Add this line
 
   const fetchData = async () => {
+    setLoading(true); // Set loading to true before fetching
     try {
       const response = await getSubKategori();
       const formattedData = response.data.map((subcat) => ({
@@ -45,6 +50,8 @@ const SubKategori = () => {
       setData(formattedData);
     } catch (error) {
       console.error("Error fetching subkategori:", error);
+    } finally {
+      setLoading(false); // Set loading to false after fetching
     }
   };
 
@@ -87,6 +94,7 @@ const SubKategori = () => {
           category_id: formData.categoryId,
         };
         await postSubKategori(newSubCategory);
+        message.success("Sub Kategori berhasil ditambahkan!");
         fetchData();
       } catch (error) {
         console.error("Error creating subkategori:", error);
@@ -98,6 +106,7 @@ const SubKategori = () => {
           category_id: formData.categoryId,
         };
         await updateSubKategori(selectedSubKategoriId, updatedSubCategory); // Update dengan ID dan data baru
+        message.success("Sub Kategori berhasil diperbarui!");
         fetchData();
       } catch (error) {
         console.error("Error updating subkategori:", error);
@@ -122,6 +131,7 @@ const SubKategori = () => {
   const handleDelete = async () => {
     try {
       await deleteSubKategori(currentCategoryId); // Use the correct ID for deletion
+      message.success("Kategori berhasil dihapus!");
       const updatedData = data.filter((_, index) => index !== currentRowIndex);
       setData(updatedData);
       setDeleteDialogOpen(false);
@@ -169,81 +179,94 @@ const SubKategori = () => {
 
   return (
     <>
-      <MUIDataTable
-        title={
-          <Button
-            onClick={handleCreate}
-            variant="contained"
-            sx={{
-              backgroundColor: theme.palette.secondary.main,
-              "&:hover": {
-                background: theme.palette.error.light,
+      {loading ? ( // Conditional rendering for loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="70vh"
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <MUIDataTable
+            title={
+              <Button
+                onClick={handleCreate}
+                variant="contained"
+                sx={{
+                  backgroundColor: theme.palette.secondary.main,
+                  "&:hover": {
+                    background: theme.palette.error.light,
+                  },
+                }}
+              >
+                Tambah Sub Kategori
+              </Button>
+            }
+            data={data}
+            columns={columns}
+            options={{
+              selectableRows: "none",
+              elevation: 0,
+              rowsPerPage: 10,
+              rowsPerPageOptions: [5, 10, 20, 50, 100],
+              textLabels: {
+                body: {
+                  noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
+                },
+                pagination: {
+                  rowsPerPage: "Baris per Halaman",
+                },
               },
             }}
-          >
-            Tambah Sub Kategori
-          </Button>
-        }
-        data={data}
-        columns={columns}
-        options={{
-          selectableRows: "none",
-          elevation: 0,
-          rowsPerPage: 10,
-          rowsPerPageOptions: [5, 10, 20, 50, 100],
-          textLabels: {
-            body: {
-              noMatch: "Maaf, tidak ada catatan yang cocok ditemukan", // Ubah pesan di sini
-            },
-            pagination: {
-              rowsPerPage: "Baris per Halaman",
-            },
-          },
-        }}
-      />
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle variant="h5">Edit Sub Kategori</DialogTitle>
-        <DialogContent sx={{ minWidth: "400px" }}>
-          <TextField
-            label="Nama Sub Kategori"
-            name="subKategoriName"
-            value={formData.subKategoriName}
-            onChange={handleInputChange}
-            sx={{ mb: "10px", mt: 2 }}
-            fullWidth
           />
-          <TextField
-            select
-            label="Kategori"
-            name="categoryId"
-            value={formData.categoryId}
-            onChange={handleInputChange}
-            fullWidth
-          >
-            {categories.map((category) => (
-              <MenuItem key={category.id} value={category.id}>
-                {category.category_name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Batal</Button>
-          <Button onClick={handleSave}>Simpan</Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
-        <DialogTitle variant="h5">Hapus Sub Kategori</DialogTitle>
-        <DialogContent>
-          Apakah Anda yakin ingin menghapus sub kategori ini?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteDialogClose}>Batal</Button>
-          <Button onClick={handleDelete} color="error">
-            Hapus
-          </Button>
-        </DialogActions>
-      </Dialog>
+          <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+            <DialogTitle variant="h5">Edit Sub Kategori</DialogTitle>
+            <DialogContent sx={{ minWidth: "400px" }}>
+              <TextField
+                label="Nama Sub Kategori"
+                name="subKategoriName"
+                value={formData.subKategoriName}
+                onChange={handleInputChange}
+                sx={{ mb: "10px", mt: 2 }}
+                fullWidth
+              />
+              <TextField
+                select
+                label="Kategori"
+                name="categoryId"
+                value={formData.categoryId}
+                onChange={handleInputChange}
+                fullWidth
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.category_name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setDialogOpen(false)}>Batal</Button>
+              <Button onClick={handleSave}>Simpan</Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
+            <DialogTitle variant="h5">Hapus Sub Kategori</DialogTitle>
+            <DialogContent>
+              Apakah Anda yakin ingin menghapus sub kategori ini?
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleDeleteDialogClose}>Batal</Button>
+              <Button onClick={handleDelete} color="error">
+                Hapus
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      )}
     </>
   );
 };

@@ -27,7 +27,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff"; // Tambahkan ini
 const EarningCard = ({ isLoading }) => {
   const theme = useTheme();
 
-  const [timeValue, setTimeValue] = React.useState("monthly"); // Default ke bulanan
+  const [timeValue, setTimeValue] = React.useState("daily"); // Default ke bulanan
   const [incomeData, setIncomeData] = useState({
     daily: 0,
     weekly: 0,
@@ -35,7 +35,6 @@ const EarningCard = ({ isLoading }) => {
     annual: 0,
   });
   const [loading, setLoading] = useState(true); // State untuk loading
-  const [isVisible, setIsVisible] = useState(false); // State untuk visibilitas nominal
 
   const handleChangeTime = (value) => {
     setTimeValue(value);
@@ -153,33 +152,14 @@ const EarningCard = ({ isLoading }) => {
                             mb: 1.1,
                           }}
                         >
-                          {isVisible
-                            ? timeValue === "daily"
-                              ? `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.daily)}`
-                              : timeValue === "weekly"
-                                ? `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.weekly)}`
-                                : timeValue === "monthly"
-                                  ? `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.monthly)}`
-                                  : `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.annual)}`
-                            : "****"}
+                          {timeValue === "daily"
+                            ? `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.daily)}`
+                            : timeValue === "weekly"
+                              ? `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.weekly)}`
+                              : timeValue === "monthly"
+                                ? `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.monthly)}`
+                                : `Rp ${new Intl.NumberFormat("id-ID").format(incomeData.annual)}`}
                         </Typography>
-                      </Grid>
-                      <Grid item>
-                        <Avatar
-                          sx={{
-                            ...theme.typography.smallAvatar,
-                            cursor: "pointer",
-                            bgcolor: "primary.200",
-                            color: "primary.dark",
-                          }}
-                          onClick={() => setIsVisible(!isVisible)} // Toggle visibility
-                        >
-                          {isVisible ? (
-                            <VisibilityOff fontSize="inherit" />
-                          ) : (
-                            <Visibility fontSize="inherit" />
-                          )}
-                        </Avatar>
                       </Grid>
                       <Grid item xs={12}>
                         <Typography

@@ -12,6 +12,7 @@ export const postSalesman = async (salesmanData) => {
         email: salesmanData.email,
         gender: salesmanData.gender,
         address: salesmanData.address,
+        phone: salesmanData.phone,
         referral_code: salesmanData.referral_code,
         password: salesmanData.password,
         password_confirmation: salesmanData.password_confirmation,

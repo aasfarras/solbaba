@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getArsipAdminById } from "../../service/admin/arsip.detail.service"; // Import the new service
-import { updateDonePesanan } from "../../service/admin/pesanan.doneUpdate.service"; // Ganti dengan path yang sesuai
+import { getPesananById } from "../../service/pesanan/pesanan.getSpesifik.service"; // Import the new service
+import { updateDonePesanan } from "../../service/pesanan/pesanan.doneUpdate.service"; // Ganti dengan path yang sesuai
 import {
   Box,
   Typography,
@@ -18,7 +18,7 @@ import {
 import MainCard from "../../ui-component/cards/MainCard";
 import { Image, message } from "antd";
 
-const DetailArsip = () => {
+const DetailPesanan = () => {
   const { id } = useParams(); // Get the transaction ID from the URL
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState(null);
@@ -28,7 +28,7 @@ const DetailArsip = () => {
   const fetchTransactionDetails = async () => {
     setLoading(true);
     try {
-      const data = await getArsipAdminById(id); // Use the service to fetch transaction details
+      const data = await getPesananById(id); // Use the service to fetch transaction details
       setTransaction(data);
     } catch (error) {
       setError("Failed to fetch transaction details");
@@ -200,4 +200,4 @@ const DetailArsip = () => {
   );
 };
 
-export default DetailArsip;
+export default DetailPesanan;

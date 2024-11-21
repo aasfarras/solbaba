@@ -26,6 +26,7 @@ const DetailPesanan = () => {
   const [error, setError] = useState(null);
 
   const fetchTransactionDetails = async () => {
+    setLoading(true);
     try {
       const data = await getPesananById(id); // Use the service to fetch transaction details
       setTransaction(data);
@@ -63,7 +64,6 @@ const DetailPesanan = () => {
     fetchTransactionDetails(); // Fetch transaction details
   }, [id]);
 
-  if (loading) return <CircularProgress />;
   if (error)
     return (
       <Typography variant="h6" color="error">
@@ -72,123 +72,136 @@ const DetailPesanan = () => {
     );
 
   return (
-    <MainCard title="Detail Pesanan">
-      <Box>
-        <TableContainer>
-          <Table>
-            <TableBody>
-              <TableRow>
-                <TableCell>Kode Pesanan</TableCell>
-                <TableCell>{transaction.data.transaction_code}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Nama Pelanggan</TableCell>
-                <TableCell>{transaction.data.customer_name}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Alamat Pelanggan</TableCell>
-                <TableCell>{transaction.data.customer_address}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Metode Pengambilan</TableCell>
-                <TableCell>{transaction.data.pickup_method}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Status</TableCell>
-                <TableCell>
-                  {statusTranslations[transaction.data.status] ||
-                    transaction.data.status}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Total Harga</TableCell>
-                <TableCell>
-                  {new Intl.NumberFormat("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  }).format(transaction.data.total_price)}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Catatan</TableCell>
-                <TableCell>{transaction.data.note}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Kode Referral</TableCell>
-                <TableCell>{transaction.data.referral_code}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Tanggal Pesanan</TableCell>
-                <TableCell>
-                  {new Date(transaction.data.created_at).toLocaleString(
-                    "id-ID",
-                    {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: false,
-                    }
-                  )}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Daftar Item</TableCell>
-                <TableCell>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Nama Produk</TableCell>
-                        <TableCell>Kategori Produk</TableCell>
-                        <TableCell>Sub Kategori Produk</TableCell>
-                        <TableCell>Jumlah</TableCell>
-                        <TableCell>Harga</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {transaction.data.order_items.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell>{item.product_name}</TableCell>
-                          <TableCell>{item.product_category}</TableCell>
-                          <TableCell>
-                            {item.product_subcategory || "-"}
-                          </TableCell>
-                          <TableCell>{item.quantity}</TableCell>
-                          <TableCell>
-                            {new Intl.NumberFormat("id-ID", {
-                              style: "currency",
-                              currency: "IDR",
-                            }).format(item.price)}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Grid
-          container
-          justifyContent="space-between"
-          alignItems="flex-end"
-          sx={{ mt: 2 }}
+    <>
+      {loading ? ( // Conditional rendering for loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="70vh"
         >
-          <Grid item>
-            <Button variant="outlined" onClick={() => navigate(-1)}>
-              Kembali
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button variant="contained" onClick={handleSave}>
-              Simpan
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
-    </MainCard>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <MainCard title="Detail Pesanan">
+          <Box>
+            <TableContainer>
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Kode Pesanan</TableCell>
+                    <TableCell>{transaction.data.transaction_code}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Nama Pelanggan</TableCell>
+                    <TableCell>{transaction.data.customer_name}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Alamat Pelanggan</TableCell>
+                    <TableCell>{transaction.data.customer_address}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Metode Pengambilan</TableCell>
+                    <TableCell>{transaction.data.pickup_method}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Status</TableCell>
+                    <TableCell>
+                      {statusTranslations[transaction.data.status] ||
+                        transaction.data.status}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Total Harga</TableCell>
+                    <TableCell>
+                      {new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR",
+                      }).format(transaction.data.total_price)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Catatan</TableCell>
+                    <TableCell>{transaction.data.note}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Kode Referral</TableCell>
+                    <TableCell>{transaction.data.referral_code}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Tanggal Pesanan</TableCell>
+                    <TableCell>
+                      {new Date(transaction.data.created_at).toLocaleString(
+                        "id-ID",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: false,
+                        }
+                      )}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Daftar Item</TableCell>
+                    <TableCell>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Nama Produk</TableCell>
+                            <TableCell>Kategori Produk</TableCell>
+                            <TableCell>Sub Kategori Produk</TableCell>
+                            <TableCell>Jumlah</TableCell>
+                            <TableCell>Harga</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {transaction.data.order_items.map((item) => (
+                            <TableRow key={item.id}>
+                              <TableCell>{item.product_name}</TableCell>
+                              <TableCell>{item.product_category}</TableCell>
+                              <TableCell>
+                                {item.product_subcategory || "-"}
+                              </TableCell>
+                              <TableCell>{item.quantity}</TableCell>
+                              <TableCell>
+                                {new Intl.NumberFormat("id-ID", {
+                                  style: "currency",
+                                  currency: "IDR",
+                                }).format(item.price)}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Grid
+              container
+              justifyContent="space-between"
+              alignItems="flex-end"
+              sx={{ mt: 2 }}
+            >
+              <Grid item>
+                <Button variant="outlined" onClick={() => navigate(-1)}>
+                  Kembali
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button variant="contained" onClick={handleSave}>
+                  Simpan
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+        </MainCard>
+      )}
+    </>
   );
 };
 

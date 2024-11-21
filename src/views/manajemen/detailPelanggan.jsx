@@ -23,6 +23,7 @@ const DetailPelanggan = () => {
   const [error, setError] = useState(null);
 
   const fetchCustomerDetails = async () => {
+    setLoading(true);
     try {
       const data = await getCustomerById(id); // Use the service to fetch customer details
       setCustomer(data);
@@ -37,7 +38,6 @@ const DetailPelanggan = () => {
     fetchCustomerDetails(); // Fetch customer details when the component mounts
   }, [id]);
 
-  if (loading) return <CircularProgress />;
   if (error)
     return (
       <Typography variant="h6" color="error">
@@ -46,56 +46,69 @@ const DetailPelanggan = () => {
     );
 
   return (
-    <MainCard title="Detail Pelanggan">
-      <Box>
-        <TableContainer>
-          <Table>
-            <TableBody>
-              <TableRow>
-                <TableCell>Nama Pelanggan</TableCell>
-                <TableCell>{customer.data.customer_name}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Email</TableCell>
-                <TableCell>{customer.data.customer_email}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Telepon</TableCell>
-                <TableCell>{customer.data.phone}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Jenis Kelamin</TableCell>
-                <TableCell>{customer.data.gender}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Alamat</TableCell>
-                <TableCell>{customer.data.customer_address}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Tanggal Lahir</TableCell>
-                <TableCell>{customer.data.date_of_birth}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Tanggal Bergabung</TableCell>
-                <TableCell>
-                  {new Date(customer.data.created_at).toLocaleDateString(
-                    "id-ID"
-                  )}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => navigate(-1)} // Navigate back
-            sx={{ mt: 5 }} // Optional: Add some margin
-          >
-            Kembali
-          </Button>
-        </TableContainer>
-      </Box>
-    </MainCard>
+    <>
+      {loading ? ( // Conditional rendering for loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="70vh"
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <MainCard title="Detail Pelanggan">
+          <Box>
+            <TableContainer>
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Nama Pelanggan</TableCell>
+                    <TableCell>{customer.data.customer_name}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Email</TableCell>
+                    <TableCell>{customer.data.customer_email}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Telepon</TableCell>
+                    <TableCell>{customer.data.phone}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Jenis Kelamin</TableCell>
+                    <TableCell>{customer.data.gender}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Alamat</TableCell>
+                    <TableCell>{customer.data.customer_address}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Tanggal Lahir</TableCell>
+                    <TableCell>{customer.data.date_of_birth}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Tanggal Bergabung</TableCell>
+                    <TableCell>
+                      {new Date(customer.data.created_at).toLocaleDateString(
+                        "id-ID"
+                      )}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate(-1)} // Navigate back
+                sx={{ mt: 5 }} // Optional: Add some margin
+              >
+                Kembali
+              </Button>
+            </TableContainer>
+          </Box>
+        </MainCard>
+      )}
+    </>
   );
 };
 
