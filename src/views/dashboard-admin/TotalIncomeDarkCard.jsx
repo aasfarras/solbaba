@@ -14,7 +14,9 @@ import Typography from "@mui/material/Typography";
 // project imports
 import MainCard from "../../ui-component/cards/MainCard";
 import TotalIncomeCard from "../../ui-component/cards/Skeleton/TotalIncomeCard";
-import PercentIcon from "@mui/icons-material/Percent";
+// import PercentIcon from "@mui/icons-material/Percent";
+// import { IconCashRegister } from "@tabler/icons-react";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
 // assets
 import TableChartOutlinedIcon from "@mui/icons-material/TableChartOutlined";
@@ -90,7 +92,7 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                       color: "#fff",
                     }}
                   >
-                    <PercentIcon />
+                    <AttachMoneyIcon />
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText

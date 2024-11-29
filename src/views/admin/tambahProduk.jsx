@@ -18,6 +18,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  InputAdornment,
 } from "@mui/material";
 import { Upload, message, Image } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -88,6 +89,21 @@ const TambahProduk = () => {
   //     specification: htmlOutput, // Update formData with HTML table
   //   }));
   // };
+
+  const handlePriceChange = (e) => {
+    const value = e.target.value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
+    const numericValue = value ? parseInt(value, 10) : 0; // Convert to number
+    setFormattedPrice(formatRupiah(numericValue)); // Format as Rupiah
+    setFormData({ ...formData, price: numericValue }); // Update the original price state
+  };
+
+  const formatRupiah = (amount) => {
+    const formatter = new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+    });
+    return formatter.format(amount);
+  };
 
   const handleRemoveVariant = async (index) => {
     const variantToDelete = fetchedVariants[index]; // Get the variant to delete
@@ -376,6 +392,11 @@ const TambahProduk = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, price: e.target.value })
                 }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">Rp</InputAdornment>
+                  ),
+                }}
               />
             </Grid>
 
@@ -411,6 +432,11 @@ const TambahProduk = () => {
                     additional_fee_area_2: e.target.value,
                   })
                 }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">Rp</InputAdornment>
+                  ),
+                }}
               />
             </Grid>
 

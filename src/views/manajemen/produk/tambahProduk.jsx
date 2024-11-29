@@ -18,6 +18,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  InputAdornment,
 } from "@mui/material";
 import { Upload, message, Image } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -376,6 +377,11 @@ const TambahProduk = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, price: e.target.value })
                 }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">Rp</InputAdornment>
+                  ),
+                }}
               />
             </Grid>
 
@@ -411,6 +417,11 @@ const TambahProduk = () => {
                     additional_fee_area_2: e.target.value,
                   })
                 }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">Rp</InputAdornment>
+                  ),
+                }}
               />
             </Grid>
 

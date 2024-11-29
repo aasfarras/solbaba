@@ -15,7 +15,7 @@ import {
   Box,
   CircularProgress,
 } from "@mui/material";
-import { IconClipboardList, IconEye } from "@tabler/icons-react";
+import { IconEdit, IconEye } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
 import { getPesanan } from "../../service/pesanan/pesanan.get.service"; // Ganti dengan path yang sesuai
 import { useNavigate } from "react-router-dom";
@@ -198,7 +198,7 @@ const Pesanan = () => {
                   onClick={() => handleOpenStatusDialog(tableMeta.rowIndex)}
                   sx={{ color: theme.palette.warning.main }}
                 >
-                  <IconClipboardList />
+                  <IconEdit />
                 </Button>
               </Tooltip>
             </Box>

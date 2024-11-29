@@ -18,6 +18,7 @@ import {
   TableBody,
   CircularProgress,
   Box,
+  InputAdornment,
 } from "@mui/material";
 import { Upload, message, Image } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -338,6 +339,11 @@ const EditProduk = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, price: e.target.value })
                   }
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">Rp</InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
               <Grid item xs={6} sx={{ mt: 1 }}>
@@ -372,6 +378,11 @@ const EditProduk = () => {
                       additional_fee_area_2: e.target.value,
                     })
                   }
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">Rp</InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
               <Grid item xs={6} sx={{ mt: 1 }}>

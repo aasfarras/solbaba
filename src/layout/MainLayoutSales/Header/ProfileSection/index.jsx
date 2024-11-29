@@ -258,20 +258,6 @@ const ProfileSection = () => {
                   boxShadow
                   shadow={theme.shadows[16]}
                 >
-                  <Box sx={{ p: 2, pb: 1 }}>
-                    <Stack>
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">Selamat Pagi,</Typography>
-                        <Typography
-                          component="span"
-                          variant="h4"
-                          sx={{ fontWeight: 400 }}
-                        >
-                          Sales
-                        </Typography>
-                      </Stack>
-                    </Stack>
-                  </Box>
                   <PerfectScrollbar
                     style={{
                       height: "100%",

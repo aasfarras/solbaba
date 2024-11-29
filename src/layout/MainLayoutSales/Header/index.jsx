@@ -1,79 +1,57 @@
 import PropTypes from "prop-types";
-
-// material-ui
 import { useTheme } from "@mui/material/styles";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import ButtonBase from "@mui/material/ButtonBase";
-
-// project imports
-// import LogoSection from "../LogoSection";
-import SearchSection from "./SearchSection";
-// import NotificationSection from "./NotificationSection";
+import { getProfile } from "../../../service/sales-route/profile.get.service";
 import ProfileSection from "./ProfileSection";
-
-// assets
-import { IconMenu2 } from "@tabler/icons-react";
-
-// import Logo from "../../../assets/images/WhatsApp Image 2024-07-30 at 16.01.42.jpeg";
+import { Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { message } from "antd";
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
 const Header = ({ handleLeftDrawerToggle }) => {
+  const [userData, setUserData] = useState({
+    name: "Johne Doe", // Default name
+  });
+
   const theme = useTheme();
+
+  // Fetch user profile data when the component mounts
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await getProfile();
+        if (response.code === 200) {
+          const { data } = response; // Get data from response
+          setUserData({
+            name: data.name, // Set the user's name
+          });
+        } else {
+          console.error("Failed to fetch profile:", response.message);
+          message.error("Failed to fetch profile information.");
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        message.error("Error fetching profile information.");
+      }
+    };
+
+    fetchUserData(); // Call the function to fetch user data
+  }, []); // Empty dependency array to run only once on mount
 
   return (
     <>
-      {/* logo & toggler button */}
-      {/* <Box
-        sx={{
-          width: 228,
-          display: "flex",
-          [theme.breakpoints.down("md")]: {
-            width: "auto",
-          },
-        }}
+      <Box sx={{ flexGrow: 1 }} />
+      <Typography
+        variant="h5"
+        // sx={{
+        //   fontWeight: "normal",
+        // }}
       >
-        <Box
-          component="span"
-          sx={{
-            display: { xs: "none", md: "block" },
-            flexGrow: 1,
-          }}
-        >
-          <LogoSection />
-        </Box>
-        <Avatar
-          variant="rounded"
-          sx={{
-            ...theme.typography.commonAvatar,
-            ...theme.typography.mediumAvatar,
-            transition: "all .1s linear",
-            background: theme.palette.secondary.light,
-            color: theme.palette.secondary.dark,
-            "&:hover": {
-              background: theme.palette.secondary.dark, // Tetap sama dengan default
-              color: theme.palette.secondary.light, // Tetap sama dengan default
-            },
-            "&:active": {
-              background: theme.palette.secondary.light, // Tetap sama dengan default saat klik
-              color: theme.palette.secondary.dark, // Tetap sama dengan default saat klik
-            },
-          }}
-          onClick={handleLeftDrawerToggle}
-          color="inherit"
-        >
-          <IconMenu2 stroke={1.5} size="1.3rem" />
-        </Avatar>
-      </Box> */}
+        Halo, {userData.name}
+      </Typography>
 
-      {/* header search */}
-      {/* <SearchSection /> */}
-      <Box sx={{ flexGrow: 1 }} />
-      <Box sx={{ flexGrow: 1 }} />
-
-      {/* notification & profile */}
-      {/* <NotificationSection /> */}
       <ProfileSection />
     </>
   );

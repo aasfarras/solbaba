@@ -188,7 +188,7 @@ const DetailPesanan = () => {
               sx={{ mt: 2 }}
             >
               <Grid item>
-                <Button variant="contained" onClick={() => navigate(-1)}>
+                <Button variant="containe" onClick={() => navigate(-1)}>
                   Kembali
                 </Button>
               </Grid>

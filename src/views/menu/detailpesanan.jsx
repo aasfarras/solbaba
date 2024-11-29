@@ -66,43 +66,6 @@ const DetailPesanan = () => {
                 <Table>
                   <TableBody>
                     <TableRow>
-                      <TableCell>Kode Pesanan</TableCell>
-                      <TableCell>{transaction.transaction_code}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Nama Pelanggan</TableCell>
-                      <TableCell>{transaction.customer_name}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Alamat Pelanggan</TableCell>
-                      <TableCell>{transaction.customer_address}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Metode Pengambilan</TableCell>
-                      <TableCell>{transaction.pickup_method}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Status</TableCell>
-                      <TableCell>{transaction.status}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Total Harga</TableCell>
-                      <TableCell>
-                        {new Intl.NumberFormat("id-ID", {
-                          style: "currency",
-                          currency: "IDR",
-                        }).format(transaction.total_price)}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Catatan</TableCell>
-                      <TableCell>{transaction.note}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Kode Referral</TableCell>
-                      <TableCell>{transaction.referral_code}</TableCell>
-                    </TableRow>
-                    <TableRow>
                       <TableCell>Tanggal Pesanan</TableCell>
                       <TableCell>
                         {new Date(transaction.created_at).toLocaleString(
@@ -119,39 +82,78 @@ const DetailPesanan = () => {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Daftar Item</TableCell>
+                      <TableCell>Kode Pesanan</TableCell>
+                      <TableCell>{transaction.transaction_code}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Nama Pelanggan</TableCell>
+                      <TableCell>{transaction.customer_name}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>No Telp Pelanggan</TableCell>
+                      <TableCell>{transaction.customer_phone}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Status</TableCell>
+                      <TableCell>{transaction.status}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Kode Referral</TableCell>
+                      <TableCell>{transaction.referral_code}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Alamat Pelanggan</TableCell>
+                      <TableCell>{transaction.customer_address}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Metode Pengambilan</TableCell>
+                      <TableCell>{transaction.pickup_method}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Catatan</TableCell>
+                      <TableCell>{transaction.note}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Total Harga</TableCell>
                       <TableCell>
-                        <Table>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell>Nama Produk</TableCell>
-                              <TableCell>Kategori Produk</TableCell>
-                              <TableCell>Sub Kategori Produk</TableCell>
-                              <TableCell>Jumlah</TableCell>
-                              <TableCell>Harga</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {transaction.order_items.map((item) => (
-                              <TableRow key={item.id}>
-                                <TableCell>{item.product_name}</TableCell>
-                                <TableCell>{item.product_category}</TableCell>
-                                <TableCell>
-                                  {item.product_subcategory || "-"}
-                                </TableCell>
-                                <TableCell>{item.quantity}</TableCell>
-                                <TableCell>
-                                  {new Intl.NumberFormat("id-ID", {
-                                    style: "currency",
-                                    currency: "IDR",
-                                  }).format(item.price)}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
+                        {new Intl.NumberFormat("id-ID", {
+                          style: "currency",
+                          currency: "IDR",
+                        }).format(transaction.total_price)}
                       </TableCell>
                     </TableRow>
+                  </TableBody>
+                </Table>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        colSpan={3}
+                        align="center"
+                        sx={{ fontWeight: "normal", fontSize: "15px" }}
+                      >
+                        Rincian Produk
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Nama Produk</TableCell>
+                      <TableCell>Jumlah</TableCell>
+                      <TableCell>Harga</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {transaction.order_items.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>{item.product_name}</TableCell>
+                        <TableCell>{item.quantity}</TableCell>
+                        <TableCell>
+                          {new Intl.NumberFormat("id-ID", {
+                            style: "currency",
+                            currency: "IDR",
+                          }).format(item.price)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </TableContainer>

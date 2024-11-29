@@ -224,6 +224,7 @@ const Kategori = () => {
                     label="Nama Kategori"
                     name="category_name"
                     fullWidth
+                    sx={{ width: 300 }}
                     value={formData.category_name}
                     onChange={handleInputChange}
                   />
