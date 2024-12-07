@@ -14,15 +14,23 @@ import {
   Select,
   CircularProgress,
   Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
 } from "@mui/material";
+import moment from "moment";
+import "moment/locale/id";
 import { IconClipboardList, IconEye } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
-import { getArsipAdmin } from "../../service/admin/arsip.get.service"; // Ganti dengan path yang sesuai
+import { getTransaksiSalesman } from "../../service/sales-route/transaksi.get.service"; // Ganti dengan path yang sesuai
 import { useNavigate } from "react-router-dom";
 import { updatePesanan } from "../../service/admin/pesanan.update.service"; // Ganti dengan path yang sesuai
-import { getArsipAdminById } from "../../service/admin/arsip.detail.service";
+import { getTransaksiSalesmanById } from "../../service/sales-route/transaksi.detail.service";
+import { Card } from "antd";
 
-const ArsipAdmin = () => {
+const TransaksiAdmin = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [data, setData] = useState([]);
@@ -42,6 +50,8 @@ const ArsipAdmin = () => {
     completed: "Selesai",
     canceled: "Dibatalkan",
     returned: "Dikembalikan",
+    ready_for_pickup: "Siap di Ambil",
+    picked_up: "Telah di Ambil",
   };
 
   const statuses = [
@@ -53,22 +63,25 @@ const ArsipAdmin = () => {
     "completed",
     "canceled",
     "returned",
+    "ready_for_pickup",
+    "picked_up",
   ];
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const result = await getArsipAdmin();
-      const formattedData = result.data.data.map((item) => [
-        item.transaction_code,
-        item.customer_name,
-        item.customer_address,
-        item.total_price,
-        item.status,
-        item.created_at,
-        item.id,
-      ]);
-      setData(formattedData);
+      const result = await getTransaksiSalesman();
+      setData(result.data.data);
+      // const formattedData = result.data.data.map((item) => [
+      //   item.transaction_code,
+      //   item.customer_name,
+      //   item.customer_address,
+      //   item.total_price,
+      //   item.status,
+      //   item.created_at,
+      //   item.id,
+      // ]);
+      // setData(formattedData);
     } catch (error) {
       console.error("Failed to fetch transaction data", error);
     } finally {
@@ -80,14 +93,14 @@ const ArsipAdmin = () => {
     fetchData();
   }, []);
 
-  const handleDetail = async (rowIndex) => {
-    const rowData = data[rowIndex];
-    const PesananId = rowData[6];
+  const handleDetail = async (PesananId) => {
+    // const rowData = data[rowIndex];
+    // const PesananId = rowData[6];
 
     try {
       // Panggil fungsi untuk mendapatkan detail pesanan berdasarkan ID
-      await getArsipAdminById(PesananId); // Ganti dengan fungsi yang sesuai untuk mendapatkan detail
-      navigate(`/admin/manajemen/arsip/detailarsip/${PesananId}`);
+      await getTransaksiSalesmanById(PesananId); // Ganti dengan fungsi yang sesuai untuk mendapatkan detail
+      navigate(`/sales/menu/transaksi/detailTransaksi/${PesananId}`);
     } catch (error) {
       // Tangkap kesalahan dan simpan pesan kesalahan
       if (error.response && error.response.data) {
@@ -210,8 +223,8 @@ const ArsipAdmin = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <>
-          <MUIDataTable
+        <Box sx={{ pb: 8 }}>
+          {/* <MUIDataTable
             title={<Typography variant="h3">Pesanan</Typography>}
             data={data}
             columns={columns}
@@ -226,9 +239,152 @@ const ArsipAdmin = () => {
                 pagination: {
                   rowsPerPage: "Baris per Halaman",
                 },
+                rowStyle: (data, index) => ({
+                  padding: theme.breakpoints.down("sm") ? "16px 0" : "0", // Add padding for mobile view
+                  marginBottom: theme.breakpoints.down("sm") ? "16px" : "0", // Add margin for mobile view
+                }),
               },
             }}
-          />
+          /> */}
+          {data.map((dat, index) => {
+            return (
+              <>
+                <Card
+                  key={index}
+                  style={{
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                  }}
+                  bodyStyle={{
+                    paddingBottom: 0, // Atur padding bottom menjadi 0 // Atur padding atas, kanan, dan kiri
+                    paddingRight: 0, // Atur padding bottom menjadi 0 // Atur padding atas, kanan, dan kiri
+                    overflow: "hidden",
+                  }}
+                >
+                  <TableContainer>
+                    <Table
+                      sx={{
+                        border: "none",
+                        "& .MuiTableCell-root": {
+                          border: "none",
+                          padding: "8px 16px",
+                        },
+                      }}
+                    >
+                      <TableBody>
+                        <TableRow>
+                          <TableCell
+                            sx={{
+                              whiteSpace: "nowrap", // Agar teks tidak terpotong
+                              fontSize: "14px",
+                            }}
+                          >
+                            Tanggal
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              wordBreak: "break-word", // Tentukan lebar minimum agar cell lebih konsisten
+                              textAlign: "left", // Ratakan teks ke kiri
+                              fontSize: "14px",
+                            }}
+                          >
+                            {moment(dat.created_at)
+                              .locale("id")
+                              .format("DD MMM YYYY HH:mm")}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell
+                            sx={{
+                              whiteSpace: "nowrap",
+                              fontSize: "14px",
+                            }}
+                          >
+                            Kode Pesanan
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              wordBreak: "break-word",
+                              fontSize: "14px",
+                            }}
+                          >
+                            {dat.transaction_code}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell
+                            sx={{
+                              whiteSpace: "nowrap",
+                              fontSize: "14px",
+                            }}
+                          >
+                            Nama Produk
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              wordBreak: "break-word",
+                              fontSize: "14px",
+                            }}
+                          >
+                            {dat.product_name}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell
+                            sx={{
+                              whiteSpace: "nowrap",
+                              fontSize: "14px",
+                            }}
+                          >
+                            Nama Pelanggan
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              wordBreak: "break-word",
+                              fontSize: "14px",
+                            }}
+                          >
+                            {dat.customer_name}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell
+                            sx={{
+                              whiteSpace: "nowrap",
+                              fontSize: "14px",
+                            }}
+                          >
+                            Status Pengiriman
+                          </TableCell>
+                          <TableCell sx={{ fontSize: "14px" }}>
+                            {statusTranslations[dat.status] || dat.status}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell sx={{ padding: 0 }}></TableCell>
+                          <TableCell
+                            sx={{
+                              position: "relative",
+                              textAlign: "right",
+                              fontSize: "14px",
+                            }}
+                          >
+                            <Button
+                              variant="text"
+                              onClick={() => handleDetail(dat.id)}
+                            >
+                              Lihat Selengkapnya
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Card>
+                <Box sx={{ height: 5 }}></Box>
+              </>
+            );
+          })}
           <Dialog
             fullWidth
             open={statusDialogOpen}
@@ -280,10 +436,10 @@ const ArsipAdmin = () => {
               </Button>
             </DialogActions>
           </Dialog>
-        </>
+        </Box>
       )}
     </>
   );
 };
 
-export default ArsipAdmin;
+export default TransaksiAdmin;

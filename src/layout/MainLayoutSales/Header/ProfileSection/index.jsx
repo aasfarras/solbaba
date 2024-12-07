@@ -258,59 +258,50 @@ const ProfileSection = () => {
                   boxShadow
                   shadow={theme.shadows[16]}
                 >
-                  <PerfectScrollbar
-                    style={{
-                      height: "100%",
-                      maxHeight: "calc(100vh - 250px)",
-                      overflowX: "hidden",
-                    }}
-                  >
-                    <Box sx={{ p: 2, pt: 0 }}>
-                      <Divider />
-                      <List
-                        component="nav"
-                        sx={{
-                          width: "100%",
-                          maxWidth: 350,
-                          minWidth: 300,
-                          backgroundColor: theme.palette.background.paper,
-                          borderRadius: "10px",
-                          [theme.breakpoints.down("md")]: {
-                            minWidth: "100%",
-                          },
-                          "& .MuiListItemButton-root": {
-                            mt: 0.5,
-                          },
-                        }}
+                  <Box sx={{ p: 2, pt: 0 }}>
+                    <List
+                      component="nav"
+                      sx={{
+                        width: "100%",
+                        maxWidth: 350,
+                        minWidth: 300,
+                        backgroundColor: theme.palette.background.paper,
+                        borderRadius: "10px",
+                        [theme.breakpoints.down("md")]: {
+                          minWidth: "100%",
+                        },
+                        "& .MuiListItemButton-root": {
+                          mt: 0.5,
+                        },
+                      }}
+                    >
+                      <ListItemButton
+                        selected={selectedIndex === 0}
+                        onClick={(event) => handleListItemClick(event, 0)}
                       >
-                        <ListItemButton
-                          selected={selectedIndex === 0}
-                          onClick={(event) => handleListItemClick(event, 0)}
-                        >
-                          <ListItemIcon>
-                            <IconSettings stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Typography variant="body2">
-                                Pengaturan Akun
-                              </Typography>
-                            }
-                          />
-                        </ListItemButton>
-                        <ListItemButton onClick={handleLogout}>
-                          <ListItemIcon>
-                            <IconLogout stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Typography variant="body2">Keluar</Typography>
-                            }
-                          />
-                        </ListItemButton>
-                      </List>
-                    </Box>
-                  </PerfectScrollbar>
+                        <ListItemIcon>
+                          <IconSettings stroke={1.5} size="1.3rem" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Typography variant="body2">
+                              Pengaturan Akun
+                            </Typography>
+                          }
+                        />
+                      </ListItemButton>
+                      <ListItemButton onClick={handleLogout}>
+                        <ListItemIcon>
+                          <IconLogout stroke={1.5} size="1.3rem" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Typography variant="body2">Keluar</Typography>
+                          }
+                        />
+                      </ListItemButton>
+                    </List>
+                  </Box>
                 </MainCard>
               </ClickAwayListener>
             </Paper>

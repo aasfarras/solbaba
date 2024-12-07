@@ -165,9 +165,14 @@ const ProfileSection = () => {
                 >
                   <Box sx={{ p: 2, pb: 0 }}>
                     <Stack>
-                      <Stack direction="row" spacing={0.5} alignItems="center">
+                      <Stack
+                        direction="row"
+                        spacing={0.5}
+                        alignItems="center"
+                        sx={{ mb: 1 }}
+                      >
                         <Typography variant="h4" sx={{ fontWeight: 500 }}>
-                          Selamat Datang,
+                          Halo,
                         </Typography>
                         <Typography
                           component="span"
@@ -180,52 +185,44 @@ const ProfileSection = () => {
                     </Stack>
                     <Divider />
                   </Box>
-                  <PerfectScrollbar
-                    style={{
-                      height: "100%",
-                      maxHeight: "calc(100vh - 250px)",
-                      overflowX: "hidden",
-                    }}
-                  >
-                    <Box sx={{ p: 2, pt: 0 }}>
-                      {/* <Divider /> */}
-                      <List
-                        component="nav"
+                  <Box sx={{ p: 2, pt: 0 }}>
+                    {/* <Divider /> */}
+                    <List
+                      component="nav"
+                      sx={{
+                        width: "100%",
+                        maxWidth: 350,
+                        minWidth: 300,
+                        backgroundColor: theme.palette.background.paper,
+                        borderRadius: "10px",
+                        [theme.breakpoints.down("md")]: {
+                          minWidth: "100%",
+                        },
+                        "& .MuiListItemButton-root": {
+                          mt: 0.5,
+                        },
+                      }}
+                    >
+                      <Button
+                        onClick={handleLogout}
+                        startIcon={<IconLogout stroke={1.5} size="1.3rem" />}
+                        variant="text"
+                        color="inherit"
                         sx={{
+                          borderRadius: `${customization.borderRadius}px`,
+                          textAlign: "left",
+                          padding: "12px 16px",
+                          justifyContent: "flex-start",
                           width: "100%",
-                          maxWidth: 350,
-                          minWidth: 300,
-                          backgroundColor: theme.palette.background.paper,
-                          borderRadius: "10px",
-                          [theme.breakpoints.down("md")]: {
-                            minWidth: "100%",
-                          },
-                          "& .MuiListItemButton-root": {
-                            mt: 0.5,
+                          "&:hover": {
+                            backgroundColor: theme.palette.action.hover,
                           },
                         }}
                       >
-                        <Button
-                          onClick={handleLogout}
-                          startIcon={<IconLogout stroke={1.5} size="1.3rem" />}
-                          variant="text"
-                          color="inherit"
-                          sx={{
-                            borderRadius: `${customization.borderRadius}px`,
-                            textAlign: "left",
-                            padding: "12px 16px",
-                            justifyContent: "flex-start",
-                            width: "100%",
-                            "&:hover": {
-                              backgroundColor: theme.palette.action.hover,
-                            },
-                          }}
-                        >
-                          <Typography variant="body2">Keluar</Typography>
-                        </Button>
-                      </List>
-                    </Box>
-                  </PerfectScrollbar>
+                        <Typography variant="body2">Keluar</Typography>
+                      </Button>
+                    </List>
+                  </Box>
                 </MainCard>
               </ClickAwayListener>
             </Paper>

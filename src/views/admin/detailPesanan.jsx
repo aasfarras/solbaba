@@ -38,14 +38,13 @@ const DetailPesanan = () => {
   };
 
   const statusTranslations = {
-    received: "Diterima",
-    pending_payment: "Menunggu Pembayaran",
-    payment_verified: "Pembayaran Terverifikasi",
-    processing: "Sedang Diproses",
-    shipped: "Dikirim",
-    completed: "Selesai",
-    canceled: "Dibatalkan",
-    returned: "Dikembalikan",
+    paid: "Menunggu Pembayaran",
+    unpaid: "Pembayaran Terverifikasi",
+  };
+
+  const pickupMethodTranslations = {
+    home_delivery: "Di Antarkan",
+    self_pickup: "Ambil di Tempat",
   };
 
   const handleSave = async () => {
@@ -89,6 +88,22 @@ const DetailPesanan = () => {
               <Table>
                 <TableBody>
                   <TableRow>
+                    <TableCell>Tanggal Pesanan</TableCell>
+                    <TableCell>
+                      {new Date(transaction.data.created_at).toLocaleString(
+                        "id-ID",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: false,
+                        }
+                      )}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
                     <TableCell>Kode Pesanan</TableCell>
                     <TableCell>{transaction.data.transaction_code}</TableCell>
                   </TableRow>
@@ -101,14 +116,40 @@ const DetailPesanan = () => {
                     <TableCell>{transaction.data.customer_address}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Metode Pengambilan</TableCell>
-                    <TableCell>{transaction.data.pickup_method}</TableCell>
+                    <TableCell>No Telp</TableCell>
+                    <TableCell>{transaction.data.customer_phone}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Status</TableCell>
+                    <TableCell>Nama Bank</TableCell>
+                    <TableCell>{transaction.data.bank_name}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Nomor Akun</TableCell>
+                    <TableCell>{transaction.data.account_number}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Nama Akun Bank</TableCell>
+                    <TableCell>{transaction.data.bank_account_name}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Nomor Akun Bank</TableCell>
                     <TableCell>
-                      {statusTranslations[transaction.data.status] ||
-                        transaction.data.status}
+                      {transaction.data.bank_account_number}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Metode Pengambilan</TableCell>
+                    <TableCell>
+                      {pickupMethodTranslations[
+                        transaction.data.pickup_method
+                      ] || transaction.data.pickup_method}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Status Pembayaran</TableCell>
+                    <TableCell>
+                      {statusTranslations[transaction.data.payment_status] ||
+                        transaction.data.payment_status}
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -129,38 +170,25 @@ const DetailPesanan = () => {
                     <TableCell>{transaction.data.referral_code}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Tanggal Pesanan</TableCell>
-                    <TableCell>
-                      {new Date(transaction.data.created_at).toLocaleString(
-                        "id-ID",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: false,
-                        }
-                      )}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
                     <TableCell>Daftar Item</TableCell>
                     <TableCell>
                       <Table>
                         <TableHead>
                           <TableRow>
                             <TableCell>Nama Produk</TableCell>
+                            <TableCell>Varian Produk</TableCell>
                             <TableCell>Kategori Produk</TableCell>
                             <TableCell>Sub Kategori Produk</TableCell>
-                            <TableCell>Jumlah</TableCell>
+                            <TableCell>Jumlah Barang</TableCell>
                             <TableCell>Harga</TableCell>
+                            <TableCell>Tanggal Pembelian</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                           {transaction.data.order_items.map((item) => (
                             <TableRow key={item.id}>
                               <TableCell>{item.product_name}</TableCell>
+                              <TableCell>{item.product_variant}</TableCell>
                               <TableCell>{item.product_category}</TableCell>
                               <TableCell>
                                 {item.product_subcategory || "-"}
@@ -171,6 +199,18 @@ const DetailPesanan = () => {
                                   style: "currency",
                                   currency: "IDR",
                                 }).format(item.price)}
+                              </TableCell>
+                              <TableCell>
+                                {new Date(
+                                  transaction.data.created_at
+                                ).toLocaleString("id-ID", {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: false,
+                                })}
                               </TableCell>
                             </TableRow>
                           ))}

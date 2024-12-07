@@ -35,17 +35,11 @@ const Pesanan = () => {
   const [loading, setLoading] = useState(false); // Add this line
 
   const statusTranslations = {
-    received: "Diterima",
-    pending_payment: "Menunggu Pembayaran",
-    payment_verified: "Pembayaran Terverifikasi",
-    processing: "Sedang Diproses",
-    shipped: "Dikirim",
-    completed: "Selesai",
-    canceled: "Dibatalkan",
-    returned: "Dikembalikan",
+    paid: "Menunggu Pembayaran",
+    unpaid: "Pembayaran Terverifikasi",
   };
 
-  const statuses = ["processing", "shipped", "completed"];
+  const statuses = ["paid", "unpaid"];
 
   const fetchData = async () => {
     setLoading(true);
@@ -56,7 +50,7 @@ const Pesanan = () => {
         item.customer_name,
         item.customer_address,
         item.total_price,
-        item.status,
+        item.payment_status,
         item.created_at,
         item.id,
       ]);
@@ -138,7 +132,7 @@ const Pesanan = () => {
     },
     {
       name: "status",
-      label: "Status",
+      label: "Status Pembayaran",
       options: {
         customBodyRender: (value) => {
           return statusTranslations[value] || value; // Menggunakan pemetaan untuk menampilkan status dalam bahasa Indonesia
@@ -179,23 +173,20 @@ const Pesanan = () => {
                   <Button
                     onClick={() => handleDetail(tableMeta.rowIndex)}
                     sx={{ color: theme.palette.info.main }}
-                    disabled={
-                      status !== "pending_payment" &&
-                      status !== "payment_verified"
-                    } // Disable jika status bukan "Menunggu Pembayaran" atau "Pembayaran Terverifikasi"
+                    disabled={status == "paid"} // Disable jika status bukan "Menunggu Pembayaran" atau "Pembayaran Terverifikasi"
                   >
                     <IconEye />
                   </Button>
                 </span>
               </Tooltip>
-              <Tooltip title="Status">
+              {/* <Tooltip title="Status">
                 <Button
                   onClick={() => handleOpenStatusDialog(tableMeta.rowIndex)}
                   sx={{ color: theme.palette.warning.main }}
                 >
                   <IconEdit />
                 </Button>
-              </Tooltip>
+              </Tooltip> */}
             </Box>
           );
         },

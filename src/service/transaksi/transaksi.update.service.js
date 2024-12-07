@@ -1,12 +1,12 @@
 import axios from "axios";
 
-export const updatePesanan = async (id, serviceData) => {
+export const updateTransaksi = async (id, serviceData) => {
   const token = sessionStorage.getItem("token");
   try {
     const response = await axios.put(
-      `${import.meta.env.VITE_APP_API}superadmin/order/status/${id}`,
+      `${import.meta.env.VITE_APP_API}superadmin/transaction/status/${id}`,
       {
-        payment_status: serviceData.status,
+        status: serviceData.status,
       },
       {
         headers: {

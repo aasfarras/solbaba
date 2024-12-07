@@ -43,9 +43,7 @@ const PopularCard = ({ isLoading }) => {
     setAnchorEl(null);
   };
 
-  const handleViewAll = () => {
-    navigate("/super-admin/manajemen/produk");
-  };
+  const handleViewAll = () => {};
 
   // Fetch data from API
   const fetchPopularityData = async () => {

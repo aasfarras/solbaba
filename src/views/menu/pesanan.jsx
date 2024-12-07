@@ -34,26 +34,11 @@ const Pesanan = () => {
   const [loading, setLoading] = useState(false); // Add this line
 
   const statusTranslations = {
-    received: "Diterima",
-    pending_payment: "Menunggu Pembayaran",
-    payment_verified: "Pembayaran Terverifikasi",
-    processing: "Sedang Diproses",
-    shipped: "Dikirim",
-    completed: "Selesai",
-    canceled: "Dibatalkan",
-    returned: "Dikembalikan",
+    paid: "Menunggu Pembayaran",
+    unpaid: "Pembayaran Terverifikasi",
   };
 
-  const statuses = [
-    "received",
-    "pending_payment",
-    "payment_verified",
-    "processing",
-    "shipped",
-    "completed",
-    "canceled",
-    "returned",
-  ];
+  const statuses = ["paid", "unpaid"];
 
   const handleDetail = async (PesananId) => {
     try {
@@ -308,10 +293,11 @@ const Pesanan = () => {
                               fontSize: "14px",
                             }}
                           >
-                            Status
+                            Status Pembayaran
                           </TableCell>
                           <TableCell sx={{ fontSize: "14px" }}>
-                            {statusTranslations[dat.status] || dat.status}
+                            {statusTranslations[dat.payment_status] ||
+                              dat.payment_status}
                           </TableCell>
                         </TableRow>
                         <TableRow>

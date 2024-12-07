@@ -35,8 +35,10 @@ const Pelanggan = Loadable(lazy(() => import("../views/manajemen/pelanggan")));
 const DetailPelanggan = Loadable(
   lazy(() => import("../views/manajemen/detailPelanggan"))
 );
-const Arsip = Loadable(lazy(() => import("../views/other/arsip")));
-const DetailArsip = Loadable(lazy(() => import("../views/other/detailArsip")));
+const Transaksi = Loadable(lazy(() => import("../views/other/transaksi")));
+const DetailTransaksi = Loadable(
+  lazy(() => import("../views/other/detailTransaksi"))
+);
 const Pesanan = Loadable(lazy(() => import("../views/other/pesanan")));
 const DetailPesanan = Loadable(
   lazy(() => import("../views/other/detailPesanan"))
@@ -178,18 +180,18 @@ const MainRoutes = {
       path: "other",
       children: [
         {
-          path: "arsip",
+          path: "transaksi",
           element: (
             <AuthGuard>
-              <Arsip />
+              <Transaksi />
             </AuthGuard>
           ),
         },
         {
-          path: "arsip/detailArsip/:id",
+          path: "transaksi/detailTransaksi/:id",
           element: (
             <AuthGuard>
-              <DetailArsip />
+              <DetailTransaksi />
             </AuthGuard>
           ),
         },

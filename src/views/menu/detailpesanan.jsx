@@ -24,6 +24,16 @@ const DetailPesanan = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const statusTranslations = {
+    paid: "Menunggu Pembayaran",
+    unpaid: "Pembayaran Terverifikasi",
+  };
+
+  const pickupMethodTranslations = {
+    home_delivery: "Di Antarkan",
+    self_pickup: "Ambil di Tempat",
+  };
+
   const fetchTransactionDetails = async () => {
     setLoading(true);
     try {
@@ -94,8 +104,11 @@ const DetailPesanan = () => {
                       <TableCell>{transaction.customer_phone}</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Status</TableCell>
-                      <TableCell>{transaction.status}</TableCell>
+                      <TableCell>Status Pembayaran</TableCell>
+                      <TableCell>
+                        {statusTranslations[transaction.payment_status] ||
+                          transaction.payment_status}
+                      </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Kode Referral</TableCell>
@@ -107,7 +120,10 @@ const DetailPesanan = () => {
                     </TableRow>
                     <TableRow>
                       <TableCell>Metode Pengambilan</TableCell>
-                      <TableCell>{transaction.pickup_method}</TableCell>
+                      <TableCell>
+                        {pickupMethodTranslations[transaction.pickup_method] ||
+                          transaction.pickup_method}
+                      </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Catatan</TableCell>

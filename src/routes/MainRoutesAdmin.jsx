@@ -10,9 +10,11 @@ const DashboardDefault = Loadable(
   lazy(() => import("../views/dashboard-admin"))
 );
 const Pesanan = Loadable(lazy(() => import("../views/admin/pesanan")));
-const ArsipAdmin = Loadable(lazy(() => import("../views/admin/arsipAdmin")));
-const DetailArsipAdmin = Loadable(
-  lazy(() => import("../views/admin/detailArsip"))
+const TransaksiAdmin = Loadable(
+  lazy(() => import("../views/admin/transaksiAdmin"))
+);
+const DetailTransaksiAdmin = Loadable(
+  lazy(() => import("../views/admin/detailTransaksi"))
 );
 const DetailPesanan = Loadable(
   lazy(() => import("../views/admin/detailPesanan"))
@@ -84,18 +86,18 @@ const MainRoutesAdmin = {
           ),
         },
         {
-          path: "arsip",
+          path: "transaksi",
           element: (
             <AuthGuard>
-              <ArsipAdmin />
+              <TransaksiAdmin />
             </AuthGuard>
           ),
         },
         {
-          path: "arsip/detailarsip/:id",
+          path: "transaksi/detailTransaksi/:id",
           element: (
             <AuthGuard>
-              <DetailArsipAdmin />
+              <DetailTransaksiAdmin />
             </AuthGuard>
           ),
         },

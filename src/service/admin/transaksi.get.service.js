@@ -1,11 +1,11 @@
 // kategori.service.js
 import axios from "axios";
 
-export const getArsipSalesman = async () => {
+export const getTransaksiAdmin = async () => {
   const token = sessionStorage.getItem("token");
   try {
     const response = await axios.get(
-      `${import.meta.env.VITE_APP_API}salesman/order/finished`,
+      `${import.meta.env.VITE_APP_API}admin/transaction`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -14,7 +14,7 @@ export const getArsipSalesman = async () => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error fetching Arsip data:", error);
+    console.error("Error fetching Transaksi data:", error);
     throw error;
   }
 };

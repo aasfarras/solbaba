@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getArsipById } from "../../service/Arsip/arsip.detail.service"; // Import the new service
+import { getTransaksiById } from "../../service/transaksi/transaksi.detail.service"; // Import the new service
 import { updateDonePesanan } from "../../service/admin/pesanan.doneUpdate.service"; // Ganti dengan path yang sesuai
 import {
   Box,
@@ -18,7 +18,7 @@ import {
 import MainCard from "../../ui-component/cards/MainCard";
 import { Image, message } from "antd";
 
-const DetailArsip = () => {
+const DetailTransaksi = () => {
   const { id } = useParams(); // Get the transaction ID from the URL
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState(null);
@@ -28,7 +28,7 @@ const DetailArsip = () => {
   const fetchTransactionDetails = async () => {
     setLoading(true);
     try {
-      const data = await getArsipById(id); // Use the service to fetch transaction details
+      const data = await getTransaksiById(id); // Use the service to fetch transaction details
       setTransaction(data);
     } catch (error) {
       setError("Failed to fetch transaction details");
@@ -46,6 +46,18 @@ const DetailArsip = () => {
     completed: "Selesai",
     canceled: "Dibatalkan",
     returned: "Dikembalikan",
+    ready_for_pickup: "Siap di Ambil",
+    picked_up: "Telah di Ambil",
+  };
+
+  const statusPaymentTranslations = {
+    paid: "Menunggu Pembayaran",
+    unpaid: "Pembayaran Terverifikasi",
+  };
+
+  const pickupMethodTranslations = {
+    home_delivery: "Di Antarkan",
+    self_pickup: "Ambil di Tempat",
   };
 
   const handleSave = async () => {
@@ -83,51 +95,11 @@ const DetailArsip = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <MainCard title="Detail Pesanan">
+        <MainCard title="Detail Transaksi">
           <Box>
             <TableContainer>
               <Table>
                 <TableBody>
-                  <TableRow>
-                    <TableCell>Kode Pesanan</TableCell>
-                    <TableCell>{transaction.data.transaction_code}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Nama Pelanggan</TableCell>
-                    <TableCell>{transaction.data.customer_name}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Alamat Pelanggan</TableCell>
-                    <TableCell>{transaction.data.customer_address}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Metode Pengambilan</TableCell>
-                    <TableCell>{transaction.data.pickup_method}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Status</TableCell>
-                    <TableCell>
-                      {statusTranslations[transaction.data.status] ||
-                        transaction.data.status}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Total Harga</TableCell>
-                    <TableCell>
-                      {new Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                      }).format(transaction.data.total_price)}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Catatan</TableCell>
-                    <TableCell>{transaction.data.note}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Kode Referral</TableCell>
-                    <TableCell>{transaction.data.referral_code}</TableCell>
-                  </TableRow>
                   <TableRow>
                     <TableCell>Tanggal Pesanan</TableCell>
                     <TableCell>
@@ -145,38 +117,73 @@ const DetailArsip = () => {
                     </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Daftar Item</TableCell>
+                    <TableCell>Kode Pesanan</TableCell>
+                    <TableCell>{transaction.data.transaction_code}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Nama Produk</TableCell>
+                    <TableCell>{transaction.data.product_name}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Varian Produk</TableCell>
+                    <TableCell>{transaction.data.product_variant}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Produk Kategori</TableCell>
+                    <TableCell>{transaction.data.product_category}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Produk Subkategori</TableCell>
                     <TableCell>
-                      <Table>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Nama Produk</TableCell>
-                            <TableCell>Kategori Produk</TableCell>
-                            <TableCell>Sub Kategori Produk</TableCell>
-                            <TableCell>Jumlah</TableCell>
-                            <TableCell>Harga</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {transaction.data.order_items.map((item) => (
-                            <TableRow key={item.id}>
-                              <TableCell>{item.product_name}</TableCell>
-                              <TableCell>{item.product_category}</TableCell>
-                              <TableCell>
-                                {item.product_subcategory || "-"}
-                              </TableCell>
-                              <TableCell>{item.quantity}</TableCell>
-                              <TableCell>
-                                {new Intl.NumberFormat("id-ID", {
-                                  style: "currency",
-                                  currency: "IDR",
-                                }).format(item.price)}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                      {transaction.data.product_subcategory}
                     </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Nama Pelanggan</TableCell>
+                    <TableCell>{transaction.data.customer_name}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>No Telp</TableCell>
+                    <TableCell>{transaction.data.customer_phone}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Alamat Pelanggan</TableCell>
+                    <TableCell>{transaction.data.customer_address}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Status Pengiriman</TableCell>
+                    <TableCell>
+                      {statusTranslations[transaction.data.status] ||
+                        transaction.data.status}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Status Pembayaran</TableCell>
+                    <TableCell>
+                      {statusPaymentTranslations[
+                        transaction.data.payment_status
+                      ] || transaction.data.payment_status}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Metode Pengambilan</TableCell>
+                    <TableCell>
+                      {pickupMethodTranslations[
+                        transaction.data.pickup_method
+                      ] || transaction.data.pickup_method}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Kode Referral</TableCell>
+                    <TableCell>{transaction.data.referral_code}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Nama Bank</TableCell>
+                    <TableCell>{transaction.data.bank_name}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Nomor Akun</TableCell>
+                    <TableCell>{transaction.data.account_number}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -200,4 +207,4 @@ const DetailArsip = () => {
   );
 };
 
-export default DetailArsip;
+export default DetailTransaksi;

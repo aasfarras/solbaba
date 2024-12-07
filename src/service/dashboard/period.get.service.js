@@ -14,7 +14,7 @@ export const getPeriod = async () => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error fetching Arsip data:", error);
+    console.error("Error fetching Transaksi data:", error);
     throw error;
   }
 };
