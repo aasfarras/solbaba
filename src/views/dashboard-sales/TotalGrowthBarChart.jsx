@@ -27,7 +27,7 @@ const TotalGrowthBarChart = ({ isLoading }) => {
     labels: [],
     datasets: [
       {
-        label: "Pendapatan",
+        label: "Total Omset",
         data: [],
         backgroundColor: "#52b1ff",
         borderColor: "#52b1ff",
@@ -49,7 +49,7 @@ const TotalGrowthBarChart = ({ isLoading }) => {
           labels: labels,
           datasets: [
             {
-              label: "Pendapatan",
+              label: "Total Omset",
               data: data,
               backgroundColor: "#52b1ff",
               borderColor: "#52b1ff",

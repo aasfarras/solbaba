@@ -34,6 +34,11 @@ const Pesanan = () => {
   const [errorDialogOpen, setErrorDialogOpen] = useState(false); // State untuk mengontrol modal kesalahan
   const [loading, setLoading] = useState(false); // Add this line
 
+  const statusNotaTrnaslations = {
+    0: "Belum",
+    1: "Selesai",
+  };
+
   const statusTranslations = {
     paid: "Menunggu Pembayaran",
     unpaid: "Pembayaran Terverifikasi",
@@ -52,6 +57,7 @@ const Pesanan = () => {
         item.total_price,
         item.payment_status,
         item.created_at,
+        item.review_at,
         item.id,
       ]);
       setData(formattedData);
@@ -68,7 +74,7 @@ const Pesanan = () => {
 
   const handleDetail = async (rowIndex) => {
     const rowData = data[rowIndex];
-    const PesananId = rowData[6];
+    const PesananId = rowData[7];
 
     try {
       // Panggil fungsi untuk mendapatkan detail pesanan berdasarkan ID
@@ -95,7 +101,7 @@ const Pesanan = () => {
 
   const handleOpenStatusDialog = (rowIndex) => {
     const rowData = data[rowIndex];
-    setCurrentPesananId(rowData[6]);
+    setCurrentPesananId(rowData[7]);
     setStatusDialogOpen(true);
   };
 
@@ -153,6 +159,18 @@ const Pesanan = () => {
             minute: "2-digit",
             hour12: false,
           }).format(date);
+        },
+      },
+    },
+    {
+      name: "review_at",
+      label: "Status Nota",
+      options: {
+        customBodyRender: (value) => {
+          if (value == null) {
+            return "belum";
+          } else 
+          return "selesai";
         },
       },
     },

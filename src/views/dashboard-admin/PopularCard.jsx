@@ -185,7 +185,7 @@ const PopularCard = ({ isLoading }) => {
               </Grid>
             </Grid>
           </CardContent>
-          <CardActions>
+          {/* <CardActions>
             <Button
               fullWidth
               variant="contained"
@@ -194,7 +194,7 @@ const PopularCard = ({ isLoading }) => {
             >
               Lihat Semua
             </Button>
-          </CardActions>
+          </CardActions> */}
         </MainCard>
       )}
     </>

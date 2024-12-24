@@ -4,7 +4,7 @@ export const updateDonePesanan = async (id) => {
   const token = sessionStorage.getItem("token");
   try {
     const response = await axios.put(
-      `${import.meta.env.VITE_APP_API}superadmin/order/${id}`,
+      `${import.meta.env.VITE_APP_API}superadmin/order/status/${id}`,
       {},
       {
         headers: {

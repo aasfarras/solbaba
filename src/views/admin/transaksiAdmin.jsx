@@ -73,6 +73,7 @@ const Transaksi = () => {
         item.created_at,
         item.id,
       ]);
+      console.log(formattedData);
       setData(formattedData);
     } catch (error) {
       console.error("Failed to fetch transaction data", error);

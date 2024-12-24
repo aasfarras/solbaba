@@ -35,26 +35,26 @@ const Transaksi = () => {
   const [loading, setLoading] = useState(false); // Add this line
 
   const statusTranslations = {
-    received: "Diterima",
+    delivered: "Diterima",
     pending_payment: "Menunggu Pembayaran",
     payment_verified: "Pembayaran Terverifikasi",
     processing: "Sedang Diproses",
     shipped: "Dikirim",
     completed: "Selesai",
-    canceled: "Dibatalkan",
+    cancelled: "Dibatalkan",
     returned: "Dikembalikan",
     ready_for_pickup: "Siap di Ambil",
     picked_up: "Telah di Ambil",
   };
 
   const statuses = [
-    "received",
+    "delivered",
     "pending_payment",
     "payment_verified",
     "processing",
     "shipped",
     "completed",
-    "canceled",
+    "cancelled",
     "returned",
     "ready_for_pickup",
     "picked_up",

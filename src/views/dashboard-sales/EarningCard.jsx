@@ -189,7 +189,7 @@ const EarningCard = ({ isLoading }) => {
                             color: "primary.200",
                           }}
                         >
-                          Jumlah Penghasilan
+                          Total Omset
                         </Typography>
                       </Grid>
                     </Grid>
