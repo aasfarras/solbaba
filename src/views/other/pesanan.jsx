@@ -15,7 +15,7 @@ import {
   Box,
   CircularProgress,
 } from "@mui/material";
-import { IconEdit, IconEye } from "@tabler/icons-react";
+import { IconEdit, IconEye, IconPhoto } from "@tabler/icons-react";
 import { useTheme } from "@mui/material/styles";
 import { getPesanan } from "../../service/pesanan/pesanan.get.service"; // Ganti dengan path yang sesuai
 import { useNavigate } from "react-router-dom";
@@ -33,6 +33,18 @@ const Pesanan = () => {
   const [errorMessage, setErrorMessage] = useState(""); // State untuk menyimpan pesan kesalahan
   const [errorDialogOpen, setErrorDialogOpen] = useState(false); // State untuk mengontrol modal kesalahan
   const [loading, setLoading] = useState(false); // Add this line
+  const [imageDialogOpen, setImageDialogOpen] = useState(false); // State untuk dialog gambar
+  const [proofImageUrl, setProofImageUrl] = useState(""); // State untuk menyimpan URL gambar bukti pembayaran
+
+  const handleOpenImageDialog = (url) => {
+    setProofImageUrl(url);
+    setImageDialogOpen(true);
+  };
+
+  const handleCloseImageDialog = () => {
+    setImageDialogOpen(false);
+    setProofImageUrl(""); // Reset URL gambar saat dialog ditutup
+  };
 
   const statusTranslations = {
     paid: "Menunggu Pembayaran",
@@ -46,6 +58,7 @@ const Pesanan = () => {
     try {
       const result = await getPesanan();
       const formattedData = result.data.map((item) => [
+        item.proof_of_payment,
         item.transaction_code,
         item.customer_name,
         item.customer_address,
@@ -55,6 +68,7 @@ const Pesanan = () => {
         item.id,
       ]);
       setData(formattedData);
+      console.log(result.data);
     } catch (error) {
       console.error("Failed to fetch transaction data", error);
     } finally {
@@ -120,6 +134,38 @@ const Pesanan = () => {
   };
 
   const columns = [
+    {
+      name: "proof_of_payment",
+      label: "Bukti Pembayaran",
+      options: {
+        customBodyRender: (value, tableMeta) => {
+          // Pastikan tableMeta dan rowIndex valid
+          if (!tableMeta || !data[tableMeta.rowIndex]) {
+            return null; // Kembalikan null jika tidak valid
+          }
+
+          const rowData = data[tableMeta.rowIndex];
+          const proofUrl = rowData[0]; // Ambil URL bukti pembayaran
+
+          return (
+            <Box>
+              <Tooltip
+                title={proofUrl ? "Bukti Transfer" : "Tidak ada bukti transfer"}
+              >
+                <span>
+                  <Button
+                    onClick={() => proofUrl && handleOpenImageDialog(proofUrl)}
+                    disabled={!proofUrl} // Nonaktifkan tombol jika proofUrl tidak ada
+                  >
+                    <IconPhoto />
+                  </Button>
+                </span>
+              </Tooltip>
+            </Box>
+          );
+        },
+      },
+    },
     { name: "transaction_code", label: "Kode Pesanan" },
     { name: "customer_name", label: "Nama Pelanggan" },
     { name: "customer_address", label: "Alamat Pelanggan" },
@@ -267,6 +313,26 @@ const Pesanan = () => {
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setErrorDialogOpen(false)} color="primary">
+                Tutup
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={imageDialogOpen}
+            onClose={handleCloseImageDialog}
+            maxWidth="md"
+            fullWidth
+          >
+            <DialogTitle>Bukti Pembayaran</DialogTitle>
+            <DialogContent>
+              <img
+                src={proofImageUrl}
+                alt="Bukti Pembayaran"
+                style={{ width: "100%", height: "auto" }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseImageDialog} color="primary">
                 Tutup
               </Button>
             </DialogActions>
