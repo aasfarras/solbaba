@@ -5,7 +5,7 @@ export const getPesananById = async (id) => {
   try {
     const token = sessionStorage.getItem("token"); // Get token from sessionStorage
     const response = await axios.get(
-      `${import.meta.env.VITE_APP_API}superadmin/order/finished/${id}`, // Use the specific product ID in the URL
+      `${import.meta.env.VITE_APP_API}superadmin/order/${id}`, // Use the specific product ID in the URL
       {
         headers: {
           Authorization: `Bearer ${token}`, // Include authorization header if needed

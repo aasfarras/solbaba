@@ -68,7 +68,7 @@ const Pesanan = () => {
         item.id,
       ]);
       setData(formattedData);
-      console.log(result.data);
+      // console.log(result.data);
     } catch (error) {
       console.error("Failed to fetch transaction data", error);
     } finally {
@@ -82,11 +82,12 @@ const Pesanan = () => {
 
   const handleDetail = async (rowIndex) => {
     const rowData = data[rowIndex];
-    const PesananId = rowData[6];
+    const PesananId = rowData[7];
 
     try {
       // Panggil fungsi untuk mendapatkan detail pesanan berdasarkan ID
       await getPesananById(PesananId); // Ganti dengan fungsi yang sesuai untuk mendapatkan detail
+
       navigate(`/super-admin/other/pesanan/detailpesanan/${PesananId}`);
     } catch (error) {
       // Tangkap kesalahan dan simpan pesan kesalahan
