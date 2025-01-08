@@ -39,12 +39,10 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
 
     const columnToDelete = columns[colIndex].accessor;
 
-    // Hapus kolom dari daftar kolom
     const updatedColumns = columns.filter((_, index) => index !== colIndex);
 
-    // Hapus data dari semua baris yang terkait dengan kolom yang dihapus
     const updatedData = data.map((row) => {
-      const { [columnToDelete]: _, ...rest } = row; // Hilangkan kolom yang dihapus
+      const { [columnToDelete]: _, ...rest } = row; // Hapus properti kolom yang sesuai
       return rest;
     });
 
@@ -53,15 +51,16 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
   };
 
   const addRow = () => {
-    const newRow = {};
+    const newRow = {}; // Initialize an empty object for the new row
     columns.forEach((column) => {
-      newRow[column.accessor] = "";
+      newRow[column.accessor] = ""; // Set each column's value to an empty string
     });
     setData([...data, newRow]);
   };
 
+  // Inisialisasi data dengan nilai default dari specifications
   useEffect(() => {
-    if (specifications && specifications.length > 0) {
+    if (specifications.length > 0) {
       const dynamicColumns = Object.keys(specifications[0]).map((key) => ({
         Header: key,
         accessor: key,
@@ -69,12 +68,13 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
       setColumns(dynamicColumns);
       setData(specifications);
     } else if (columns.length === 0 && data.length === 0) {
+      // Jika kolom dan data kosong, set kolom dan data default
       const defaultColumn = {
         Header: "Spesifikasi 1",
         accessor: "spesifikasi1",
       };
       setColumns([defaultColumn]);
-      setData([{ spesifikasi1: "" }]);
+      setData([{ spesifikasi1: "" }]); // Baris default
     }
   }, [specifications]);
 
@@ -84,9 +84,7 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
 
   const handleCellChange = (rowIndex, colId, value) => {
     const updatedData = [...data];
-    if (updatedData[rowIndex]) {
-      updatedData[rowIndex][colId] = value;
-    }
+    updatedData[rowIndex][colId] = value;
     setData(updatedData);
   };
 
@@ -120,8 +118,6 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
   };
 
   const handleDeleteRow = (rowIndex) => {
-    if (rowIndex < 0 || rowIndex >= data.length) return;
-
     const updatedData = data.filter((_, index) => index !== rowIndex);
     setData(updatedData);
   };
@@ -134,39 +130,41 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
             {headerGroups.map((headerGroup) => (
               <TableRow
                 {...headerGroup.getHeaderGroupProps()}
-                key={`header-group-${headerGroup.id}`}
+                key={`header-${headerGroup.id}`} // Menggunakan kombinasi 'header-' dan id
                 style={{ borderBottom: "0.2px solid #ccc" }}
               >
                 {headerGroup.headers.map((column, index) => (
                   <TableCell
                     {...column.getHeaderProps()}
-                    key={`header-cell-${column.id}`}
+                    key={`header-${column.id}`} // Menggunakan kombinasi 'header-' dan id kolom
                     style={{ border: "0.2px solid #ccc", height: "3rem" }}
                   >
                     {isEditingHeader === index ? (
                       <TextField
-                        value={headerInput}
+                        value={headerInput} // Pastikan headerInput sudah diatur dengan benar
                         onChange={(e) => setHeaderInput(e.target.value)}
-                        onBlur={() => handleHeaderEditSave(index)}
+                        onBlur={() => handleHeaderEditSave(index)} // Menyimpan perubahan saat kehilangan fokus
                         autoFocus
                       />
                     ) : (
                       <Box
                         onClick={() =>
-                          handleHeaderEditStart(index, column.Header)
+                          handleHeaderEditStart(index, column.render("Header"))
                         }
                         sx={{
                           cursor: "pointer",
                           display: "flex",
                           justifyContent: "space-between",
+                          alignContent: "center",
+                          flex: 1,
                         }}
                       >
-                        {column.Header}
-                        {index > 0 && (
+                        {column.render("Header")}
+                        {index > -1 && (
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation(); // Hindari trigger edit saat menghapus
-                              handleDeleteColumn(index);
+                              e.stopPropagation(); // Mencegah klik pada tombol "Hapus" untuk memanggil onClick header
+                              handleDeleteColumn(index); // Menghapus kolom tanpa konfirmasi
                             }}
                             sx={{
                               color: "black",
@@ -181,25 +179,29 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
                     )}
                   </TableCell>
                 ))}
+
                 <TableCell style={{ border: "0.2px solid #ccc" }}>
                   Aksi
                 </TableCell>
               </TableRow>
             ))}
           </TableHead>
-          <TableBody {...getTableBodyProps()}>
+          <TableBody
+            {...getTableBodyProps()}
+            style={{ border: "0.2px solid #ccc" }}
+          >
             {rows.map((row, rowIndex) => {
               prepareRow(row);
               return (
                 <TableRow
                   {...row.getRowProps()}
-                  key={`row-${rowIndex}`}
+                  key={`row-${row.id}`} // Menggunakan kombinasi 'row-' dan id baris
                   style={{ borderBottom: "0.2px solid #ccc" }}
                 >
                   {row.cells.map((cell) => (
                     <TableCell
                       {...cell.getCellProps()}
-                      key={`cell-${rowIndex}-${cell.column.id}`}
+                      key={`cell-${cell.column.id}-${rowIndex}`} // Menggunakan kombinasi 'cell-', id kolom, dan indeks baris
                       style={{ border: "0.2px solid #ccc" }}
                     >
                       <TextField
@@ -214,6 +216,7 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
                         margin="dense"
                         label="Spesifikasi"
                         fullWidth
+                        autoFocus
                       />
                     </TableCell>
                   ))}
@@ -232,31 +235,31 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
         </Table>
       </TableContainer>
 
-      <Box sx={{ mt: 2 }}>
-        <Button
-          variant="outlined"
-          sx={{
-            backgroundColor: "white",
-            color: "#555",
-            borderColor: "#999",
-            mr: 1,
-          }}
-          onClick={addColumn}
-        >
-          Tambah Kolom
-        </Button>
-        <Button
-          variant="outlined"
-          sx={{
-            backgroundColor: "white",
-            color: "#555",
-            borderColor: "#999",
-          }}
-          onClick={addRow}
-        >
-          Tambah Baris
-        </Button>
-      </Box>
+      <Button
+        variant="outlined"
+        sx={{
+          backgroundColor: "white",
+          color: "#555",
+          borderColor: "#999",
+          mt: 1,
+          mr: 1,
+        }}
+        onClick={addColumn}
+      >
+        Tambah Kolom
+      </Button>
+      <Button
+        variant="outlined"
+        sx={{
+          backgroundColor: "white",
+          color: "#555",
+          borderColor: "#999",
+          mt: 1,
+        }}
+        onClick={addRow}
+      >
+        Tambah Baris
+      </Button>
     </Paper>
   );
 };
