@@ -26,10 +26,11 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
     });
 
   const addColumn = () => {
-    const newCol = `col${columns.length + 1}`;
+    const newColIndex = (columns.length + 1) % 1000; // Menggunakan modulus untuk membatasi hingga 999
+    const newCol = `col${newColIndex.toString().padStart(3, "0")}`; // Menghasilkan ID dengan 3 digit
     setColumns([
       ...columns,
-      { Header: `Spesifikasi ${columns.length + 1}`, accessor: newCol },
+      { Header: `Spesifikasi ${newColIndex}`, accessor: newCol },
     ]);
     setData(data.map((row) => ({ ...row, [newCol]: "" })));
   };
@@ -101,20 +102,27 @@ const DynamicTable = ({ specifications, setSpecifications }) => {
       return;
     }
 
-    if (columns.some((col, i) => col.Header === newHeader && i !== index)) {
-      alert("Header tidak boleh duplikat.");
-      return;
-    }
-
-    // Perbarui hanya Header, tanpa mengubah accessor
+    // Perbarui hanya Header tanpa mengubah accessor
     const updatedColumns = [...columns];
+    const oldColumn = updatedColumns[index];
     updatedColumns[index] = {
       ...updatedColumns[index],
-      Header: newHeader,
+      Header: newHeader, // Update nama header
     };
 
-    setColumns(updatedColumns);
-    setIsEditingHeader(null);
+    // Perbarui urutan data berdasarkan urutan kolom yang baru
+    const updatedData = data.map((row) => {
+      const newRow = {};
+      updatedColumns.forEach((col) => {
+        newRow[col.Header] = row[col.accessor] || ""; // Menyesuaikan data dengan urutan kolom yang baru
+      });
+      return newRow;
+    });
+
+    setData(updatedData); // Update data sesuai dengan urutan kolom yang baru
+    setColumns(updatedColumns); // Update kolom dengan header yang baru
+
+    setIsEditingHeader(null); // Menyembunyikan input edit setelah perubahan
   };
 
   const handleDeleteRow = (rowIndex) => {
