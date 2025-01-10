@@ -37,6 +37,12 @@ const DetailPesanan = () => {
     }
   };
 
+  const shippingTranslations = {
+    medium: "Mobil Sedang",
+    small: "Mobil Kecil",
+    large: "Mobil Besar",
+  };
+
   const statusTranslations = {
     paid: "Menunggu Pembayaran",
     unpaid: "Pembayaran Terverifikasi",
