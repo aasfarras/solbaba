@@ -40,8 +40,8 @@ const Pesanan = () => {
   };
 
   const statusTranslations = {
-    paid: "Menunggu Pembayaran",
-    unpaid: "Pembayaran Terverifikasi",
+    unpaid: "Menunggu Pembayaran",
+    paid: "Pembayaran Terverifikasi",
   };
 
   const statuses = ["paid", "unpaid"];
@@ -169,8 +169,7 @@ const Pesanan = () => {
         customBodyRender: (value) => {
           if (value == null) {
             return "belum";
-          } else 
-          return "selesai";
+          } else return "selesai";
         },
       },
     },

@@ -47,8 +47,8 @@ const Pesanan = () => {
   };
 
   const statusTranslations = {
-    paid: "Menunggu Pembayaran",
-    unpaid: "Pembayaran Terverifikasi",
+    unpaid: "Menunggu Pembayaran",
+    paid: "Pembayaran Terverifikasi",
   };
 
   const statuses = ["paid", "unpaid"];
@@ -68,6 +68,7 @@ const Pesanan = () => {
         item.id,
       ]);
       setData(formattedData);
+      console.log(getPesanan);
       // console.log(result.data);
     } catch (error) {
       console.error("Failed to fetch transaction data", error);
@@ -110,7 +111,7 @@ const Pesanan = () => {
 
   const handleOpenStatusDialog = (rowIndex) => {
     const rowData = data[rowIndex];
-    setCurrentPesananId(rowData[6]);
+    setCurrentPesananId(rowData[7]);
     setStatusDialogOpen(true);
   };
 
@@ -178,11 +179,12 @@ const Pesanan = () => {
       },
     },
     {
-      name: "status",
+      name: "payment_status",
       label: "Status Pembayaran",
       options: {
         customBodyRender: (value) => {
-          return statusTranslations[value] || value; // Menggunakan pemetaan untuk menampilkan status dalam bahasa Indonesia
+          // Gunakan pemetaan statusTranslations untuk menampilkan status dalam bahasa Indonesia
+          return statusTranslations[value] || "Status Tidak Diketahui";
         },
       },
     },

@@ -37,6 +37,12 @@ const DetailPesanan = () => {
     }
   };
 
+  const shippingTranslations = {
+    medium: "Mobil Sedang",
+    small: "Mobil Kecil",
+    large: "Mobil Besar",
+  };
+
   const statusTranslations = {
     paid: "Menunggu Pembayaran",
     unpaid: "Pembayaran Terverifikasi",
@@ -159,6 +165,13 @@ const DetailPesanan = () => {
                         style: "currency",
                         currency: "IDR",
                       }).format(transaction.data.total_price)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Akses Pengantaran</TableCell>
+                    <TableCell>
+                      {shippingTranslations[transaction.data.shipping_access] ||
+                        transaction.data.shipping_access}
                     </TableCell>
                   </TableRow>
                   <TableRow>

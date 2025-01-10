@@ -36,8 +36,9 @@ const Transaksi = () => {
 
   const statusTranslations = {
     received: "Diterima",
-    pending_payment: "Menunggu Pembayaran",
-    payment_verified: "Pembayaran Terverifikasi",
+    // pending_payment: "Menunggu Pembayaran",
+    // payment_verified: "Pembayaran Terverifikasi",
+    delivered: "Diantarkan",
     processing: "Sedang Diproses",
     shipped: "Dikirim",
     completed: "Selesai",
@@ -49,8 +50,9 @@ const Transaksi = () => {
 
   const statuses = [
     "received",
-    "pending_payment",
-    "payment_verified",
+    // "pending_payment",
+    // "payment_verified",
+    "delivered",
     "processing",
     "shipped",
     "completed",
@@ -105,13 +107,13 @@ const Transaksi = () => {
     }
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  // const formatPrice = (price) => {
+  //   return new Intl.NumberFormat("id-ID", {
+  //     style: "currency",
+  //     currency: "IDR",
+  //     minimumFractionDigits: 0,
+  //   }).format(price);
+  // };
 
   const handleOpenStatusDialog = (rowIndex) => {
     const rowData = data[rowIndex];

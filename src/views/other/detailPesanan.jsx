@@ -162,6 +162,13 @@ const DetailPesanan = () => {
                     </TableCell>
                   </TableRow>
                   <TableRow>
+                    <TableCell>Akses Pengantaran</TableCell>
+                    <TableCell>
+                      {shippingTranslations[transaction.data.shipping_access] ||
+                        transaction.data.shipping_access}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
                     <TableCell>Catatan</TableCell>
                     <TableCell>{transaction.data.note}</TableCell>
                   </TableRow>
