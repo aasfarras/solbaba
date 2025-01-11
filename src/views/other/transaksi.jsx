@@ -35,9 +35,10 @@ const Transaksi = () => {
   const [loading, setLoading] = useState(false); // Add this line
 
   const statusTranslations = {
-    delivered: "Diterima",
+    delivered: "Diantarkan",
     // pending_payment: "Menunggu Pembayaran",
     // payment_verified: "Pembayaran Terverifikasi",
+    received: "Diterima",
     processing: "Sedang Diproses",
     shipped: "Dikirim",
     completed: "Selesai",
@@ -48,6 +49,7 @@ const Transaksi = () => {
   };
 
   const statuses = [
+    "received",
     "delivered",
     // "pending_payment",
     // "payment_verified",
